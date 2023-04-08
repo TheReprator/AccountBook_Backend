@@ -8,6 +8,12 @@ ktor:
     modules:
       - dev.reprator.ApplicationKt.module
 
+storage:
+  driverClassName: "org.postgresql.Driver"
+  databaseName: "khatabook"
+  portNumber: 5432
+  serverName: localhost
+  ehcacheFilePath: build/ehcache
 
 jwt:
   secret: "secret"
