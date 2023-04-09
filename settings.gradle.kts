@@ -1,3 +1,5 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -12,4 +14,10 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Khatabook"
+rootProject.name = "AccountBook"
+
+include(":lib:testModule")
+include(":lib:core")
+include(":api:language")
+include(":api:splash")
+include(":api:country")

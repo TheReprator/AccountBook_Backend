@@ -7,7 +7,8 @@ import com.fasterxml.jackson.databind.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.application.*
 
-fun Application.configureSerialization() {
+fun Application.configureContentNegotiation() {
+
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
