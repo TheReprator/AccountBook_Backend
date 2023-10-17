@@ -30,7 +30,7 @@ exposed-postgres = "org.postgresql:postgresql:42.6.0"
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 
-test-mockk = "io.mockk:mockk:1.13.4"
+test-mockk = "io.mockk:mockk:1.13.8"
 test-junit5-suite = "org.junit.platform:junit-platform-suite:1.9.2"
 test-junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 test-junit5-runtime= { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
