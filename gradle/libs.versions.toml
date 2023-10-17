@@ -4,7 +4,7 @@ ktor = "2.3.5"
 ksp = "1.9.10-1.0.13"
 logback = "1.4.11"
 exposedVersion = "0.44.0"
-koin = "3.4.0"
+koin = "3.5.1"
 junit5 = "5.10.0"
 
 [libraries]
