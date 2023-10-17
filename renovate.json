@@ -2,5 +2,32 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
+  ],
+  "schedule": [
+    "after 10pm every weekday",
+    "before 5am every weekday",
+    "every weekend"
+    ],
+  "timezone": "Asia/Dubai",
+  "labels": ["dependency-update"],
+  "dependencyDashboardTitle": "Dependency Dashboard for api update",
+  "packageRules": [
+    {
+      "description": "Automatically merge minor and patch-level updates",
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "major": {
+        "dependencyDashboardApproval": true
+      }
+    },
+    {
+      "description": "Disable updates to SNAPSHOTS",
+      "matchDatasources": ["maven"],
+      "allowedVersions": "!/SNAPSHOT$/"
+    }
   ]
 }
