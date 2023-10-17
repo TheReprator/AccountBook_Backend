@@ -3,7 +3,7 @@ kotlin = "1.8.20"
 ktor = "2.3.0"
 ksp = "1.8.0-1.0.9"
 logback = "1.4.11"
-exposedVersion = "0.41.1"
+exposedVersion = "0.44.0"
 koin = "3.4.0"
 junit5 = "5.9.2"
 
