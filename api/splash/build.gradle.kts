@@ -11,14 +11,14 @@ java {
 }
 
 dependencies {
-    implementation(project(":api:language"))
+    implementation(projects.api.language)
 
     implementation(libs.koin.ktor)
 
     // testing
     testImplementation(libs.test.ktor.server)
     testImplementation(libs.test.mockk)
-    testImplementation(project(":lib:testModule"))
+    testImplementation(projects.lib.testModule)
 }
 
 tasks {

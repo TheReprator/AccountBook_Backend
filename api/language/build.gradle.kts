@@ -11,14 +11,14 @@ java {
 }
 
 dependencies {
-    api(project(":lib:core"))
+    api(projects.lib.core)
 
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)
 
     // testing
     testImplementation(libs.test.ktor.server)
-    testImplementation(project(":lib:testModule"))
+    testImplementation(projects.lib.testModule)
 }
 
 tasks {

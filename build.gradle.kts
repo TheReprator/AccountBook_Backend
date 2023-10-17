@@ -19,9 +19,9 @@ java {
 }
 
 dependencies {
-    implementation(project("api:language"))
-    implementation(project("api:splash"))
-    implementation(project("api:country"))
+    implementation(projects.api.language)
+    implementation(projects.api.splash)
+    implementation(projects.api.country)
 
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.common)
@@ -41,7 +41,7 @@ dependencies {
     implementation(libs.koin.logger)
 
     // testing
-    testImplementation(project(":lib:testModule"))
+    testImplementation(projects.lib.testModule)
     testImplementation(libs.test.ktor.server)
 }
 
