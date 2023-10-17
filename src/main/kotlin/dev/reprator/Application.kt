@@ -17,7 +17,6 @@ import org.koin.logger.SLF4JLogger
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-
 fun Application.module() {
 
     install(Koin) {
