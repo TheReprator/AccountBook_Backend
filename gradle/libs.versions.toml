@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.9.20"
 ktor = "2.3.6"
-ksp = "1.9.20-1.0.14"
+ksp = "1.9.21-1.0.15"
 logback = "1.4.13"
 exposedVersion = "0.44.1"
 koin = "3.5.1"
