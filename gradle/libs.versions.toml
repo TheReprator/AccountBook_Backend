@@ -2,7 +2,7 @@
 kotlin = "1.9.20"
 ktor = "2.3.6"
 ksp = "1.9.20-1.0.14"
-logback = "1.4.11"
+logback = "1.4.13"
 exposedVersion = "0.44.1"
 koin = "3.5.1"
 koin-test = "3.5.0"
