@@ -5,7 +5,7 @@ ksp = "1.9.21-1.0.15"
 logback = "1.4.14"
 exposedVersion = "0.45.0"
 koin = "3.5.3"
-koin-test = "3.5.0"
+koin-test = "3.5.3"
 junit5 = "5.10.1"
 
 [libraries]
