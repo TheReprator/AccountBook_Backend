@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ###
 
-# CURRENT USER
+# CURRENT USER delet
 GET {{base-url}}/user
 Accept: application/json
 Authorization: Token {{auth_token}}
