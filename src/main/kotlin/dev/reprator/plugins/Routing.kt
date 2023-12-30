@@ -19,9 +19,16 @@ fun Application.configureRouting() {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             if (cause is StatusCodeException)
-                call.respond(FailResponse(cause.statusCode.value, cause.message.orEmpty()))
-            else
-                call.respond(FailResponse(HttpStatusCode.InternalServerError.value, "500: ${cause.message}"))
+            {
+                call.respond(HttpStatusCode(cause.statusCode.value , ""),
+                    FailResponse(cause.statusCode.value, cause.message.orEmpty()))
+            }
+            else {
+                call.respond(
+                    HttpStatusCode(HttpStatusCode.InternalServerError.value, ""),
+                    FailResponse(HttpStatusCode.InternalServerError.value, "500: ${cause.message}")
+                )
+            }
         }
 
         status(HttpStatusCode.NotFound, HttpStatusCode.Forbidden) { call, status ->
@@ -29,7 +36,8 @@ fun Application.configureRouting() {
                 HttpStatusCode.NotFound -> ERROR_DESCRIPTION_NOT_FOUND
                 else -> ERROR_DESCRIPTION_UNKNOWN
             }
-            call.respond(FailResponse(status.value, message))
+            call.respond(HttpStatusCode(status.value , ""),
+                FailResponse(status.value, message))
         }
     }
 

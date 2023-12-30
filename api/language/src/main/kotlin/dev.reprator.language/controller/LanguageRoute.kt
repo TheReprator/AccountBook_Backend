@@ -1,8 +1,6 @@
 package dev.reprator.language.controller
 
 import dev.reprator.core.ResultResponse
-import dev.reprator.core.exception.StatusCodeException
-import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageEntity.DTO.Companion.mapToModal
 import dev.reprator.language.modal.validateLanguageId
 import dev.reprator.language.modal.validateLanguageName
