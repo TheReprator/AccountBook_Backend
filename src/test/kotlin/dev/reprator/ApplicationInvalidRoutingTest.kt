@@ -23,7 +23,7 @@ internal class ApplicationInvalidRoutingTest {
         val client = createHttpClient()
         val response = client.get("${KtorServerExtension.BASE_URL}$ENDPOINT_LANGUAGE/InvalidApi")
 
-        Assertions.assertEquals(response.status, HttpStatusCode.OK)
+        Assertions.assertEquals(response.status, HttpStatusCode.NotFound)
         val resultBody = response.body<FailResponse>()
         Assertions.assertEquals(resultBody.statusCode, HttpStatusCode.NotFound.value)
         Assertions.assertEquals(ERROR_DESCRIPTION_NOT_FOUND, resultBody.error)

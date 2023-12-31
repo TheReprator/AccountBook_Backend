@@ -158,7 +158,7 @@ internal class CountryRouteTest : KoinTest {
         val client = createHttpClient()
         val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_COUNTRY/$countryId")
 
-        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.OK)
+        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.NotFound)
 
         val findResultBody = findResponseSuccess.body<FailResponse>()
         Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.statusCode)

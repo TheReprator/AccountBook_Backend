@@ -24,6 +24,7 @@ ktor-logback = { module = "ch.qos.logback:logback-classic", version.ref = "logba
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposedVersion" }
 exposed-dao= { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposedVersion" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposedVersion" }
+exposed-jodatime = { module = "org.jetbrains.exposed:exposed-jodatime", version.ref = "exposedVersion" }
 exposed-h2Db = "com.h2database:h2:2.2.224"
 exposed-hikariCp = "com.zaxxer:HikariCP:5.1.0"
 exposed-postgres = "org.postgresql:postgresql:42.7.1"

@@ -103,7 +103,7 @@ internal class LanguageRouteTest : KoinTest {
         Assertions.assertEquals(resultBody.data.name, LANGUAGE_ENGLISH)
 
         val addAgainEnglishLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
-        Assertions.assertEquals(addAgainEnglishLanguageResponse.status, HttpStatusCode.OK)
+        Assertions.assertEquals(addAgainEnglishLanguageResponse.status, HttpStatusCode.InternalServerError)
         val resultBodyAgain = addAgainEnglishLanguageResponse.body<FailResponse>()
         Assertions.assertEquals(resultBodyAgain.statusCode, HttpStatusCode.InternalServerError.value)
         Assertions.assertNotNull(resultBodyAgain)
@@ -151,7 +151,7 @@ internal class LanguageRouteTest : KoinTest {
         val client = createHttpClient()
         val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_LANGUAGE/$languageId")
 
-        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.OK)
+        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.NotFound)
         val findResultBody = findResponseSuccess.body<FailResponse>()
         Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.statusCode)
     }

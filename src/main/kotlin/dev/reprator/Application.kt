@@ -8,6 +8,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import dev.reprator.plugins.*
+import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
 import org.koin.core.parameter.parametersOf
@@ -24,6 +25,7 @@ fun Application.module() {
         modules(koinAppModule)
         setUpKoinLanguage()
         setUpKoinCountry()
+        setUpKoinUserIdentityModule()
     }
 
     install(CORS) {

@@ -12,6 +12,7 @@ java {
 dependencies {
     api(libs.ktor.server.core)
     api(libs.exposed.core)
+    api(libs.exposed.jodatime)
 
     //For testing of api, else we jackson response get parsing error
     api(libs.ktor.server.serialization)

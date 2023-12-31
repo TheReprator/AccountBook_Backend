@@ -22,6 +22,7 @@ dependencies {
     implementation(projects.api.language)
     implementation(projects.api.splash)
     implementation(projects.api.country)
+    implementation(projects.api.userIdentity)
 
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.common)
