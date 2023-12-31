@@ -10,11 +10,9 @@ import org.jetbrains.exposed.sql.ResultRow
 
 
 class UserIdentityResponseRegisterMapper : Mapper<ResultRow, UserIdentityRegisterModal> {
-
     override suspend fun map(from: ResultRow): UserIdentityRegisterModal {
         return UserIdentityRegisterModal.DTO(from[TableUserIdentity.id])
     }
-
 }
 
 class UserIdentityResponseOTPMapper : Mapper<ResultRow, UserIdentityOTPModal> {
@@ -30,7 +28,8 @@ class UserIdentityResponseOTPMapper : Mapper<ResultRow, UserIdentityOTPModal> {
         return UserIdentityOTPModal.DTO(
             from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
             from[TableUserIdentity.isPhoneVerified], countryModal,
-             ""
+            from[TableUserIdentity.refreshToken] ?: "",
+            from[TableUserIdentity.userType]
         )
     }
 }

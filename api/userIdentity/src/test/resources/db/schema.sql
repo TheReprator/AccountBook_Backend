@@ -8,13 +8,15 @@ CREATE TABLE `country`
 
 CREATE TABLE `user_login_data`
 (
-    `userId`            LONG PRIMARY KEY AUTO_INCREMENT         NOT NULL,
+    `userid`            LONG PRIMARY KEY AUTO_INCREMENT         NOT NULL,
     `phoneNumber`       VARCHAR(255)                            NOT NULL,
-    `phoneCountryId`    integer                                 NOT NULL,
+    `phonecountryid`    integer                                 NOT NULL,
     `phoneOtp`          integer                                 ,
-    `isPhoneVerified`   boolean                                 DEFAULT false,
-    `userType`          ENUM ('admin', 'owner', 'employee')     DEFAULT 'owner',
-    `refreshToken`      VARCHAR(255)                            ,
+    `isphoneverified`   boolean                                 DEFAULT false,
+    `usertype`          ENUM ('ADMIN', 'OWNER', 'EMPLOYEE')     DEFAULT 'OWNER',
+    `refreshtoken`      VARCHAR(255)                            ,
+    `creationtime`      TIMESTAMP                               DEFAULT CURRENT_DATE,
+    `updatetime`        TIMESTAMP                               DEFAULT CURRENT_DATE,
     CONSTRAINT fk_countryId
         FOREIGN KEY(phoneCountryId)
             REFERENCES country(id)

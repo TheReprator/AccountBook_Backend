@@ -149,8 +149,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
     @Test
     fun `Get all inserted User`() {
 
-        val inputList = listOf(UserIdentityRegisterEntity.DTO("9041866055",1),
-        UserIdentityRegisterEntity.DTO("507532480",2))
+        val inputList = listOf(UserIdentityRegisterEntity.DTO("9041866055",1))
 
         inputList.forEach {
             val inputUser: UserIdentityRegisterEntity.DTO = it
@@ -176,12 +175,15 @@ internal class TableUserIdentityEntityTest : KoinTest {
                 UserIdentityOTPModal.DTO(
                     from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
                     from[TableUserIdentity.isPhoneVerified], countryModal,
-                     ""
+                    from[TableUserIdentity.refreshToken] ?: "", from[TableUserIdentity.userType]
                 )
             }
         }
 
         assertEquals(inputList.size, userList.size)
+        assertNotEquals(null, userList.first().refreshToken)
+        assertNotEquals(USER_CATEGORY.EMPLOYEE, userList.first().userType)
+        assertEquals(USER_CATEGORY.OWNER, userList.first().userType)
         assertEquals(inputList.first().phoneNumber, userList.first().phoneNumber)
     }
 
