@@ -175,7 +175,8 @@ internal class TableUserIdentityEntityTest : KoinTest {
                 UserIdentityOTPModal.DTO(
                     from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
                     from[TableUserIdentity.isPhoneVerified], countryModal,
-                    from[TableUserIdentity.refreshToken] ?: "", from[TableUserIdentity.userType]
+                    from[TableUserIdentity.refreshToken] ?: "",
+                    from[TableUserIdentity.userType]
                 )
             }
         }

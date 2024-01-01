@@ -1,9 +1,7 @@
 package dev.reprator.userIdentity.socialVerifier
 
 import com.fasterxml.jackson.annotation.JsonAlias
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import dev.reprator.core.AppLogger
 import dev.reprator.userIdentity.socialVerifier.util.ApiResponse
 import dev.reprator.userIdentity.socialVerifier.util.HttpExceptions
@@ -58,7 +56,7 @@ class SMScodeGeneratorImpl(private val appLogger: AppLogger, private val scope: 
                             append("security-code", "$messageCode")
                             append("language-code", "en")
                             append("code-length", "6")
-                            append("brand-name", "Reprator-Khatabook")
+                            append("brand-name", "Reprator-Cashbook")
                         })
                 )
             }
