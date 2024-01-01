@@ -5,12 +5,12 @@ import dev.reprator.country.domain.IllegalCountryException
 
 typealias CountryId = Int
 typealias CountryName = String
-typealias CountryCode = Int
+typealias CountryCallingCode = Int
 typealias CountryShortCode = String
 
 interface CountryEntity {
     val name: CountryName
-    val code: CountryCode
+    val callingCode: CountryCallingCode
     val shortCode: CountryShortCode
 
     companion object {
@@ -40,14 +40,14 @@ interface CountryEntity {
 
     data class DTO (
         override val name: CountryName,
-        override val code: CountryCode,
+        override val callingCode: CountryCallingCode,
         override val shortCode: CountryShortCode
     ) : CountryEntity, Validator<DTO> {
 
         override fun validate(): DTO {
             validateCountryName(name)
             validateCountryShortCode(shortCode)
-            code.toString().validateCountryIsoCode()
+            callingCode.toString().validateCountryIsoCode()
 
             return this
         }
@@ -70,7 +70,7 @@ fun validateCountryShortCode(countryShortCode: CountryShortCode) {
     }
 }
 
-fun String?.validateCountryIsoCode(): CountryCode {
+fun String?.validateCountryIsoCode(): CountryCallingCode {
     val countryCode = this?.toIntOrNull() ?: throw IllegalCountryException()
 
     if(0 >= countryCode) {

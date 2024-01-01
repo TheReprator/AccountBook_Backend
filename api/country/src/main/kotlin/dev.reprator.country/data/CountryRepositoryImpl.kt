@@ -28,7 +28,7 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
     }
 
     override suspend fun addNewCountry(countryInfo: CountryEntity): CountryModal = dbQuery {
-        val existingCountry = TableCountryEntity.find { TableCountry.isocode eq countryInfo.code }.firstOrNull()
+        val existingCountry = TableCountryEntity.find { TableCountry.callingCode eq countryInfo.callingCode }.firstOrNull()
 
         if(null != existingCountry)
             throw IllegalCountryException()
@@ -36,7 +36,7 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
         val newCountry = TableCountryEntity.new {
             name = countryInfo.name.trimStart()
             shortcode = countryInfo.shortCode.trimStart()
-            isocode = countryInfo.code
+            isocode = countryInfo.callingCode
         }
         resultRowToCountry(newCountry)
     }
@@ -49,8 +49,8 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
                 it[name] = countryInfo.name.trimStart()
             if(countryInfo.shortCode.isNotBlank())
                 it[shortcode] = countryInfo.shortCode.trimStart()
-            if(0 < countryInfo.code)
-                it[isocode] = countryInfo.code
+            if(0 < countryInfo.callingCode)
+                it[callingCode] = countryInfo.callingCode
         } > 0
     }
 

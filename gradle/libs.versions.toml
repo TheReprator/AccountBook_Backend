@@ -9,7 +9,6 @@ koin-test = "3.5.3"
 junit5 = "5.10.1"
 
 [libraries]
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
@@ -20,6 +19,11 @@ ktor-server-serialization = { module = "io.ktor:ktor-serialization-jackson", ver
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposedVersion" }
 exposed-dao= { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposedVersion" }

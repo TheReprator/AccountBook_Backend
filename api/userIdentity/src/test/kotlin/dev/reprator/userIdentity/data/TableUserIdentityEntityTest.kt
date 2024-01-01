@@ -182,8 +182,8 @@ internal class TableUserIdentityEntityTest : KoinTest {
 
         assertEquals(inputList.size, userList.size)
         assertNotEquals(null, userList.first().refreshToken)
-        assertNotEquals(USER_CATEGORY.EMPLOYEE, userList.first().userType)
-        assertEquals(USER_CATEGORY.OWNER, userList.first().userType)
+        assertNotEquals(USER_CATEGORY.employee, userList.first().userType)
+        assertEquals(USER_CATEGORY.owner, userList.first().userType)
         assertEquals(inputList.first().phoneNumber, userList.first().phoneNumber)
     }
 

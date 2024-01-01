@@ -24,7 +24,6 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
-import java.util.*
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -110,7 +109,7 @@ internal class TableCountryEntityTest : KoinTest {
             TableCountryEntity.new {
                 name = inputCountry.name
                 shortcode = inputCountry.shortCode
-                isocode = inputCountry.code
+                isocode = inputCountry.callingCode
             }
         }
 
@@ -145,7 +144,7 @@ internal class TableCountryEntityTest : KoinTest {
             TableCountryEntity.new {
                 name = inputCountry.name
                 shortcode = inputCountry.shortCode
-                isocode = inputCountry.code
+                isocode = inputCountry.callingCode
             }
         }
 
@@ -181,7 +180,7 @@ internal class TableCountryEntityTest : KoinTest {
                 TableCountryEntity.new {
                     name = inputCountry.name
                     shortcode = inputCountry.shortCode
-                    isocode = inputCountry.code
+                    isocode = inputCountry.callingCode
                 }
             }
         }
@@ -213,7 +212,7 @@ internal class TableCountryEntityTest : KoinTest {
                 TableCountryEntity.new {
                     name = inputCountry.name
                     shortcode = inputCountry.shortCode
-                    isocode = inputCountry.code
+                    isocode = inputCountry.callingCode
                 }
             }
         }
@@ -228,11 +227,11 @@ internal class TableCountryEntityTest : KoinTest {
             TableCountryEntity.new {
                 name = inputCountry.name
                 shortcode = inputCountry.shortCode
-                isocode = inputCountry.code
+                isocode = inputCountry.callingCode
             }
         }
 
-        assertEquals(inputCountry.code, insertedCountry.isocode)
+        assertEquals(inputCountry.callingCode, insertedCountry.isocode)
 
         val updateCountry = transaction {
 
@@ -241,8 +240,8 @@ internal class TableCountryEntityTest : KoinTest {
                     it[name] = countryInfo.name.trimStart()
                 if (countryInfo.shortCode.isNotBlank())
                     it[shortcode] = countryInfo.shortCode.trimStart()
-                if (0 < countryInfo.code)
-                    it[isocode] = countryInfo.code
+                if (0 < countryInfo.callingCode)
+                    it[callingCode] = countryInfo.callingCode
             }
         }
 
@@ -258,11 +257,11 @@ internal class TableCountryEntityTest : KoinTest {
             TableCountryEntity.new {
                 name = inputCountry.name
                 shortcode = inputCountry.shortCode
-                isocode = inputCountry.code
+                isocode = inputCountry.callingCode
             }
         }
 
-        assertEquals(inputCountry.code, insertedCountry.isocode)
+        assertEquals(inputCountry.callingCode, insertedCountry.isocode)
 
         assertThrows<ExposedSQLException> {
             transaction {
@@ -271,8 +270,8 @@ internal class TableCountryEntityTest : KoinTest {
                         it[name] = countryInfo.name.trimStart()
                     if (countryInfo.shortCode.isNotBlank())
                         it[shortcode] = countryInfo.shortCode.trimStart()
-                    if (0 < countryInfo.code)
-                        it[isocode] = countryInfo.code
+                    if (0 < countryInfo.callingCode)
+                        it[callingCode] = countryInfo.callingCode
                 }
             }
         }
@@ -287,7 +286,7 @@ internal class TableCountryEntityTest : KoinTest {
             TableCountryEntity.new {
                 name = inputCountry.name
                 shortcode = inputCountry.shortCode
-                isocode = inputCountry.code
+                isocode = inputCountry.callingCode
             }
         }
 
@@ -309,7 +308,7 @@ internal class TableCountryEntityTest : KoinTest {
                 TableCountryEntity.new {
                     name = inputCountry.name
                     shortcode = inputCountry.shortCode
-                    isocode = inputCountry.code
+                    isocode = inputCountry.callingCode
                 }
             }
         }

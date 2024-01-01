@@ -14,13 +14,8 @@ import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.createHttpClient
 import io.ktor.client.call.*
-import io.ktor.client.network.sockets.*
-import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
-import io.ktor.test.dispatcher.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -33,7 +28,6 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
-import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
@@ -92,7 +86,7 @@ internal class CountryRouteTest : KoinTest {
 
     @Test
     fun `Failed to add new country, for invalid countryCode`(): Unit = runBlocking {
-        val addCountryResponse = addCountryInDb(INPUT_COUNTRY.copy(code = -5))
+        val addCountryResponse = addCountryInDb(INPUT_COUNTRY.copy(callingCode = -5))
 
         val resultBodyAgain = addCountryResponse.body<FailResponse>()
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, resultBodyAgain.statusCode)
@@ -170,7 +164,7 @@ internal class CountryRouteTest : KoinTest {
         val addCountryResponse = addCountryInDb(INPUT_COUNTRY)
 
         val addResultBody = addCountryResponse.body<ResultResponse<CountryModal.DTO>>()
-        Assertions.assertEquals(INPUT_COUNTRY.code, addResultBody.data.code)
+        Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.data.callingCode)
 
         val changedRequestBody = CountryEntity.DTO("United Arab Emirates",971,"UAE")
 
@@ -205,7 +199,7 @@ internal class CountryRouteTest : KoinTest {
         val addCountryResponse = addCountryInDb(INPUT_COUNTRY)
 
         val addResultBody = addCountryResponse.body<ResultResponse<CountryModal.DTO>>()
-        Assertions.assertEquals(INPUT_COUNTRY.code, addResultBody.data.code)
+        Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.data.callingCode)
 
         val changedRequestBody = INPUT_COUNTRY.copy(name ="United Arab Emirates")
 
@@ -226,7 +220,7 @@ internal class CountryRouteTest : KoinTest {
         val addCountryResponse = addCountryInDb(INPUT_COUNTRY)
 
         val addResultBody = addCountryResponse.body<ResultResponse<CountryModal.DTO>>()
-        Assertions.assertEquals(INPUT_COUNTRY.code, addResultBody.data.code)
+        Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.data.callingCode)
 
         val changedRequestBody = INPUT_COUNTRY.copy(name = "    ")
 
