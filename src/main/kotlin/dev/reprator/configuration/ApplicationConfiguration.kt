@@ -1,7 +1,7 @@
 package dev.reprator.configuration
 
-import dev.reprator.core.AppDBConfiguration
-import dev.reprator.core.DatabaseConfig
+import dev.reprator.core.util.dbConfiguration.AppDBConfiguration
+import dev.reprator.core.util.dbConfiguration.DatabaseConfig
 import io.ktor.server.config.*
 
 fun ApplicationConfig.setupApplicationConfiguration(): AppDBConfiguration {

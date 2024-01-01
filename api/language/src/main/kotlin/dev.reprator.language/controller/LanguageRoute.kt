@@ -1,13 +1,12 @@
 package dev.reprator.language.controller
 
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.util.respondWithResult
 import dev.reprator.language.modal.LanguageEntity.DTO.Companion.mapToModal
 import dev.reprator.language.modal.validateLanguageId
 import dev.reprator.language.modal.validateLanguageName
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
@@ -20,30 +19,30 @@ fun Routing.routeLanguage() {
 
     route(ENDPOINT_LANGUAGE) {
         get {
-            call.respond(ResultResponse(HttpStatusCode.OK.value, controller.getAllLanguage()))
+            respondWithResult(HttpStatusCode.OK, controller.getAllLanguage())
         }
 
         get("{$INPUT_LANGUAGE_ID}") {
             val languageId = call.parameters[INPUT_LANGUAGE_ID].validateLanguageId()
-            call.respond(ResultResponse(HttpStatusCode.OK.value, controller.getLanguage(languageId)))
+            respondWithResult(HttpStatusCode.OK, controller.getLanguage(languageId))
         }
 
         post {
             val languageName: String =
                 call.receiveNullable<String>().validateLanguageName()
-            call.respond(ResultResponse(HttpStatusCode.Created.value, controller.addNewLanguage(languageName)))
+            respondWithResult(HttpStatusCode.Created, controller.addNewLanguage(languageName))
         }
 
         patch("{$INPUT_LANGUAGE_ID}") {
             val languageId = call.parameters[INPUT_LANGUAGE_ID].validateLanguageId()
             val languageInfo = call.receiveNullable<Map<String, String>>().mapToModal()
 
-            call.respond(ResultResponse(HttpStatusCode.OK.value, controller.editLanguage(languageId, languageInfo)))
+            respondWithResult(HttpStatusCode.OK, controller.editLanguage(languageId, languageInfo))
         }
 
         delete("{$INPUT_LANGUAGE_ID}") {
             val languageId = call.parameters[INPUT_LANGUAGE_ID].validateLanguageId()
-            call.respond(ResultResponse(HttpStatusCode.OK.value, controller.deleteLanguage(languageId)))
+            respondWithResult(HttpStatusCode.OK, controller.deleteLanguage(languageId))
         }
     }
 }

@@ -1,4 +1,4 @@
-package dev.reprator.userIdentity.socialVerifier.util
+package dev.reprator.core.util.api
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import io.ktor.client.*

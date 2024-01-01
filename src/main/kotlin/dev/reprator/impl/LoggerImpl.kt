@@ -1,6 +1,6 @@
 package dev.reprator.impl
 
-import dev.reprator.core.AppLogger
+import dev.reprator.core.util.logger.AppLogger
 
 class LoggerImpl : AppLogger {
 

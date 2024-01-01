@@ -2,7 +2,7 @@ package dev.reprator.testModule
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import org.h2.tools.RunScript
 import org.jetbrains.exposed.sql.Database
 import java.nio.file.Files

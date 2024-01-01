@@ -1,4 +1,4 @@
-package dev.reprator.core
+package dev.reprator.core.usecase
 
 
 interface HttpStatusCodeModal {

@@ -1,6 +1,6 @@
 package dev.reprator.language.data.mapper
 
-import dev.reprator.core.Mapper
+import dev.reprator.core.util.Mapper
 import dev.reprator.language.data.TableLanguage
 import dev.reprator.language.modal.LanguageModal
 import org.jetbrains.exposed.sql.ResultRow

@@ -1,7 +1,7 @@
 package dev.reprator
 
 import dev.reprator.configuration.setupApplicationConfiguration
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.setUpKoinCountry
 import dev.reprator.language.setUpKoinLanguage
 import io.ktor.server.application.*
@@ -22,7 +22,7 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules(koinAppModule)
+        modules(koinAppModule, koinAppNetworkModule)
         setUpKoinLanguage()
         setUpKoinCountry()
         setUpKoinUserIdentityModule()

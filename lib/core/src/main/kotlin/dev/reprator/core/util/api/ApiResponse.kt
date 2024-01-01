@@ -1,4 +1,4 @@
-package dev.reprator.userIdentity.socialVerifier.util
+package dev.reprator.core.util.api
 
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*

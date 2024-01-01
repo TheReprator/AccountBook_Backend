@@ -11,6 +11,14 @@ version = "0.0.1"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("Reprator-cashBook.jar")
+    }
 }
 
 java {
@@ -23,6 +31,7 @@ dependencies {
     implementation(projects.api.splash)
     implementation(projects.api.country)
     implementation(projects.api.userIdentity)
+    implementation(projects.lib.core)
 
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.common)
@@ -40,6 +49,10 @@ dependencies {
 
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger)
+
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
 
     // testing
     testImplementation(projects.lib.testModule)

@@ -7,10 +7,10 @@ import com.google.api.client.http.HttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
-import dev.reprator.core.AppLogger
+import dev.reprator.core.util.logger.AppLogger
 import java.util.*
 
-class GoogleTokenVerifier(val logger: AppLogger) {
+class GoogleTokenVerifier(private val logger: AppLogger) {
 
     private val transport: HttpTransport = NetHttpTransport()
     private val jsonFactory: JsonFactory = GsonFactory()

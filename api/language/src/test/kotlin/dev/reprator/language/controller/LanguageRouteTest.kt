@@ -1,8 +1,8 @@
 package dev.reprator.language.controller
 
-import dev.reprator.core.DatabaseFactory
-import dev.reprator.core.FailResponse
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.usecase.ResultResponse
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.language.data.LanguageRepository
 import dev.reprator.language.data.TableLanguage
 import dev.reprator.language.domain.LanguageNotFoundException
@@ -83,7 +83,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Add new language And Verify from db by id for existence`(): Unit = runBlocking {
         val response = addLanguageInDb(LANGUAGE_ENGLISH)
 
-        Assertions.assertEquals(response.status, HttpStatusCode.OK)
+        Assertions.assertEquals(HttpStatusCode.Created, response.status)
         val resultBody = response.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(resultBody)
 
@@ -95,7 +95,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Failed to add new language, if language already exist`(): Unit = runBlocking {
         val addEnglishLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
 
-        Assertions.assertEquals(addEnglishLanguageResponse.status, HttpStatusCode.OK)
+        Assertions.assertEquals(HttpStatusCode.Created, addEnglishLanguageResponse.status)
         val resultBody = addEnglishLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(resultBody)
 
@@ -131,7 +131,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Get language from db by ID, if exist`(): Unit = runBlocking {
         val addLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
 
-        Assertions.assertEquals(addLanguageResponse.status, HttpStatusCode.OK)
+        Assertions.assertEquals(HttpStatusCode.Created, addLanguageResponse.status)
         val addResultBody = addLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(addResultBody)
 

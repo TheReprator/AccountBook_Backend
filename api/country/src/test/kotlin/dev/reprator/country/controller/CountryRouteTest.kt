@@ -1,8 +1,8 @@
 package dev.reprator.country.controller
 
-import dev.reprator.core.DatabaseFactory
-import dev.reprator.core.FailResponse
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.usecase.ResultResponse
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.domain.CountryNotFoundException
@@ -77,7 +77,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Add new country And Verify from db by id for existence`(): Unit = runBlocking {
         val response = addCountryInDb(INPUT_COUNTRY)
 
-        Assertions.assertEquals(response.status, HttpStatusCode.OK)
+        Assertions.assertEquals(HttpStatusCode.Created, response.status)
         val resultBody = response.body<ResultResponse<CountryModal.DTO>>()
 
         Assertions.assertNotNull(resultBody)
@@ -97,7 +97,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Failed to add new country, if country already exist`(): Unit = runBlocking {
         val addCountryResponse = addCountryInDb(INPUT_COUNTRY)
 
-        Assertions.assertEquals(addCountryResponse.status, HttpStatusCode.OK)
+        Assertions.assertEquals(HttpStatusCode.Created, addCountryResponse.status)
         val resultBody = addCountryResponse.body<ResultResponse<CountryModal.DTO>>()
 
         Assertions.assertNotNull(resultBody)

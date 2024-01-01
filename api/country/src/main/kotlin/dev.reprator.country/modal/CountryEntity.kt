@@ -1,6 +1,6 @@
 package dev.reprator.country.modal
 
-import dev.reprator.core.Validator
+import dev.reprator.core.usecase.AppEntityValidator
 import dev.reprator.country.domain.IllegalCountryException
 
 typealias CountryId = Int
@@ -14,7 +14,7 @@ interface CountryEntity {
     val shortCode: CountryShortCode
 
     companion object {
-        fun Map<String, String>?.mapToModal(): DTO = object: Validator<DTO> {
+        fun Map<String, String>?.mapToModal(): DTO = object: AppEntityValidator<DTO> {
 
             val data = this@mapToModal ?: throw IllegalCountryException()
 
@@ -42,7 +42,7 @@ interface CountryEntity {
         override val name: CountryName,
         override val callingCode: CountryCallingCode,
         override val shortCode: CountryShortCode
-    ) : CountryEntity, Validator<DTO> {
+    ) : CountryEntity, AppEntityValidator<DTO> {
 
         override fun validate(): DTO {
             validateCountryName(name)

@@ -1,7 +1,7 @@
 package dev.reprator
 
-import dev.reprator.core.ERROR_DESCRIPTION_NOT_FOUND
-import dev.reprator.core.FailResponse
+import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.util.constants.ERROR_DESCRIPTION_NOT_FOUND
 import dev.reprator.language.controller.ENDPOINT_LANGUAGE
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.createHttpClient

@@ -1,6 +1,6 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension

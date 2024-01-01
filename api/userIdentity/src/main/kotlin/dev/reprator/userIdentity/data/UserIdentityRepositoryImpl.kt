@@ -1,8 +1,8 @@
 package dev.reprator.userIdentity.data
 
-import dev.reprator.core.AppLogger
-import dev.reprator.core.Mapper
-import dev.reprator.core.dbQuery
+import dev.reprator.core.util.Mapper
+import dev.reprator.core.util.dbConfiguration.dbQuery
+import dev.reprator.core.util.logger.AppLogger
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity

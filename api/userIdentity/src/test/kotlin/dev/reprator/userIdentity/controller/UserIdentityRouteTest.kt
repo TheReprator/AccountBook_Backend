@@ -1,8 +1,7 @@
 package dev.reprator.userIdentity.controller
 
-import dev.reprator.core.DatabaseFactory
-import dev.reprator.core.FailResponse
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.setUpKoinCountry
@@ -13,7 +12,6 @@ import dev.reprator.testModule.createHttpClient
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
-import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.client.call.*
 import io.ktor.client.request.*

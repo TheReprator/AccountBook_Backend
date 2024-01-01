@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.modal
 
-import dev.reprator.core.Validator
+import dev.reprator.core.usecase.AppEntityValidator
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import java.lang.NumberFormatException
 
@@ -16,7 +16,7 @@ interface UserIdentityRegisterEntity {
     data class DTO (
         override val phoneNumber: PhoneNumber,
         override val countryId: PhoneCountryCodeId
-    ) : UserIdentityRegisterEntity, Validator<DTO> {
+    ) : UserIdentityRegisterEntity, AppEntityValidator<DTO> {
 
         override fun validate(): DTO {
             phoneNumber.validatePhoneNumber()
@@ -27,7 +27,7 @@ interface UserIdentityRegisterEntity {
     }
 
     companion object {
-        fun Map<String, String>?.mapToModal(): DTO = object: Validator<DTO> {
+        fun Map<String, String>?.mapToModal(): DTO = object: AppEntityValidator<DTO> {
 
             val data = this@mapToModal ?: throw IllegalUserIdentityException()
 
@@ -52,7 +52,33 @@ interface UserIdentityOtpEntity {
     data class DTO (
         override val userId: UserIdentityId,
         override val phoneOtp: UserPhoneOTP
-    ) : UserIdentityOtpEntity
+    ) : UserIdentityOtpEntity, AppEntityValidator<DTO> {
+
+        override fun validate(): DTO {
+            userId.validateForNonEmpty()
+            phoneOtp.validateForNonEmpty()
+
+            return this
+        }
+    }
+
+    companion object {
+        fun Map<String, String>?.mapToModal(): DTO = object: AppEntityValidator<DTO> {
+
+            val data = this@mapToModal ?: throw IllegalUserIdentityException()
+
+            val userId: String by data.withDefault { "" }
+            val phoneOtp: String by data.withDefault { "" }
+
+            override fun validate(): DTO {
+                userId.validateForNonEmpty()
+                phoneOtp.validateForNonEmpty()
+
+                return DTO(userId.trim().toInt(), phoneOtp.trim().toInt())
+            }
+
+        }.validate()
+    }
 }
 
 

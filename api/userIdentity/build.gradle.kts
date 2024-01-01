@@ -20,11 +20,6 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)
 
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.content.negotiation)
-
     // testing
     testImplementation(libs.test.ktor.server)
     testImplementation(projects.lib.testModule)

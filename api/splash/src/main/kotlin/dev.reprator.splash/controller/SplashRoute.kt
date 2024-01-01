@@ -1,11 +1,9 @@
 package dev.reprator.splash.controller
 
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.util.respondWithResult
 import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.splash.modal.SplashModal
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.async
 import org.koin.ktor.ext.inject
@@ -31,7 +29,7 @@ fun Routing.routeSplash(splashDirectory: File?) {
             }
 
             val splashModal = SplashModal(fileAsyncResult.await(), languageAsyncResult.await())
-            call.respond(ResultResponse(HttpStatusCode.OK.value, splashModal))
+            respondWithResult(HttpStatusCode.OK, splashModal)
         }
 
     }

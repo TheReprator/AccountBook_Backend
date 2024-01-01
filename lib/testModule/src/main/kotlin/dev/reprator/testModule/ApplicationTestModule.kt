@@ -1,9 +1,9 @@
 package dev.reprator.testModule
 
-import dev.reprator.core.ERROR_DESCRIPTION_NOT_FOUND
-import dev.reprator.core.ERROR_DESCRIPTION_UNKNOWN
-import dev.reprator.core.FailResponse
 import dev.reprator.core.exception.StatusCodeException
+import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.util.constants.ERROR_DESCRIPTION_NOT_FOUND
+import dev.reprator.core.util.constants.ERROR_DESCRIPTION_UNKNOWN
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -21,7 +21,8 @@ fun Application.configureCoreModule() {
         exception<Throwable> { call, cause ->
             if (cause is StatusCodeException) {
                 call.respond(HttpStatusCode(cause.statusCode.value , ""),
-                    FailResponse(cause.statusCode.value, cause.message.orEmpty()))
+                    FailResponse(cause.statusCode.value, cause.message.orEmpty())
+                )
             }
             else {
                 call.respond(

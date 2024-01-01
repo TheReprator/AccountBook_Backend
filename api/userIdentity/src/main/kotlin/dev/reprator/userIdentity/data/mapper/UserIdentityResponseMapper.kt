@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.data.mapper
 
-import dev.reprator.core.Mapper
+import dev.reprator.core.util.Mapper
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.userIdentity.data.TableUserIdentity

@@ -2,8 +2,8 @@ package dev.reprator.dao
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.reprator.core.AppDBConfiguration
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.AppDBConfiguration
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.language.data.TableLanguage
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

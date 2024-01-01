@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.data
 
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal

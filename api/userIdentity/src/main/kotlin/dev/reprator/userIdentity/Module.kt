@@ -1,7 +1,7 @@
 package dev.reprator.userIdentity
 
-import dev.reprator.core.APP_COROUTINE_SCOPE
-import dev.reprator.core.Mapper
+import dev.reprator.core.util.Mapper
+import dev.reprator.core.util.constants.APP_COROUTINE_SCOPE
 import dev.reprator.userIdentity.controller.UserIdentityController
 import dev.reprator.userIdentity.controller.UserIdentityControllerImpl
 import dev.reprator.userIdentity.data.UserIdentityRepositoryImpl
@@ -24,7 +24,7 @@ private const val KOIN_NAMED_MAPPER = "userIdentityMapper"
 
 val userIdentityModule = module {
     singleOf(::UserIdentityResponseRegisterMapper).withOptions {qualifier = named(KOIN_NAMED_MAPPER) } bind Mapper::class
-    single<SMScodeGenerator>{  SMScodeGeneratorImpl(get(), get(qualifier = named(APP_COROUTINE_SCOPE)))}
+    single<SMScodeGenerator>{  SMScodeGeneratorImpl(get(), get(), get(qualifier = named(APP_COROUTINE_SCOPE)))}
     single<UserIdentityRepository> { UserIdentityRepositoryImpl(get(), get(), get(qualifier = named(KOIN_NAMED_MAPPER))) }
     singleOf(::UserIdentityFacadeImpl) bind UserIdentityFacade::class
     single { UserIdentityControllerImpl(get()) } bind UserIdentityController::class
