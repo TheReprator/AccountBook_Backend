@@ -1,66 +1,56 @@
 package dev.reprator.userIdentity.data
 
-import dev.reprator.core.util.Mapper
 import dev.reprator.core.util.dbConfiguration.dbQuery
 import dev.reprator.core.util.logger.AppLogger
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
-import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
-import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
-import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
-import org.jetbrains.exposed.sql.ResultRow
+import dev.reprator.userIdentity.data.mapper.UserIdentityResponseRegisterMapper
+import dev.reprator.userIdentity.domain.IllegalUserIdentityException
+import dev.reprator.userIdentity.modal.*
 import org.jetbrains.exposed.sql.*
 
 class UserIdentityRepositoryImpl(
-    private val appLogger: AppLogger,
-    private val smsCodeGenerator: SMScodeGenerator,
-    private val mapper: Mapper<ResultRow, UserIdentityRegisterModal>
+    private val mapper: UserIdentityResponseRegisterMapper,
+    private val appLogger: AppLogger
 ) : UserIdentityRepository {
-
-    private suspend fun resultRowToUserIdentity(row: ResultRow): UserIdentityRegisterModal = mapper.map(row)
-
 
     override suspend fun addNewUserIdentity(name: UserIdentityRegisterEntity): UserIdentityRegisterModal = dbQuery {
 
-        val userExistQuery = (TableUserIdentity innerJoin TableCountryEntity.table)
+        val updateOrInsertResult: ResultRow = (TableUserIdentity innerJoin TableCountryEntity.table)
             .select {
                 (TableUserIdentity.phoneNumber eq name.phoneNumber) and
                         (TableCountry.id eq name.countryId)
             }.firstOrNull()
-
-
-        val otpCode = smsCodeGenerator.generateCode()
-
-        val updateOrInsertResult: ResultRow = if (null == userExistQuery) {
-            TableUserIdentity.insert {
+            ?: TableUserIdentity.insert {
                 it[phoneNumber] = name.phoneNumber
                 it[phoneCountryId] = name.countryId
-                it[phoneOtp] = otpCode
             }.resultedValues!!.first()
 
-        } else {
-            TableUserIdentity.update({ TableUserIdentity.id eq userExistQuery[TableUserIdentity.id] }) {
-                it[phoneOtp] = otpCode
+        mapper.mapToRegisterModal(updateOrInsertResult)
+    }
+
+    override suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal.DTO = dbQuery {
+        TableUserIdentity
+            .select { TableUserIdentity.id eq userId }
+            .map {
+                mapper.mapToFullUserAuthModal(it)
             }
-            userExistQuery
-        }
+            .singleOrNull() ?: throw IllegalUserIdentityException()
+    }
 
-        val countryCallingCode = TableCountry.select {
-            TableCountry.id eq name.countryId
-        }.limit(1).map {
-            it[TableCountry.callingCode]
-        }.first()
+    override suspend fun updateUserById(userModal: UserIdentityFullModal) {
+        val result = TableUserIdentity.update({ TableUserIdentity.id eq userModal.userId }) {
+            it[updateTime] = userModal.updateTime
+            it[isPhoneVerified] = userModal.isPhoneVerified
+            if(userModal.otpCount.safeValidateForNonNegative())
+                it[otpCount] = userModal.otpCount
+            if(userModal.phoneOtp.safeValidateForOTP())
+                it[phoneOtp] = userModal.phoneOtp
+            if(!userModal.refreshToken.safeValidateForEmpty())
+                it[refreshToken] = userModal.refreshToken
+            //it[userType] = userModal.userType
+        } > 0
 
-        appLogger.e { "vikramResponseTest00:: ${updateOrInsertResult[TableUserIdentity.otpCount]}" }
-        val smsSendResult = smsCodeGenerator.sendTokenToMobileNumber(countryCallingCode, name.phoneNumber, otpCode)
-        if(smsSendResult) {
-            val isOTPCountUpdated = TableUserIdentity.update({ TableUserIdentity.id eq updateOrInsertResult[TableUserIdentity.id] }) {
-                it[otpCount] = updateOrInsertResult[otpCount] + 1
-            } > 0
-            appLogger.e { "vikramResponseTest11:: $isOTPCountUpdated" }
-        }
-
-        appLogger.e { "vikramResponseTest12:: $smsSendResult" }
-        resultRowToUserIdentity(updateOrInsertResult)
+        appLogger.e { "record updated status:: $result" }
     }
 }

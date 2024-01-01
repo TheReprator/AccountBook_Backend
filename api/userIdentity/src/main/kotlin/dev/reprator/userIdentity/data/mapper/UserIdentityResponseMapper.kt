@@ -1,35 +1,53 @@
 package dev.reprator.userIdentity.data.mapper
 
-import dev.reprator.core.util.Mapper
+import dev.reprator.core.util.AppMarkerMapper
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.userIdentity.data.TableUserIdentity
+import dev.reprator.userIdentity.modal.UserIdentityFullModal
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import org.jetbrains.exposed.sql.ResultRow
 
 
-class UserIdentityResponseRegisterMapper : Mapper<ResultRow, UserIdentityRegisterModal> {
-    override suspend fun map(from: ResultRow): UserIdentityRegisterModal {
+class UserIdentityResponseRegisterMapper : AppMarkerMapper {
+
+    suspend fun mapToRegisterModal(from: ResultRow): UserIdentityRegisterModal {
         return UserIdentityRegisterModal.DTO(from[TableUserIdentity.id])
     }
-}
 
-class UserIdentityResponseOTPMapper : Mapper<ResultRow, UserIdentityOTPModal> {
+    suspend fun mapToOtpModal(from: ResultRow): UserIdentityOTPModal {
 
-    override suspend fun map(from: ResultRow): UserIdentityOTPModal {
-
-        val countryEntity = TableCountryEntity.wrapRow(from)
-        val countryModal = CountryModal.DTO(
-            countryEntity.id.value,
-            countryEntity.name, countryEntity.isocode, countryEntity.shortcode
-        )
+        val countryModal = convertToCountryModal(from)
 
         return UserIdentityOTPModal.DTO(
             from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
             from[TableUserIdentity.isPhoneVerified], countryModal,
             from[TableUserIdentity.refreshToken] ?: "",
             from[TableUserIdentity.userType]
+        )
+    }
+
+    suspend fun mapToFullUserAuthModal(from: ResultRow): UserIdentityFullModal.DTO {
+
+        val countryModal = convertToCountryModal(from)
+
+        return UserIdentityFullModal.DTO(
+            from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
+            from[TableUserIdentity.isPhoneVerified], countryModal,
+            from[TableUserIdentity.refreshToken] ?: "",
+            from[TableUserIdentity.userType],
+            from[TableUserIdentity.phoneOtp] ?: -1,
+            from[TableUserIdentity.otpCount],
+            from[TableUserIdentity.updateTime],
+        )
+    }
+
+    private fun convertToCountryModal(resultRow: ResultRow): CountryModal.DTO{
+        val countryEntity = TableCountryEntity.wrapRow(resultRow)
+        return CountryModal.DTO(
+            countryEntity.id.value,
+            countryEntity.name, countryEntity.isocode, countryEntity.shortcode
         )
     }
 }

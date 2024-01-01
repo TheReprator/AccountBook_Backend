@@ -1,11 +1,13 @@
 package dev.reprator.core.util
 
-interface Mapper<in InputModal, out OutputModal> {
+interface AppMarkerMapper
+
+fun interface AppMapper<in InputModal, out OutputModal> {
     suspend fun map(from: InputModal): OutputModal
 }
 
 
-interface MapperToFrom<InputModal, OutputModal> {
+interface AppMapperToFrom<InputModal, OutputModal> {
     suspend fun mapTo(from: InputModal): OutputModal
     suspend fun mapFrom(from: OutputModal): InputModal
 }

@@ -5,10 +5,8 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.setUpKoinCountry
-import dev.reprator.testModule.KtorServerExtension
+import dev.reprator.testModule.*
 import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
-import dev.reprator.testModule.TestDatabaseFactory
-import dev.reprator.testModule.createHttpClient
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
@@ -49,7 +47,7 @@ internal class UserIdentityRouteTest : KoinTest {
         setUpKoinCountry()
         setUpKoinUserIdentityModule()
 
-        modules(
+        modules(koinAppTestNetworkModule,
             module {
                 singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
             })
@@ -62,7 +60,7 @@ internal class UserIdentityRouteTest : KoinTest {
         transaction {
             TableCountry.deleteAll()
             TableUserIdentity.deleteAll()
-            
+
             TableCountryEntity.new {
                 name = "India"
                 shortcode = "IN"

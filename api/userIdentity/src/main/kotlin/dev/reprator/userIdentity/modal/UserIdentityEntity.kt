@@ -1,6 +1,7 @@
 package dev.reprator.userIdentity.modal
 
 import dev.reprator.core.usecase.AppEntityValidator
+import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import java.lang.NumberFormatException
 
@@ -105,8 +106,25 @@ fun String.validateForNonEmpty() {
     }
 }
 
-fun Int.validateForNonEmpty() {
+fun Int.validateForNonEmpty(): Int {
     if(-1 >= this) {
         throw IllegalUserIdentityException()
     }
+
+    return this
+}
+
+fun String.safeValidateForEmpty(): Boolean {
+    return this.trim().isBlank()
+}
+
+fun Int.safeValidateForNonNegative(): Boolean {
+    return -1 < this
+}
+
+fun Int.safeValidateForOTP(): Boolean {
+    if(-1 >= this)
+        return false
+    val otpLength = this.toString().trim().length
+    return LENGTH_OTP == otpLength
 }

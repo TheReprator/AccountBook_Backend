@@ -1,6 +1,6 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.util.Mapper
+import dev.reprator.core.util.AppMapper
 import dev.reprator.core.util.dbConfiguration.dbQuery
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
@@ -10,7 +10,7 @@ import dev.reprator.country.modal.CountryModal
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, CountryModal>) : CountryRepository {
+class CountryRepositoryImpl(private val mapper: AppMapper<TableCountryEntity, CountryModal>) : CountryRepository {
 
     private suspend fun resultRowToCountry(row: TableCountryEntity): CountryModal = mapper.map(row)
 

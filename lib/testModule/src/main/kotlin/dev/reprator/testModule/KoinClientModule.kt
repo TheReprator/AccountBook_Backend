@@ -1,79 +1,49 @@
-package dev.reprator
+package dev.reprator.testModule
 
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
-import dev.reprator.core.util.logger.AppLogger
-import dev.reprator.dao.DefaultDatabaseFactory
-import dev.reprator.impl.AppLoggerImpl
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import org.koin.core.module.dsl.withOptions
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 private const val MILLISECONDS = 1000L
 
+val koinAppTestNetworkModule = module {
+    single<List<MockClientResponseHandler>> { emptyList() }
 
-val koinAppModule = module {
-    single<DatabaseFactory> { params -> DefaultDatabaseFactory(appConfig = params.get()) }
-    single<AppLogger> { AppLoggerImpl() }
-    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }.withOptions {
-        qualifier = named(APP_COROUTINE_SCOPE)
-    }
-}
-
-val koinAppNetworkModule = module {
     single<Attributes> { Attributes(true) }
 
     single<HttpClient> {
-        val clientAttributes: Attributes = get()
+        val engine = MockEngine { request ->
 
-        HttpClient(CIO) {
+            val injectedHandlers: List<MockClientResponseHandler> = get()
 
-            expectSuccess = true
-
-            engine {
-                maxConnectionsCount = 1000
-                endpoint {
-                    maxConnectionsPerRoute = 100
-                    pipelineMaxSize = 20
-                    keepAliveTime = 5000
-                    connectTimeout = 5000
-                    connectAttempts = 5
+            injectedHandlers.forEach { handler ->
+                val response = handler.handleRequest(this, request)
+                if (response != null) {
+                    return@MockEngine response
                 }
             }
+            return@MockEngine errorResponse()
+        }
 
-//            install(HttpRequestRetry) {
-//                maxRetries = 5
-//                retryIf { _, response ->
-//                    !response.status.isSuccess()
-//                }
-//                retryOnExceptionIf { _, cause ->
-//                    cause is IOException
-//                }
-//                delayMillis { retry ->
-//                    retry * 3000L
-//                } // retries in 3, 6, 9, etc. seconds
-//            }
+        val clientAttributes: Attributes = get()
 
+        HttpClient(engine) {
+
+            expectSuccess = true
 
             install(Logging) {
                 logger = Logger.DEFAULT
                 level = LogLevel.ALL
-//                filter { request ->
-//                    request.url.host.contains("ktor.io")
-//                }
                 sanitizeHeader { header -> header == HttpHeaders.Authorization }
             }
 
@@ -84,9 +54,9 @@ val koinAppNetworkModule = module {
 
 
             install(HttpTimeout) {
-                connectTimeoutMillis = 10 * MILLISECONDS
-                socketTimeoutMillis = 10 * MILLISECONDS
-                requestTimeoutMillis = 10 * MILLISECONDS
+                connectTimeoutMillis = 60 * MILLISECONDS
+                socketTimeoutMillis = 60 * MILLISECONDS
+                requestTimeoutMillis = 60 * MILLISECONDS
             }
 
 
@@ -111,9 +81,11 @@ val koinAppNetworkModule = module {
                         else -> API_BASE_URL.INTERNAL_APP.value
                     }
                     host = apiHost
-                    //protocol = URLProtocol.HTTPS
+                    port = 8081
+                    protocol = if(providerType == APIS.EXTERNAL_OTP_VERIFICATION) URLProtocol.HTTPS else URLProtocol.HTTP
                 }
             }
+
 
             HttpResponseValidator {
                 validateResponse { response ->
@@ -141,4 +113,12 @@ val koinAppNetworkModule = module {
             }
         }
     }
+}
+
+private fun MockRequestHandleScope.errorResponse(): HttpResponseData {
+    return respond(
+        content = "",
+        status = HttpStatusCode.BadRequest,
+        headers = headersOf(HttpHeaders.ContentType, "application/json")
+    )
 }

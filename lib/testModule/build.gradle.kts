@@ -23,6 +23,8 @@ dependencies {
     api(libs.test.koin.junit5)
     api(libs.test.kotlin)
 
+    api(libs.ktor.client.mock)
+    implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
 
     implementation(libs.ktor.server.netty)

@@ -9,5 +9,8 @@ class UserIdentityControllerImpl(private val userIdentityFacade: UserIdentityFac
         return userIdentityFacade.addNewUserIdentity(userInfo)
     }
 
+    override suspend fun generateAndSendOTP(userId: UserIdentityId): Boolean =
+        userIdentityFacade.generateAndSendOTP(userId)
+
 }
 

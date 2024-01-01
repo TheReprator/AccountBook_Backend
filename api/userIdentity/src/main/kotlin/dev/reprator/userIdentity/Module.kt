@@ -1,7 +1,6 @@
 package dev.reprator.userIdentity
 
-import dev.reprator.core.util.Mapper
-import dev.reprator.core.util.constants.APP_COROUTINE_SCOPE
+import dev.reprator.core.util.AppMarkerMapper
 import dev.reprator.userIdentity.controller.UserIdentityController
 import dev.reprator.userIdentity.controller.UserIdentityControllerImpl
 import dev.reprator.userIdentity.data.UserIdentityRepositoryImpl
@@ -14,6 +13,7 @@ import org.koin.dsl.module
 import dev.reprator.userIdentity.data.mapper.UserIdentityResponseRegisterMapper
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
 import dev.reprator.userIdentity.socialVerifier.SMScodeGeneratorImpl
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
 
@@ -23,9 +23,9 @@ import org.koin.core.qualifier.named
 private const val KOIN_NAMED_MAPPER = "userIdentityMapper"
 
 val userIdentityModule = module {
-    singleOf(::UserIdentityResponseRegisterMapper).withOptions {qualifier = named(KOIN_NAMED_MAPPER) } bind Mapper::class
-    single<SMScodeGenerator>{  SMScodeGeneratorImpl(get(), get(), get(qualifier = named(APP_COROUTINE_SCOPE)))}
-    single<UserIdentityRepository> { UserIdentityRepositoryImpl(get(), get(), get(qualifier = named(KOIN_NAMED_MAPPER))) }
+    factoryOf(::UserIdentityResponseRegisterMapper).withOptions {qualifier = named(KOIN_NAMED_MAPPER) } bind AppMarkerMapper::class
+    single<SMScodeGenerator>{  SMScodeGeneratorImpl(get(), get(), get())}
+    single<UserIdentityRepository> { UserIdentityRepositoryImpl( get(), get(qualifier = named(KOIN_NAMED_MAPPER))) }
     singleOf(::UserIdentityFacadeImpl) bind UserIdentityFacade::class
     single { UserIdentityControllerImpl(get()) } bind UserIdentityController::class
 }

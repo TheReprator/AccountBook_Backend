@@ -1,6 +1,6 @@
 package dev.reprator.language
 
-import dev.reprator.core.util.Mapper
+import dev.reprator.core.util.AppMapper
 import dev.reprator.language.controller.LanguageController
 import dev.reprator.language.controller.LanguageControllerImpl
 import dev.reprator.language.data.LanguageRepositoryImpl
@@ -20,7 +20,7 @@ import org.koin.core.qualifier.named
 private const val KOIN_NAMED_MAPPER_LANGUAGE = "languageMapper"
 
 val languageModule = module {
-    singleOf(::LanguageResponseMapper).withOptions {qualifier = named(KOIN_NAMED_MAPPER_LANGUAGE) } bind Mapper::class
+    singleOf(::LanguageResponseMapper).withOptions {qualifier = named(KOIN_NAMED_MAPPER_LANGUAGE) } bind AppMapper::class
     single<LanguageRepository> { LanguageRepositoryImpl(get(qualifier = named(KOIN_NAMED_MAPPER_LANGUAGE))) }
     singleOf(::LanguageFacadeImpl) bind LanguageFacade::class
     single { LanguageControllerImpl(get()) } bind LanguageController::class

@@ -2,7 +2,7 @@ package dev.reprator.impl
 
 import dev.reprator.core.util.logger.AppLogger
 
-class LoggerImpl : AppLogger {
+class AppLoggerImpl : AppLogger {
 
     enum class AppLogLevel {
         Verbose,
