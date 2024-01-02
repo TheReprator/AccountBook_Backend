@@ -29,10 +29,10 @@ fun KoinApplication.setupCoreNetworkModule() {
 
 private val appCoreModule = module {
     single<AppLogger> { AppLoggerImpl() }
-    single<Int> { ApplicationConfig("application-test.conf").property("ktor.deployment.port").getString().toInt() }
 }
 
 private val koinAppTestNetworkModule = module {
+    single<Int> { ApplicationConfig("application-test.conf").property("ktor.deployment.port").getString().toInt() }
 
     single<HttpClientEngine> { CIO.create() }
 
