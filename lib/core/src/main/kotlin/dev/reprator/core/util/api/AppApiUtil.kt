@@ -19,27 +19,27 @@ suspend inline fun <reified T> HttpClient.safeRequest(
         val response = request { block() }
         ApiResponse.Success(response.body())
     } catch (exception: ClientRequestException) {
+        println("vikramTest:: ApiError:: ClientRequestException:: "+ exception.response.body())
         ApiResponse.Error.HttpError(
             code = exception.response.status.value,
             errorBody = exception.response.body(),
             errorMessage = "Status Code: ${exception.response.status.value} - API Key Missing",
         )
     } catch (exception: HttpExceptions) {
+        println("vikramTest:: ApiError:: HttpExceptions:: "+ exception.response.body())
         ApiResponse.Error.HttpError(
             code = exception.response.status.value,
             errorBody = exception.response.body(),
             errorMessage = exception.message,
         )
     } catch (e: JsonMappingException) {
+        println("vikramTest:: ApiError:: JsonMappingException:: "+ e.message)
         ApiResponse.Error.SerializationError(
             message = e.message,
             errorMessage = "Something went wrong, parsing error",
         )
     } catch (e: Exception) {
-        e.stackTrace
-        println("vikramTest"+ e.stackTrace)
-        println("vikramTest11"+ e.localizedMessage)
-        println("vikramTest12"+ e.message)
+        println("vikramTest:: ApiError:: "+ e.message)
         ApiResponse.Error.GenericError(
             message = e.message,
             errorMessage = "Something went wrong",

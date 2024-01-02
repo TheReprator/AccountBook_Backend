@@ -4,13 +4,14 @@ import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.api.safeRequest
 import dev.reprator.core.util.constants.APIS
 import dev.reprator.core.util.constants.LENGTH_OTP
+import dev.reprator.core.util.logger.AppLogger
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.util.*
 
-class SMScodeGeneratorTestSuccessImpl(private val client: HttpClient, private val attributes: Attributes) : SMScodeGenerator {
+class SMScodeGeneratorTestSuccessImpl(private val client: HttpClient, private val attributes: Attributes, private val appLogger: AppLogger) : SMScodeGenerator {
 
     override suspend fun sendOtpToMobileNumber(countryCode: Int, phoneNumber: String, messageCode: Int): Boolean {
         val response: ApiResponse<AuthServiceEntity> = client.safeRequest(apiType= APIS.EXTERNAL_OTP_VERIFICATION, attributes = attributes) {
@@ -30,6 +31,8 @@ class SMScodeGeneratorTestSuccessImpl(private val client: HttpClient, private va
                 )
             }
         }
+
+        appLogger.e { "ResponseSucc : $response" }
         return when (response) {
             is ApiResponse.Success -> {
                 response.body.sent
@@ -40,7 +43,7 @@ class SMScodeGeneratorTestSuccessImpl(private val client: HttpClient, private va
     }
 }
 
-class SMScodeGeneratorTestFailImpl(private val client: HttpClient, private val attributes: Attributes) : SMScodeGenerator {
+class SMScodeGeneratorTestFailImpl(private val client: HttpClient, private val attributes: Attributes, private val appLogger: AppLogger) : SMScodeGenerator {
 
     override suspend fun sendOtpToMobileNumber(countryCode: Int, phoneNumber: String, messageCode: Int): Boolean {
         val response: ApiResponse<AuthServiceEntity> = client.safeRequest(apiType= APIS.EXTERNAL_OTP_VERIFICATION, attributes = attributes) {
@@ -59,6 +62,7 @@ class SMScodeGeneratorTestFailImpl(private val client: HttpClient, private val a
                 )
             }
         }
+        appLogger.e { "ResponseFail : $response" }
         return when (response) {
             is ApiResponse.Success -> {
                 response.body.sent

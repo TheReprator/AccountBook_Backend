@@ -6,6 +6,7 @@ import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.setupCoreNetworkModule
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -35,13 +36,13 @@ internal class TableUserIdentityEntityTest : KoinTest {
 
         @JvmStatic
         fun inValidUserInput() = Stream.of(
-            Arguments.of(UserIdentityRegisterEntity.DTO("9041866055",91)),
+            Arguments.of(UserIdentityRegisterEntity.DTO("9041866055", 91)),
         )
 
         @JvmStatic
         fun validUserInput() = Stream.of(
-            Arguments.of(UserIdentityRegisterEntity.DTO("9041866055",1)),
-            Arguments.of(UserIdentityRegisterEntity.DTO("507532480",2))
+            Arguments.of(UserIdentityRegisterEntity.DTO("9041866055", 1)),
+            Arguments.of(UserIdentityRegisterEntity.DTO("507532480", 2))
         )
     }
 
@@ -50,6 +51,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
+        setupCoreNetworkModule()
         modules(
             module {
                 singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
@@ -85,7 +87,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
 
     @Test
     fun `Delete user by id`() {
-        val inputUser = UserIdentityRegisterEntity.DTO("9041866055",1)
+        val inputUser = UserIdentityRegisterEntity.DTO("9041866055", 1)
 
         val insertedUserId = transaction {
             TableUserIdentity.insert {
@@ -119,7 +121,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
 
     @Test
     fun `Get user by id`() {
-        val inputUser = UserIdentityRegisterEntity.DTO("9041866055",1)
+        val inputUser = UserIdentityRegisterEntity.DTO("9041866055", 1)
 
         val insertedUserId = transaction {
             TableUserIdentity.insert {
@@ -149,7 +151,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
     @Test
     fun `Get all inserted User`() {
 
-        val inputList = listOf(UserIdentityRegisterEntity.DTO("9041866055",1))
+        val inputList = listOf(UserIdentityRegisterEntity.DTO("9041866055", 1))
 
         inputList.forEach {
             val inputUser: UserIdentityRegisterEntity.DTO = it
@@ -166,19 +168,19 @@ internal class TableUserIdentityEntityTest : KoinTest {
             (TableUserIdentity innerJoin TableCountryEntity.table)
                 .selectAll().map { from ->
 
-                val countryEntity = TableCountryEntity.wrapRow(from)
-                val countryModal = CountryModal.DTO(
-                    countryEntity.id.value,
-                    countryEntity.name, countryEntity.isocode, countryEntity.shortcode
-                )
+                    val countryEntity = TableCountryEntity.wrapRow(from)
+                    val countryModal = CountryModal.DTO(
+                        countryEntity.id.value,
+                        countryEntity.name, countryEntity.isocode, countryEntity.shortcode
+                    )
 
-                UserIdentityOTPModal.DTO(
-                    from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
-                    from[TableUserIdentity.isPhoneVerified], countryModal,
-                    from[TableUserIdentity.refreshToken] ?: "",
-                    from[TableUserIdentity.userType]
-                )
-            }
+                    UserIdentityOTPModal.DTO(
+                        from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
+                        from[TableUserIdentity.isPhoneVerified], countryModal,
+                        from[TableUserIdentity.refreshToken] ?: "",
+                        from[TableUserIdentity.userType]
+                    )
+                }
         }
 
         assertEquals(inputList.size, userList.size)

@@ -18,7 +18,7 @@ class SmsResponseHandler: MockClientResponseHandler {
         }
 
         val formData = (request.body as FormDataContent).formData
-        val numberLength = formData["number"]!!.length
+        val numberLength = formData["number"]?.length ?: 0
         val responseContent= if(10 < numberLength)
             MockedApiResponseSMS.FOR_VALID
          else

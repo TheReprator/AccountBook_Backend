@@ -1,12 +1,14 @@
 package dev.reprator.userIdentity.socialVerifier
 
+import dev.reprator.core.util.logger.AppLogger
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.MockClientResponseHandler
-import dev.reprator.testModule.koinAppTestNetworkModule
+import dev.reprator.testModule.errorResponse
+import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.mock.*
 import io.ktor.util.*
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -15,41 +17,46 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
 internal class SMScodeGeneratorImplTest : KoinTest {
 
-    private val httpClient by inject<HttpClient>()
 
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
+        setupCoreNetworkModule()
 
-        modules(koinAppTestNetworkModule, module {
-            single<List<MockClientResponseHandler>>{
-                listOf(SmsResponseHandler())
+        val engine = MockEngine { request ->
+
+            val handlerList = listOf(SmsResponseHandler())
+
+            handlerList.forEach { handler ->
+                val response = handler.handleRequest(this, request)
+                if (response != null) {
+                    return@MockEngine response
+                }
             }
-        })
-    }
+            return@MockEngine errorResponse()
+        }
 
-    @AfterEach
-    fun closeDataBase() {
-        httpClient.close()
+        modules(module {
+            single<HttpClientEngine> { engine }
+        })
     }
 
     @Test
     fun `failed to send the code to mobile number, due to invalid number`() = runBlocking {
-        val sMScodeGenerator = SMScodeGeneratorTestFailImpl(httpClient, get<Attributes>())
+        val sMScodeGenerator = SMScodeGeneratorTestFailImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
         val posts = sMScodeGenerator.sendOtpToMobileNumber(0, "2432", 123456)
         Assertions.assertEquals(false, posts)
     }
 
     @Test
     fun `Successfully sent the code to mobile number`() = runBlocking {
-        val sMScodeGenerator = SMScodeGeneratorTestSuccessImpl(httpClient, get<Attributes>())
+        val sMScodeGenerator = SMScodeGeneratorTestSuccessImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
         val posts = sMScodeGenerator.sendOtpToMobileNumber(91, "9041866044", 123456)
         Assertions.assertEquals(true, posts)
     }
