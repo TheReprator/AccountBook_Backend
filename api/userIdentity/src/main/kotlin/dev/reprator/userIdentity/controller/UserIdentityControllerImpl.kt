@@ -12,5 +12,9 @@ class UserIdentityControllerImpl(private val userIdentityFacade: UserIdentityFac
     override suspend fun generateAndSendOTP(userId: UserIdentityId): Boolean =
         userIdentityFacade.generateAndSendOTP(userId)
 
+    override suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal {
+        return userIdentityFacade.getUserById(userId)
+    }
+
 }
 

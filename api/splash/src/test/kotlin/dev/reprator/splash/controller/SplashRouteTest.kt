@@ -1,6 +1,6 @@
 package dev.reprator.splash.controller
 
-import dev.reprator.core.usecase.ResultResponse
+import dev.reprator.core.usecase.ResultDTOResponse
 import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.splash.modal.SplashModal
@@ -45,7 +45,7 @@ internal class SplashController : KoinTest {
 
 
         val client = createHttpClient()
-        val response: ResultResponse<SplashModal> = client.get("$BASE_URL$ENDPOINT_SPLASH").body()
+        val response: ResultDTOResponse<SplashModal> = client.get("$BASE_URL$ENDPOINT_SPLASH").body()
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(langList.size, response.data.languageList.size)

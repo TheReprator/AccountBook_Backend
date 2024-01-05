@@ -1,7 +1,6 @@
 package dev.reprator.country.controller
 
 import dev.reprator.core.util.respondWithResult
-import dev.reprator.country.domain.CountryFacade
 import dev.reprator.country.domain.IllegalCountryException
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryEntity.Companion.mapToModal
@@ -17,7 +16,7 @@ private const val INPUT_COUNTRY_ID = "countryId"
 
 fun Routing.routeCountry() {
 
-    val countryFacade by inject<CountryFacade>()
+    val countryFacade by inject<CountryController>()
 
     route(ENDPOINT_COUNTRY) {
         get {

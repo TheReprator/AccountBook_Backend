@@ -1,11 +1,13 @@
 package dev.reprator.testModule
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
 import dev.reprator.core.util.logger.AppLogger
 import impl.AppLoggerImpl
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.mock.*
@@ -54,7 +56,14 @@ private val koinAppTestNetworkModule = module {
 
 
             install(ContentNegotiation) {
-                jackson()
+                jackson{
+                    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+
+                    configure(SerializationFeature.INDENT_OUTPUT, true)
+                    setDefaultPrettyPrinter(DefaultPrettyPrinter().apply {
+                        indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
+                    })
+                }
             }
 
 

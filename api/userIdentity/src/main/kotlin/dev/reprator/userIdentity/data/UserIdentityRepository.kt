@@ -11,6 +11,6 @@ interface UserIdentityRepository {
 
     suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal.DTO
 
-    suspend fun updateUserById(userModal: UserIdentityFullModal)
+     suspend fun updateUserById(userModal: UserIdentityFullModal)
 
 }

@@ -1,8 +1,8 @@
 package dev.reprator.core.util
 
 import dev.reprator.core.entity.wrapperBean.MultipartDTO
-import dev.reprator.core.usecase.FailResponse
-import dev.reprator.core.usecase.ResultResponse
+import dev.reprator.core.usecase.FailDTOResponse
+import dev.reprator.core.usecase.ResultDTOResponse
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -14,13 +14,13 @@ import io.ktor.util.pipeline.*
 suspend inline fun <reified T> PipelineContext<Unit, ApplicationCall>.respondWithResult(
     statusCode: HttpStatusCode, result: T, message: String? = null
 ) {
-    call.respond(statusCode, ResultResponse(statusCode.value, result))
+    call.respond(statusCode, ResultDTOResponse(statusCode.value, result))
 }
 
 suspend fun respondWithError(
     call: ApplicationCall, statusCode: HttpStatusCode, errorMessage: Map<Int, String>? = null
 ) {
-    call.respond(statusCode, FailResponse(statusCode.value, errorMessage.toString()))
+    call.respond(statusCode, FailDTOResponse(statusCode.value, errorMessage.toString()))
 }
 
 suspend inline fun <reified T> PipelineContext<Unit, ApplicationCall>.receiveMultipart(

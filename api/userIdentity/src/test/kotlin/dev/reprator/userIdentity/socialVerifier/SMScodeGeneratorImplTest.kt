@@ -49,14 +49,14 @@ internal class SMScodeGeneratorImplTest : KoinTest {
 
     @Test
     fun `failed to send the code to mobile number, due to invalid number`() = runBlocking {
-        val sMScodeGenerator = SMScodeGeneratorTestFailImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
+        val sMScodeGenerator = SMScodeGeneratorClientTestFailImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
         val posts = sMScodeGenerator.sendOtpToMobileNumber(0, "2432", 123456)
         Assertions.assertEquals(false, posts)
     }
 
     @Test
     fun `Successfully sent the code to mobile number`() = runBlocking {
-        val sMScodeGenerator = SMScodeGeneratorTestSuccessImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
+        val sMScodeGenerator = SMScodeGeneratorClientTestSuccessImpl(get<HttpClient>(), get<Attributes>(), get<AppLogger>())
         val posts = sMScodeGenerator.sendOtpToMobileNumber(91, "9041866044", 123456)
         Assertions.assertEquals(true, posts)
     }

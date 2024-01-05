@@ -7,4 +7,6 @@ interface UserIdentityFacade {
     suspend fun addNewUserIdentity(userInfo: UserIdentityRegisterEntity): UserIdentityRegisterModal
 
     suspend fun generateAndSendOTP(userId: UserIdentityId): Boolean
+
+    suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal
 }

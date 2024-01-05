@@ -2,6 +2,7 @@ package dev.reprator.userIdentity.domain
 
 import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.userIdentity.data.UserIdentityRepository
+import dev.reprator.userIdentity.modal.UserIdentityFullModal
 import dev.reprator.userIdentity.modal.UserIdentityId
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
@@ -34,4 +35,7 @@ class UserIdentityFacadeImpl(
             repository.updateUserById(updateModal)
         }
     }
+
+    override suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal = repository.getUserById(userId)
+
 }

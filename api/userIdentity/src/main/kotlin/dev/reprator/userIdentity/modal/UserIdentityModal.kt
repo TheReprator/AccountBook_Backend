@@ -1,9 +1,11 @@
 package dev.reprator.userIdentity.modal
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.userIdentity.data.USER_CATEGORY
 import org.joda.time.DateTime
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityRegisterModal.DTO::class)
 interface UserIdentityRegisterModal  {
 
     val userId: UserIdentityId
@@ -13,6 +15,7 @@ interface UserIdentityRegisterModal  {
     ) : UserIdentityRegisterModal
 }
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityOTPModal.DTO::class)
 interface UserIdentityOTPModal {
     val userId: UserIdentityId
     val phoneNumber: PhoneNumber
@@ -31,6 +34,7 @@ interface UserIdentityOTPModal {
     ) : UserIdentityOTPModal
 }
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityFullModal.DTO::class)
 interface UserIdentityFullModal {
     val userId: UserIdentityId
     val country: CountryModal.DTO

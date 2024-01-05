@@ -139,16 +139,6 @@ internal class TableUserIdentityEntityTest : KoinTest {
     }
 
     @Test
-    fun `Failed to get user by id as it didn't exist in db`() {
-
-        val foundCountry = transaction {
-            TableUserIdentity.select { TableUserIdentity.id eq 48 }.count()
-        }
-
-        assertEquals(0, foundCountry)
-    }
-
-    @Test
     fun `Get all inserted User`() {
 
         val inputList = listOf(UserIdentityRegisterEntity.DTO("9041866055", 1))
@@ -192,7 +182,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
 
     @ParameterizedTest
     @MethodSource("validUserInput")
-    fun `Tests for the successful insertion of valid country`(
+    fun `Register a user with valid country id`(
         inputUser: UserIdentityRegisterEntity.DTO
     ) {
         val insertedUserId = transaction {

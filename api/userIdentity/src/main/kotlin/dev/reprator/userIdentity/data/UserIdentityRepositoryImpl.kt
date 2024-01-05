@@ -30,7 +30,7 @@ class UserIdentityRepositoryImpl(
     }
 
     override suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal.DTO = dbQuery {
-        TableUserIdentity
+        (TableUserIdentity innerJoin TableCountryEntity.table)
             .select { TableUserIdentity.id eq userId }
             .map {
                 mapper.mapToFullUserAuthModal(it)
@@ -38,8 +38,9 @@ class UserIdentityRepositoryImpl(
             .singleOrNull() ?: throw IllegalUserIdentityException()
     }
 
-    override suspend fun updateUserById(userModal: UserIdentityFullModal) {
-        val result = TableUserIdentity.update({ TableUserIdentity.id eq userModal.userId }) {
+    override suspend fun updateUserById(userModal: UserIdentityFullModal) = dbQuery {
+        val result =
+            TableUserIdentity.update({ TableUserIdentity.id eq userModal.userId }) {
             it[updateTime] = userModal.updateTime
             it[isPhoneVerified] = userModal.isPhoneVerified
             if(userModal.otpCount.safeValidateForNonNegative())
@@ -49,7 +50,7 @@ class UserIdentityRepositoryImpl(
             if(!userModal.refreshToken.safeValidateForEmpty())
                 it[refreshToken] = userModal.refreshToken
             //it[userType] = userModal.userType
-        } > 0
+        }
 
         appLogger.e { "record updated status:: $result" }
     }

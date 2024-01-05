@@ -1,11 +1,14 @@
 package dev.reprator.userIdentity.controller
 
+import dev.reprator.core.usecase.ResultDTOResponse
 import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.api.safeRequest
 import dev.reprator.core.util.constants.APIS
+import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
-import dev.reprator.country.data.TableCountryEntity
+import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.setUpKoinCountry
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.TestDatabaseFactory
@@ -14,6 +17,7 @@ import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
+import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -37,11 +41,15 @@ import org.koin.test.junit5.KoinTestExtension
 internal class UserIdentityRouteTest : KoinTest {
 
     companion object {
+        private val INPUT_COUNTRY = CountryEntity.DTO("India", 91, "IN")
         private val INPUT_COUNTRY_INVALID_COUNTRY = UserIdentityRegisterEntity.DTO("9041866055", 91)
+        private fun INPUT_COUNTRY_VALID_COUNTRY(countryId: Int) =
+            UserIdentityRegisterEntity.DTO("9041866055", countryId)
     }
 
     private val databaseFactory by inject<DatabaseFactory>()
-    private val client by inject<HttpClient>()
+    private val controller by inject<UserIdentityController>()
+    private val countryController by inject<CountryController>()
 
     @JvmField
     @RegisterExtension
@@ -54,6 +62,7 @@ internal class UserIdentityRouteTest : KoinTest {
         modules(
             module {
                 singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::SMScodeGeneratorTestImpl) bind SMScodeGenerator::class
             })
     }
 
@@ -64,18 +73,6 @@ internal class UserIdentityRouteTest : KoinTest {
         transaction {
             TableCountry.deleteAll()
             TableUserIdentity.deleteAll()
-
-            TableCountryEntity.new {
-                name = "India"
-                shortcode = "IN"
-                isocode = 91
-            }
-
-            TableCountryEntity.new {
-                name = "United Arab Emirates"
-                shortcode = "UAE"
-                isocode = 971
-            }
         }
     }
 
@@ -84,8 +81,8 @@ internal class UserIdentityRouteTest : KoinTest {
         databaseFactory.close()
     }
 
-    private fun addUserInDb(countryInfo: UserIdentityRegisterEntity.DTO) = runBlocking {
-        client.safeRequest<ApiResponse<UserIdentityRegisterModal>>(
+    private fun addUserInDb(countryInfo: UserIdentityRegisterEntity) = runBlocking {
+        get<HttpClient>().safeRequest<ResultDTOResponse<UserIdentityRegisterModal>>(
             apiType = APIS.INTERNAL_APP,
             attributes = get<Attributes>()
         ) {
@@ -99,10 +96,33 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
+    fun `Register a user as new user, for valid country id, with otp being sent by server to client successfully`() =
+        runBlocking {
+
+            val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+            val userRegisterResponse = addUserInDb(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+
+            Assertions.assertTrue(userRegisterResponse is ApiResponse.Success)
+            Assertions.assertNotNull(userRegisterResponse)
+            val body = (userRegisterResponse as ApiResponse.Success).body
+            Assertions.assertEquals(1, body.data.userId)
+
+            val userFullModal = controller.getUserById(1)
+            Assertions.assertEquals(LENGTH_OTP, userFullModal.phoneOtp.toString().length)
+            Assertions.assertEquals(1, userFullModal.otpCount)
+        }
+
+    @Test
     fun `Failed to add new user, for invalid country id`(): Unit = runBlocking {
         val addCountryResponse = addUserInDb(INPUT_COUNTRY_INVALID_COUNTRY)
 
         Assertions.assertTrue(addCountryResponse is ApiResponse.Error.GenericError)
         Assertions.assertNotNull(addCountryResponse)
     }
+}
+
+
+class SMScodeGeneratorTestImpl : SMScodeGenerator {
+
+    override suspend fun sendOtpToMobileNumber(countryCode: Int, phoneNumber: String, messageCode: Int): Boolean = true
 }

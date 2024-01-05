@@ -37,7 +37,7 @@ class UserIdentityResponseRegisterMapper : AppMarkerMapper {
             from[TableUserIdentity.isPhoneVerified], countryModal,
             from[TableUserIdentity.refreshToken] ?: "",
             from[TableUserIdentity.userType],
-            from[TableUserIdentity.phoneOtp] ?: -1,
+            from[TableUserIdentity.phoneOtp] ?: 0,
             from[TableUserIdentity.otpCount],
             from[TableUserIdentity.updateTime],
         )

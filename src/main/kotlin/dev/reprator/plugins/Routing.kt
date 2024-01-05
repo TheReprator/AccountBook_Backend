@@ -1,7 +1,7 @@
 package dev.reprator.plugins
 
 import dev.reprator.core.exception.StatusCodeException
-import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.usecase.FailDTOResponse
 import dev.reprator.core.util.constants.ERROR_DESCRIPTION_NOT_FOUND
 import dev.reprator.core.util.constants.ERROR_DESCRIPTION_UNKNOWN
 import dev.reprator.country.controller.routeCountry
@@ -22,13 +22,13 @@ fun Application.configureRouting() {
             if (cause is StatusCodeException)
             {
                 call.respond(HttpStatusCode(cause.statusCode.value , ""),
-                    FailResponse(cause.statusCode.value, cause.message.orEmpty())
+                    FailDTOResponse(cause.statusCode.value, cause.message.orEmpty())
                 )
             }
             else {
                 call.respond(
                     HttpStatusCode(HttpStatusCode.InternalServerError.value, ""),
-                    FailResponse(HttpStatusCode.InternalServerError.value, "500: ${cause.message}")
+                    FailDTOResponse(HttpStatusCode.InternalServerError.value, "500: ${cause.message}")
                 )
             }
         }
@@ -39,7 +39,7 @@ fun Application.configureRouting() {
                 else -> ERROR_DESCRIPTION_UNKNOWN
             }
             call.respond(HttpStatusCode(status.value , ""),
-                FailResponse(status.value, message))
+                FailDTOResponse(status.value, message))
         }
     }
 

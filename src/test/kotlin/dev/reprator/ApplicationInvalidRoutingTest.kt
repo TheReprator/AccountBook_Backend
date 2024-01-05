@@ -1,6 +1,6 @@
 package dev.reprator
 
-import dev.reprator.core.usecase.FailResponse
+import dev.reprator.core.usecase.FailDTOResponse
 import dev.reprator.core.util.constants.ERROR_DESCRIPTION_NOT_FOUND
 import dev.reprator.language.controller.ENDPOINT_LANGUAGE
 import dev.reprator.testModule.KtorServerExtension
@@ -24,7 +24,7 @@ internal class ApplicationInvalidRoutingTest {
         val response = client.get("${KtorServerExtension.BASE_URL}$ENDPOINT_LANGUAGE/InvalidApi")
 
         Assertions.assertEquals(response.status, HttpStatusCode.NotFound)
-        val resultBody = response.body<FailResponse>()
+        val resultBody = response.body<FailDTOResponse>()
         Assertions.assertEquals(resultBody.statusCode, HttpStatusCode.NotFound.value)
         Assertions.assertEquals(ERROR_DESCRIPTION_NOT_FOUND, resultBody.error)
         Assertions.assertNotNull(resultBody)

@@ -2,13 +2,11 @@ package dev.reprator.userIdentity.controller
 
 import dev.reprator.core.util.respondWithResult
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
-import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.validateForNonEmpty
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
