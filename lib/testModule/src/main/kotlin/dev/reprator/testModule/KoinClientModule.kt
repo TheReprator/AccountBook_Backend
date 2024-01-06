@@ -3,10 +3,12 @@ package dev.reprator.testModule
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
+import dev.reprator.core.usecase.JWTToken
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
 import dev.reprator.core.util.logger.AppLogger
 import impl.AppLoggerImpl
+import impl.JWTTokenImpl
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
@@ -31,6 +33,7 @@ fun KoinApplication.setupCoreNetworkModule() {
 
 private val appCoreModule = module {
     single<AppLogger> { AppLoggerImpl() }
+    single<JWTToken> { JWTTokenImpl() }
 }
 
 private val koinAppTestNetworkModule = module {

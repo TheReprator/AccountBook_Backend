@@ -16,5 +16,8 @@ class UserIdentityControllerImpl(private val userIdentityFacade: UserIdentityFac
         return userIdentityFacade.getUserById(userId)
     }
 
+    override suspend fun verifyOtp(userInfo: UserIdentityOtpEntity): UserIdentityOTPModal =
+        userIdentityFacade.verifyOTP(userInfo)
+
 }
 

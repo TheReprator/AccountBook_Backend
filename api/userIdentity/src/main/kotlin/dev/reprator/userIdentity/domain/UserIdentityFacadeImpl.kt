@@ -1,18 +1,17 @@
 package dev.reprator.userIdentity.domain
 
+import dev.reprator.core.usecase.JWTToken
 import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.userIdentity.data.UserIdentityRepository
-import dev.reprator.userIdentity.modal.UserIdentityFullModal
-import dev.reprator.userIdentity.modal.UserIdentityId
-import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
-import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
+import dev.reprator.userIdentity.modal.*
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
 import org.joda.time.DateTime
 import kotlin.random.Random
 
 class UserIdentityFacadeImpl(
     private val repository: UserIdentityRepository,
-    private val smsUseCase: SMScodeGenerator
+    private val smsUseCase: SMScodeGenerator,
+    private val jwtToken: JWTToken
 ) : UserIdentityFacade {
 
     override suspend fun addNewUserIdentity(userInfo: UserIdentityRegisterEntity): UserIdentityRegisterModal {
@@ -31,11 +30,19 @@ class UserIdentityFacadeImpl(
             if(!it)
                 return@also
             val updateModal = userModal.copy(phoneOtp= otpCode,
-                otpCount = (userModal.otpCount + 1), updateTime = DateTime.now().toDateTimeISO())
+                otpCount = (userModal.otpCount.plus(1)), updateTime = DateTime.now().toDateTimeISO())
             repository.updateUserById(updateModal)
         }
     }
 
     override suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal = repository.getUserById(userId)
+
+    override suspend fun verifyOTP(otpInfo: UserIdentityOtpEntity): UserIdentityOTPModal {
+        val fullUserInfo = repository.getUserById(otpInfo.userId)
+        val token = jwtToken.generateToken()
+        val updatedModal = fullUserInfo.copy(phoneOtp = otpInfo.phoneOtp, refreshToken = token.second,
+            accessToken = token.first, isPhoneVerified = true)
+        return repository.verifyOtp(updatedModal)
+    }
 
 }

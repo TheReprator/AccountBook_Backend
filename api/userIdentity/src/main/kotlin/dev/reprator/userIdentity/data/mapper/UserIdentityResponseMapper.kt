@@ -21,10 +21,24 @@ class UserIdentityResponseRegisterMapper : AppMarkerMapper {
         val countryModal = convertToCountryModal(from)
 
         return UserIdentityOTPModal.DTO(
-            from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
-            from[TableUserIdentity.isPhoneVerified], countryModal,
+            from[TableUserIdentity.id],
+            from[TableUserIdentity.phoneNumber].toString(),
+            from[TableUserIdentity.isPhoneVerified],
+            countryModal,
             from[TableUserIdentity.refreshToken] ?: "",
             from[TableUserIdentity.userType]
+        )
+    }
+
+    suspend fun mapToOtpModal(from: UserIdentityFullModal): UserIdentityOTPModal {
+
+        return UserIdentityOTPModal.DTO(
+            from.userId,
+            from.phoneNumber,
+            from.isPhoneVerified,
+            from.country,
+            from.refreshToken,
+            from.userType
         )
     }
 

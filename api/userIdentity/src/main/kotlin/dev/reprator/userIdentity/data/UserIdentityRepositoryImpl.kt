@@ -38,9 +38,11 @@ class UserIdentityRepositoryImpl(
             .singleOrNull() ?: throw IllegalUserIdentityException()
     }
 
-    override suspend fun updateUserById(userModal: UserIdentityFullModal) = dbQuery {
-        val result =
-            TableUserIdentity.update({ TableUserIdentity.id eq userModal.userId }) {
+    override suspend fun updateUserById(
+        userModal: UserIdentityFullModal,
+        conditionBlock: SqlExpressionBuilder.() -> Op<Boolean>
+    ): Int = dbQuery {
+        val result = TableUserIdentity.update({ conditionBlock(this) }) {
             it[updateTime] = userModal.updateTime
             it[isPhoneVerified] = userModal.isPhoneVerified
             if(userModal.otpCount.safeValidateForNonNegative())
@@ -53,5 +55,18 @@ class UserIdentityRepositoryImpl(
         }
 
         appLogger.e { "record updated status:: $result" }
+        result
+    }
+
+    override suspend fun verifyOtp(userModal: UserIdentityFullModal): UserIdentityOTPModal {
+
+        val result = updateUserById(userModal) {
+            (TableUserIdentity.id eq userModal.userId) and (TableUserIdentity.phoneOtp eq userModal.phoneOtp)
+        }
+
+        if(0 < result) {
+            return mapper.mapToOtpModal(userModal)
+        }
+        throw IllegalUserIdentityException()
     }
 }

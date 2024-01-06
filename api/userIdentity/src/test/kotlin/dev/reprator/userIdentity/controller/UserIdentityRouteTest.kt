@@ -14,6 +14,8 @@ import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.setupCoreNetworkModule
 import dev.reprator.userIdentity.data.TableUserIdentity
+import dev.reprator.userIdentity.modal.UserIdentityOTPModal
+import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
@@ -84,6 +86,7 @@ internal class UserIdentityRouteTest : KoinTest {
 
     private suspend inline fun <reified T> clientBody(
         endPoint: String,
+        methodName: HttpMethod = HttpMethod.Post,
         crossinline block: HttpRequestBuilder.() -> Unit
     ) =
         get<HttpClient>().safeRequest<T>(
@@ -91,7 +94,7 @@ internal class UserIdentityRouteTest : KoinTest {
             attributes = get<Attributes>()
         ) {
             url {
-                method = HttpMethod.Post
+                method = methodName
                 path("$ENDPOINT_ACCOUNT/$endPoint")
             }
             contentType(ContentType.Application.Json)
@@ -125,7 +128,7 @@ internal class UserIdentityRouteTest : KoinTest {
             setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
         } as ApiResponse.Success
 
-        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE) {
+        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE, HttpMethod.Patch) {
             setBody(FormDataContent(Parameters.build {
                 append(PARAMETER_USER_ID, "${userRegisterResponse.body.data.userId}")
             }))
@@ -140,13 +143,52 @@ internal class UserIdentityRouteTest : KoinTest {
     @Test
     fun `Failed to Generate otp as user didn't exist in db`() = runBlocking {
 
-        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE) {
+        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE, HttpMethod.Patch) {
             setBody(FormDataContent(Parameters.build {
                 append(PARAMETER_USER_ID, "95")
             }))
         } as ApiResponse.Error.HttpError
 
         Assertions.assertEquals(400, generateOtp.code)
+    }
+
+    @Test
+    fun `Verify user with otp, when user exist in db`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+
+        val verifyOtp = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
+        } as ApiResponse.Success
+
+        val otpModal = verifyOtp.body.data
+
+        Assertions.assertTrue(otpModal.isPhoneVerified)
+        //Assertions.assertTrue(1== otpModal.refreshToken.length)
+        Assertions.assertEquals(userFullModal.userId, otpModal.userId)
+        Assertions.assertEquals(userFullModal.phoneNumber, otpModal.phoneNumber)
+    }
+
+    @Test
+    fun `Failed to verify user with otp as otp didn't match in db for user`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+
+        val verifyOtp = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, 3534543))
+        } as ApiResponse.Error.HttpError
+
+        Assertions.assertEquals(400, verifyOtp.code)
     }
 
     @Test

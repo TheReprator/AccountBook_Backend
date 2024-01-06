@@ -9,4 +9,6 @@ interface UserIdentityFacade {
     suspend fun generateAndSendOTP(userId: UserIdentityId): Boolean
 
     suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal
+
+    suspend fun verifyOTP(otpInfo: UserIdentityOtpEntity): UserIdentityOTPModal
 }

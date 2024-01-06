@@ -11,5 +11,8 @@ interface UserIdentityController  {
 
     @Throws(IllegalUserIdentityException::class)
     suspend fun getUserById(userId: UserIdentityId): UserIdentityFullModal
+
+    @Throws(IllegalUserIdentityException::class)
+    suspend fun verifyOtp(userInfo: UserIdentityOtpEntity): UserIdentityOTPModal
 }
 

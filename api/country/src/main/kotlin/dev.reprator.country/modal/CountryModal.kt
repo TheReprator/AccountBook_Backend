@@ -8,5 +8,9 @@ interface CountryModal : CountryEntity {
         override val name: CountryName,
         override val callingCode: CountryCallingCode,
         override val shortCode: CountryShortCode
-    ) : CountryModal
+    ) : CountryModal {
+        companion object {
+            fun emptyCountryModal(): DTO = DTO(-1, "", -1, "" )
+        }
+    }
 }

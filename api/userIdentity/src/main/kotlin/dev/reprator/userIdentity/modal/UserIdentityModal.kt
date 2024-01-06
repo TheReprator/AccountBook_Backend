@@ -1,7 +1,10 @@
 package dev.reprator.userIdentity.modal
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import dev.reprator.core.usecase.ACCESS_TOKEN
+import dev.reprator.core.usecase.REFRESH_TOKEN
 import dev.reprator.country.modal.CountryModal
+import dev.reprator.country.modal.CountryModal.DTO.Companion.emptyCountryModal
 import dev.reprator.userIdentity.data.USER_CATEGORY
 import org.joda.time.DateTime
 
@@ -42,7 +45,8 @@ interface UserIdentityFullModal {
     val phoneOtp: UserPhoneOTP
     val isPhoneVerified: Boolean
     val userType: USER_CATEGORY
-    val refreshToken: String
+    val accessToken: ACCESS_TOKEN
+    val refreshToken: REFRESH_TOKEN
     val otpCount: Int
     val updateTime: DateTime
 
@@ -51,10 +55,17 @@ interface UserIdentityFullModal {
         override val phoneNumber: PhoneNumber,
         override val isPhoneVerified: Boolean,
         override val country: CountryModal.DTO,
-        override val refreshToken: String,
+        override val refreshToken: REFRESH_TOKEN,
         override val userType: USER_CATEGORY,
         override val phoneOtp: UserPhoneOTP,
         override val otpCount: Int,
-        override val updateTime: DateTime
-    ) : UserIdentityFullModal
+        override val updateTime: DateTime, override val accessToken: ACCESS_TOKEN = ""
+    ) : UserIdentityFullModal {
+
+        companion object {
+            fun emptyFullModalByUserId(userId: UserIdentityId): DTO =
+                DTO(userId, "", false,
+                    emptyCountryModal(), "", USER_CATEGORY.admin, -1, -1, DateTime.now().toDateTimeISO())
+        }
+    }
 }

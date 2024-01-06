@@ -2,6 +2,7 @@ package dev.reprator.userIdentity.controller
 
 import dev.reprator.core.util.respondWithResult
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
+import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.validateForNonEmpty
 import io.ktor.http.*
@@ -31,9 +32,15 @@ fun Routing.routeUserIdentity() {
             }
         }
 
-        post(ACCOUNT_OTP_GENERATE) {
+        patch (ACCOUNT_OTP_GENERATE) {
             val userId = call.receiveParameters()[PARAMETER_USER_ID]?.toIntOrNull()?.validateForNonEmpty() ?: throw IllegalUserIdentityException()
             respondWithResult(HttpStatusCode.OK, controller.generateAndSendOTP(userId))
+        }
+
+        post(ACCOUNT_OTP_VERIFY) {
+            val otpInfo =
+                call.receiveNullable<UserIdentityOtpEntity.DTO>()?.validate() ?: throw IllegalUserIdentityException()
+            respondWithResult(HttpStatusCode.OK, controller.verifyOtp(otpInfo))
         }
     }
 }

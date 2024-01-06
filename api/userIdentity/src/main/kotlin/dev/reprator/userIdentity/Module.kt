@@ -16,7 +16,7 @@ val userIdentityModule = module {
     single<UserIdentityRepository> { UserIdentityRepositoryImpl(get(), get()) }
 
     single<SMScodeGenerator> { SMScodeGeneratorImpl(get(), get(), get()) }
-    single<UserIdentityFacade> { UserIdentityFacadeImpl(get(), get()) }
+    single<UserIdentityFacade> { UserIdentityFacadeImpl(get(), get(), get()) }
 
     single<UserIdentityController> { UserIdentityControllerImpl(get()) }
 }

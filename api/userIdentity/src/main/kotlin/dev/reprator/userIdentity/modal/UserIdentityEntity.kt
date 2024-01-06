@@ -57,7 +57,7 @@ interface UserIdentityOtpEntity {
 
         override fun validate(): DTO {
             userId.validateForNonEmpty()
-            phoneOtp.validateForNonEmpty()
+            phoneOtp.validateForOtp()
 
             return this
         }
@@ -113,6 +113,14 @@ fun Int.validateForNonEmpty(): Int {
 
     return this
 }
+
+fun Int.validateForOtp(): Boolean {
+    if(-1 >= this)
+        return false
+    val otpLength = this.toString().trim().length
+    return LENGTH_OTP == otpLength
+}
+
 
 fun String.safeValidateForEmpty(): Boolean {
     return this.trim().isBlank()
