@@ -16,6 +16,7 @@ dependencies {
     implementation("com.google.api-client:google-api-client:1.32.1")
 
     implementation(libs.exposed.postgres)
+    implementation(libs.test.coroutine)
 
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)

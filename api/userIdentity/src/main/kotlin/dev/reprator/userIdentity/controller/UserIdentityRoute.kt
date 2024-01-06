@@ -12,8 +12,9 @@ import org.koin.ktor.ext.inject
 
 const val ENDPOINT_ACCOUNT = "/accounts"
 const val ACCOUNT_REGISTER = "register"
-const val ACCOUNT_OTP_GENERATE = "generateOtp"
+const val ACCOUNT_OTP_GENERATE = "otpGenerate"
 const val ACCOUNT_OTP_VERIFY = "otpVerify"
+const val PARAMETER_USER_ID="userId"
 
 fun Routing.routeUserIdentity() {
 
@@ -31,7 +32,7 @@ fun Routing.routeUserIdentity() {
         }
 
         post(ACCOUNT_OTP_GENERATE) {
-            val userId = call.parameters["userId"]?.toIntOrNull()?.validateForNonEmpty() ?: throw IllegalUserIdentityException()
+            val userId = call.receiveParameters()[PARAMETER_USER_ID]?.toIntOrNull()?.validateForNonEmpty() ?: throw IllegalUserIdentityException()
             respondWithResult(HttpStatusCode.OK, controller.generateAndSendOTP(userId))
         }
     }

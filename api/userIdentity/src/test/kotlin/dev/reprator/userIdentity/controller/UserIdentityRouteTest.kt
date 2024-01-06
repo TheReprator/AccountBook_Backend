@@ -20,6 +20,7 @@ import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.runBlocking
@@ -81,26 +82,30 @@ internal class UserIdentityRouteTest : KoinTest {
         databaseFactory.close()
     }
 
-    private fun addUserInDb(countryInfo: UserIdentityRegisterEntity) = runBlocking {
-        get<HttpClient>().safeRequest<ResultDTOResponse<UserIdentityRegisterModal>>(
+    private suspend inline fun <reified T> clientBody(
+        endPoint: String,
+        crossinline block: HttpRequestBuilder.() -> Unit
+    ) =
+        get<HttpClient>().safeRequest<T>(
             apiType = APIS.INTERNAL_APP,
             attributes = get<Attributes>()
         ) {
             url {
                 method = HttpMethod.Post
-                path("$ENDPOINT_ACCOUNT/$ACCOUNT_REGISTER")
-                contentType(ContentType.Application.Json)
-                setBody(countryInfo)
+                path("$ENDPOINT_ACCOUNT/$endPoint")
             }
+            contentType(ContentType.Application.Json)
+            block(this@safeRequest)
         }
-    }
 
     @Test
     fun `Register a user as new user, for valid country id, with otp being sent by server to client successfully`() =
         runBlocking {
 
             val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
-            val userRegisterResponse = addUserInDb(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+            val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+                setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+            }
 
             Assertions.assertTrue(userRegisterResponse is ApiResponse.Success)
             Assertions.assertNotNull(userRegisterResponse)
@@ -113,8 +118,42 @@ internal class UserIdentityRouteTest : KoinTest {
         }
 
     @Test
+    fun `Generate otp and send, when user exist in db`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE) {
+            setBody(FormDataContent(Parameters.build {
+                append(PARAMETER_USER_ID, "${userRegisterResponse.body.data.userId}")
+            }))
+        } as ApiResponse.Success
+
+        Assertions.assertTrue(generateOtp.body.data)
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+        Assertions.assertEquals(2, userFullModal.otpCount)
+    }
+
+    @Test
+    fun `Failed to Generate otp as user didn't exist in db`() = runBlocking {
+
+        val generateOtp = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_OTP_GENERATE) {
+            setBody(FormDataContent(Parameters.build {
+                append(PARAMETER_USER_ID, "95")
+            }))
+        } as ApiResponse.Error.HttpError
+
+        Assertions.assertEquals(400, generateOtp.code)
+    }
+
+    @Test
     fun `Failed to add new user, for invalid country id`(): Unit = runBlocking {
-        val addCountryResponse = addUserInDb(INPUT_COUNTRY_INVALID_COUNTRY)
+        val addCountryResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_INVALID_COUNTRY)
+        }
 
         Assertions.assertTrue(addCountryResponse is ApiResponse.Error.GenericError)
         Assertions.assertNotNull(addCountryResponse)
