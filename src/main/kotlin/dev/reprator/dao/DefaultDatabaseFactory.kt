@@ -4,12 +4,14 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import dev.reprator.core.util.dbConfiguration.DatabaseConfig
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.country.data.TableCountry
 import dev.reprator.language.data.TableLanguage
+import dev.reprator.userIdentity.data.TableUserIdentity
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DefaultDatabaseFactory(private val dbConfig: DatabaseConfig) : DatabaseFactory {
+class DefaultDatabaseFactory(dbConfig: DatabaseConfig) : DatabaseFactory {
 
     private val dataSource: HikariDataSource by lazy {
         val jdbcUrl = "jdbc:postgresql://${dbConfig.serverName}:${dbConfig.port}/${dbConfig.dbName}?user=${dbConfig.userName}&password=${dbConfig.password}"
@@ -20,7 +22,7 @@ class DefaultDatabaseFactory(private val dbConfig: DatabaseConfig) : DatabaseFac
         val database = Database.connect(dataSource)
 
         transaction(database) {
-            SchemaUtils.create(TableLanguage)
+            SchemaUtils.create(TableLanguage, TableCountry, TableUserIdentity)
         }
     }
 

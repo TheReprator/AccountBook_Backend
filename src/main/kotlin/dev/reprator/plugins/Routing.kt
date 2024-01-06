@@ -7,7 +7,6 @@ import dev.reprator.core.util.constants.ERROR_DESCRIPTION_UNKNOWN
 import dev.reprator.country.controller.routeCountry
 import dev.reprator.language.controller.routeLanguage
 import dev.reprator.splash.controller.routeSplash
-import dev.reprator.splash.setUpSplashFolder
 import dev.reprator.userIdentity.controller.routeUserIdentity
 import io.ktor.server.routing.*
 import io.ktor.server.response.*
@@ -44,7 +43,7 @@ fun Application.configureRouting() {
     }
 
     routing {
-        routeSplash(environment?.config?.setUpSplashFolder())
+        routeSplash()
         routeLanguage()
         routeCountry()
         routeUserIdentity()

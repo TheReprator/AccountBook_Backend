@@ -35,6 +35,7 @@ fun koinAppModule(applicationEnvironment: ApplicationEnvironment) = module {
 
     single<ApplicationConfig> { applicationEnvironment.config }
 
+    factory(named(UPLOAD_FOLDER_SPLASH)) { applicationEnvironment.config.propertyConfig(UPLOAD_FOLDER_SPLASH) }
     factory(named(VERIFICATION_SMS_PHONE_APIKEY)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_APIKEY) }
     factory(named(VERIFICATION_SMS_PHONE_USERID)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_USERID) }
 

@@ -8,6 +8,7 @@ ktor:
     modules:
       - dev.reprator.ApplicationKt.module
 
+
 storage:
   driverClassName: "org.postgresql.Driver"
   databaseName: "$DATABASE_NAME:khatabook"
@@ -16,6 +17,7 @@ storage:
   userName: "$DATABASE_USERNAME:postgres"
   password: "$DATABASE_PASSWORD:vikram90#"
 
+
 secrets:
   phone:
       apiKey: "dQzSARrkyBgkLpNKLnswaqnktfC2EvrB7IwiPCLbIUUKJtIj"
@@ -23,10 +25,12 @@ secrets:
 
 
 jwt:
-  secret: "secret"
-  issuer: "http://0.0.0.0:8081/"
-  audience: "http://0.0.0.0:8081/hello"
-  realm: "Access to 'hello'"
+  secret: "RepratorKhataBookSecret"
+  issuer: "khataBookIssuer"
+  audience: "khatabookAudience"
+  realm: "khatabookRealm"
+  realmRole: "khatabookRealmRole"
+
 
 khatabook:
   splash:

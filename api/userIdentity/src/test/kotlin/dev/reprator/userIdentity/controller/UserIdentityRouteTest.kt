@@ -169,7 +169,7 @@ internal class UserIdentityRouteTest : KoinTest {
         val otpModal = verifyOtp.body.data
 
         Assertions.assertTrue(otpModal.isPhoneVerified)
-        //Assertions.assertTrue(1== otpModal.refreshToken.length)
+        Assertions.assertTrue(LENGTH_OTP == otpModal.refreshToken.length)
         Assertions.assertEquals(userFullModal.userId, otpModal.userId)
         Assertions.assertEquals(userFullModal.phoneNumber, otpModal.phoneNumber)
     }

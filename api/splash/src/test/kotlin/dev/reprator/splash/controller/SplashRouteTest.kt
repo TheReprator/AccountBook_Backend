@@ -1,6 +1,7 @@
 package dev.reprator.splash.controller
 
 import dev.reprator.core.usecase.ResultDTOResponse
+import dev.reprator.core.util.constants.UPLOAD_FOLDER_SPLASH
 import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.splash.modal.SplashModal
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.core.context.startKoin
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.junit5.mock.MockProviderExtension
 import org.koin.test.mock.declareMock
@@ -33,7 +36,13 @@ internal class SplashController : KoinTest {
 
     @Test
     fun `Fetch Splash api`(): Unit = runBlocking {
-        startKoin {  }
+
+        startKoin {
+            modules(
+                module {
+                factory(named(UPLOAD_FOLDER_SPLASH)) { "splashFileDirectory" }
+            })
+        }
 
         val mockLanguageFacade = declareMock<LanguageFacade>()
 
