@@ -1,6 +1,5 @@
 package dev.reprator
 
-import dev.reprator.configuration.setupApplicationConfiguration
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.setUpKoinCountry
 import dev.reprator.language.setUpKoinLanguage
@@ -11,8 +10,7 @@ import dev.reprator.plugins.*
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
-import org.koin.core.parameter.parametersOf
-import org.koin.ktor.ext.inject
+import org.koin.ktor.ext.get
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
 
@@ -22,7 +20,7 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules(koinAppModule, koinAppNetworkModule)
+        modules(koinAppModule(this@module.environment), koinAppDBModule, koinAppNetworkModule)
         setUpKoinLanguage()
         setUpKoinCountry()
         setUpKoinUserIdentityModule()
@@ -44,8 +42,7 @@ fun Application.module() {
         anyHost()
     }
 
-    val databaseFactory : DatabaseFactory by inject { parametersOf(environment.config.setupApplicationConfiguration()) }
-    databaseFactory.connect()
+    get<DatabaseFactory>().connect()
 
     install(ShutDownUrl.ApplicationCallPlugin) {
         shutDownUrl = "/shutdown"

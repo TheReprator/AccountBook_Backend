@@ -2,6 +2,7 @@ package dev.reprator
 
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
+import dev.reprator.core.util.dbConfiguration.DatabaseConfig
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.core.util.logger.AppLogger
 import dev.reprator.dao.DefaultDatabaseFactory
@@ -14,6 +15,8 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,12 +27,32 @@ import org.koin.dsl.module
 
 private const val MILLISECONDS = 1000L
 
+private val propertyConfig: ApplicationConfig.(String) -> String = {
+    this.property(it).getString()
+}
 
-val koinAppModule = module {
-    single<DatabaseFactory> { params -> DefaultDatabaseFactory(appConfig = params.get()) }
+fun koinAppModule(applicationEnvironment: ApplicationEnvironment) = module {
+
+    single<ApplicationConfig> { applicationEnvironment.config }
+
+    factory(named(VERIFICATION_SMS_PHONE_APIKEY)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_APIKEY) }
+    factory(named(VERIFICATION_SMS_PHONE_USERID)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_USERID) }
+
     single<AppLogger> { AppLoggerImpl() }
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }.withOptions {
         qualifier = named(APP_COROUTINE_SCOPE)
+    }
+}
+
+val koinAppDBModule = module {
+    single<DatabaseFactory> {
+        val config: ApplicationConfig = get<ApplicationConfig>()
+
+        fun property(property: String): String = config.propertyConfig("storage.$property")
+
+        DefaultDatabaseFactory((DatabaseConfig(property("driverClassName"), property("databaseName"),
+            property("portNumber").toInt(), property("serverName"), property("userName"), property("password"))))
+
     }
 }
 
@@ -99,8 +122,8 @@ val koinAppNetworkModule = module {
 
                     val apiType = providerType == APIS.EXTERNAL_OTP_VERIFICATION
                     if(apiType) {
-                        append("API-Key", VERIFICATION_SMS_PHONE_API)
-                        append("User-ID", VERIFICATION_SMS_PHONE_USERID)
+                        append("API-Key", get<String>(named(VERIFICATION_SMS_PHONE_APIKEY)))
+                        append("User-ID", get<String>(named(VERIFICATION_SMS_PHONE_USERID)))
                     }
                 }
 

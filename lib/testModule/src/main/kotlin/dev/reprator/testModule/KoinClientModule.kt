@@ -88,7 +88,7 @@ private val koinAppTestNetworkModule = module {
                     append(HttpHeaders.ContentType, "application/json")
 
                     if (isExternal) {
-                        append("API-Key", VERIFICATION_SMS_PHONE_API)
+                        append("API-Key", VERIFICATION_SMS_PHONE_APIKEY)
                         append("User-ID", VERIFICATION_SMS_PHONE_USERID)
                     }
                 }

@@ -16,6 +16,12 @@ storage:
   userName: "$DATABASE_USERNAME:postgres"
   password: "$DATABASE_PASSWORD:vikram90#"
 
+secrets:
+  phone:
+      apiKey: "dQzSARrkyBgkLpNKLnswaqnktfC2EvrB7IwiPCLbIUUKJtIj"
+      userId: "Reprator"
+
+
 jwt:
   secret: "secret"
   issuer: "http://0.0.0.0:8081/"

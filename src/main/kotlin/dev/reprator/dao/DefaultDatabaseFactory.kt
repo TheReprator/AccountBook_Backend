@@ -2,20 +2,21 @@ package dev.reprator.dao
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.reprator.core.util.dbConfiguration.AppDBConfiguration
+import dev.reprator.core.util.dbConfiguration.DatabaseConfig
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.language.data.TableLanguage
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DefaultDatabaseFactory(appConfig: AppDBConfiguration) : DatabaseFactory {
+class DefaultDatabaseFactory(private val dbConfig: DatabaseConfig) : DatabaseFactory {
 
-    private val dbConfig = appConfig.databaseConfig
-    private lateinit var dataSource: HikariDataSource
+    private val dataSource: HikariDataSource by lazy {
+        val jdbcUrl = "jdbc:postgresql://${dbConfig.serverName}:${dbConfig.port}/${dbConfig.dbName}?user=${dbConfig.userName}&password=${dbConfig.password}"
+        createHikariDataSource(dbConfig.driverClass, jdbcUrl)
+    }
 
     override fun connect() {
-        dataSource = hikari()
         val database = Database.connect(dataSource)
 
         transaction(database) {
@@ -25,11 +26,6 @@ class DefaultDatabaseFactory(appConfig: AppDBConfiguration) : DatabaseFactory {
 
     override fun close() {
         dataSource.close()
-    }
-
-    private fun hikari(): HikariDataSource {
-        val jdbcUrl = "jdbc:postgresql://${dbConfig.serverName}:${dbConfig.port}/${dbConfig.dbName}?user=${dbConfig.userName}&password=${dbConfig.password}"
-        return createHikariDataSource(dbConfig.driverClass, jdbcUrl)
     }
 
     private fun createHikariDataSource(

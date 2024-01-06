@@ -1,7 +1,8 @@
 package dev.reprator.core.util.constants
 
-const val VERIFICATION_SMS_PHONE_API = "dQzSARrkyBgkLpNKLnswaqnktfC2EvrB7IwiPCLbIUUKJtIj"
-const val VERIFICATION_SMS_PHONE_USERID = "Reprator"
+private const val VERIFICATION_SMS_PHONE = "secrets.phone"
+const val VERIFICATION_SMS_PHONE_APIKEY = "$VERIFICATION_SMS_PHONE.apiKey"
+const val VERIFICATION_SMS_PHONE_USERID = "$VERIFICATION_SMS_PHONE.userId"
 
 const val LENGTH_OTP = 6
 
