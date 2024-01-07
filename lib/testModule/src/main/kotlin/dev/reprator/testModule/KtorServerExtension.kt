@@ -1,5 +1,6 @@
 package dev.reprator.testModule
 
+import dev.reprator.core.util.constants.API_BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -13,15 +14,16 @@ import io.ktor.server.netty.NettyApplicationEngine
 import org.junit.jupiter.api.extension.*
 
 class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
+
+
     companion object {
-        const val BASE_HOST = "0.0.0.0"
-        private lateinit var server: NettyApplicationEngine
 
-        var testPort: Int = 0
-            private set
+        var TEST_SERVER: NettyApplicationEngine ?= null
 
-        val BASE_URL: String
-            get() = "http://$BASE_HOST:$testPort"
+        private var testPort: Int = 0
+
+        val TEST_BASE_URL: String
+            get() = "http://${API_BASE_URL.INTERNAL_APP.value}:$testPort"
     }
 
     override fun beforeEach(context: ExtensionContext?) {
@@ -29,16 +31,17 @@ class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
             config = ApplicationConfig("application-test.conf")
             // Public API
             connector {
-                host = BASE_HOST
+                host = API_BASE_URL.INTERNAL_APP.value
                 port = config.property("ktor.deployment.port").getString().toInt()
                 testPort = port
             }
         }
-        server = embeddedServer(Netty, env).start(false)
+
+        TEST_SERVER = embeddedServer(Netty, env).start(false)
     }
 
     override fun afterEach(context: ExtensionContext?) {
-        server.stop(100, 100)
+            TEST_SERVER?.stop(100, 100)
     }
 }
 

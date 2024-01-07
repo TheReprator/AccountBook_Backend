@@ -2,7 +2,6 @@ package dev.reprator.language.data
 
 import dev.reprator.language.modal.LanguageModal
 
-
 interface LanguageRepository {
 
     suspend fun allLanguage(): List<LanguageModal>

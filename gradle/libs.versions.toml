@@ -9,7 +9,6 @@ koin-test = "3.5.3"
 junit5 = "5.10.1"
 
 [libraries]
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
@@ -19,11 +18,21 @@ ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negoti
 ktor-server-serialization = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth-jvm", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt-jvm", version.ref = "ktor" }
 ktor-logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposedVersion" }
 exposed-dao= { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposedVersion" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposedVersion" }
+exposed-jodatime = { module = "org.jetbrains.exposed:exposed-jodatime", version.ref = "exposedVersion" }
 exposed-h2Db = "com.h2database:h2:2.2.224"
 exposed-hikariCp = "com.zaxxer:HikariCP:5.1.0"
 exposed-postgres = "org.postgresql:postgresql:42.7.1"
@@ -32,6 +41,7 @@ koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 
 test-mockk = "io.mockk:mockk:1.13.8"
+test-coroutine = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3"
 test-junit5-suite = "org.junit.platform:junit-platform-suite:1.10.1"
 test-junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 test-junit5-runtime= { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }

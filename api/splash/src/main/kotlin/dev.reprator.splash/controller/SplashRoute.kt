@@ -1,19 +1,23 @@
 package dev.reprator.splash.controller
 
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.util.constants.UPLOAD_FOLDER_SPLASH
+import dev.reprator.core.util.respondWithResult
 import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.splash.modal.SplashModal
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.async
+import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 import java.io.File
+import java.io.IOException
+import org.koin.ktor.ext.get as koinGet
 
 const val ENDPOINT_SPLASH = "/splash"
 
-fun Routing.routeSplash(splashDirectory: File?) {
+fun Routing.routeSplash() {
+
+    val splashDirectory by lazy { setUpSplashFolder(koinGet<String>(named(UPLOAD_FOLDER_SPLASH))) }
 
     val languageFacade by inject<LanguageFacade>()
 
@@ -21,7 +25,7 @@ fun Routing.routeSplash(splashDirectory: File?) {
         get {
 
             val fileAsyncResult = async {
-                 splashDirectory?.listFiles()?.map {
+                splashDirectory.listFiles()?.map {
                     it.absolutePath
                 }.orEmpty()
             }
@@ -31,8 +35,16 @@ fun Routing.routeSplash(splashDirectory: File?) {
             }
 
             val splashModal = SplashModal(fileAsyncResult.await(), languageAsyncResult.await())
-            call.respond(ResultResponse(HttpStatusCode.OK.value, splashModal))
+            respondWithResult(HttpStatusCode.OK, splashModal)
         }
 
     }
+}
+
+private fun setUpSplashFolder(uploadDirPath: String): File {
+    val uploadDir = File(uploadDirPath)
+    if (!uploadDir.mkdirs() && !uploadDir.exists()) {
+        throw IOException("Failed to create directory ${uploadDir.absolutePath}")
+    }
+    return uploadDir
 }
