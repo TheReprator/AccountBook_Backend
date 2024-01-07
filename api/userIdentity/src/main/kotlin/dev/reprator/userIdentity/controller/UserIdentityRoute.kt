@@ -7,6 +7,7 @@ import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.validateForNonEmpty
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
@@ -15,7 +16,11 @@ const val ENDPOINT_ACCOUNT = "/accounts"
 const val ACCOUNT_REGISTER = "register"
 const val ACCOUNT_OTP_GENERATE = "otpGenerate"
 const val ACCOUNT_OTP_VERIFY = "otpVerify"
-const val PARAMETER_USER_ID="userId"
+const val ACCOUNT_LOGOUT = "logOut"
+const val ACCOUNT_TOKEN_REFRESH = "refreshToken"
+
+const val PARAMETER_USER_ID = "userId"
+const val PARAMETER_ACCESS_TOKEN = "accessToken"
 
 fun Routing.routeUserIdentity() {
 
@@ -41,6 +46,19 @@ fun Routing.routeUserIdentity() {
             val otpInfo =
                 call.receiveNullable<UserIdentityOtpEntity.DTO>()?.validate() ?: throw IllegalUserIdentityException()
             respondWithResult(HttpStatusCode.OK, controller.verifyOtp(otpInfo))
+        }
+
+        post(ACCOUNT_TOKEN_REFRESH) {
+            val accessToken = call.receiveParameters()[PARAMETER_ACCESS_TOKEN]
+            accessToken?.validateForNonEmpty() ?: throw IllegalUserIdentityException()
+            respondWithResult(HttpStatusCode.OK, controller.refreshToken(accessToken))
+        }
+
+        authenticate {
+            post(ACCOUNT_LOGOUT) {
+                val userId = call.receiveParameters()[PARAMETER_USER_ID]?.toIntOrNull()?.validateForNonEmpty() ?: throw IllegalUserIdentityException()
+                respondWithResult(HttpStatusCode.OK, controller.logout(userId))
+            }
         }
     }
 }

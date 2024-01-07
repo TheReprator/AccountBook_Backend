@@ -7,10 +7,9 @@ import java.util.regex.Pattern
 class AppLoggerImpl : AppLogger {
 
     companion object {
-        private const val MAX_LOG_LENGTH = 4000
-        private const val MAX_TAG_LENGTH = 23
         private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
     }
+
     enum class AppLogLevel {
         Verbose,
         Debug,
@@ -21,7 +20,7 @@ class AppLoggerImpl : AppLogger {
 
 
     private val tag: String?
-        get() =  Throwable().stackTrace[3]
+        get() = Throwable().stackTrace[3]
             .let(::createStackElementTag)
 
     /**
@@ -31,18 +30,14 @@ class AppLoggerImpl : AppLogger {
      *
      * Note: This will not be called if a [manual tag][.tag] was specified.
      */
-    private fun createStackElementTag(element: StackTraceElement): String? {
+    private fun createStackElementTag(element: StackTraceElement): String {
         var tag = element.fileName ?: element.className.substringAfterLast('.')
         val m = ANONYMOUS_CLASS.matcher(tag)
         if (m.find()) {
             tag = m.replaceAll("")
         }
-
-          return  tag
-
+        return tag
     }
-//    private val tag: String
-//        get() = Thread.currentThread().stackTrace[2].className
 
     private fun log(
         severity: AppLogLevel,
@@ -53,7 +48,8 @@ class AppLoggerImpl : AppLogger {
         println(formatMessage(severity, message, tag, throwable))
     }
 
-    private fun formatMessage(severity: AppLogLevel, message: String, tag: String?, throwable: Throwable?): String = "$severity: ($tag) $message"
+    private fun formatMessage(severity: AppLogLevel, message: String, tag: String?, throwable: Throwable?): String =
+        "$severity: ($tag) $message"
 
     private fun processLog(
         severity: AppLogLevel,

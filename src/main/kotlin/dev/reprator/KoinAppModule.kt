@@ -1,5 +1,7 @@
 package dev.reprator
 
+import dev.reprator.core.usecase.JWTConfiguration
+import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
 import dev.reprator.core.util.dbConfiguration.DatabaseConfig
@@ -7,6 +9,7 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.core.util.logger.AppLogger
 import dev.reprator.dao.DefaultDatabaseFactory
 import dev.reprator.impl.AppLoggerImpl
+import dev.reprator.impl.JwtTokenServiceImpl
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -36,8 +39,22 @@ fun koinAppModule(applicationEnvironment: ApplicationEnvironment) = module {
     single<ApplicationConfig> { applicationEnvironment.config }
 
     factory(named(UPLOAD_FOLDER_SPLASH)) { applicationEnvironment.config.propertyConfig(UPLOAD_FOLDER_SPLASH) }
-    factory(named(VERIFICATION_SMS_PHONE_APIKEY)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_APIKEY) }
-    factory(named(VERIFICATION_SMS_PHONE_USERID)) { applicationEnvironment.config.propertyConfig(VERIFICATION_SMS_PHONE_USERID) }
+    factory(named(VERIFICATION_SMS_PHONE_APIKEY)) {
+        applicationEnvironment.config.propertyConfig(
+            VERIFICATION_SMS_PHONE_APIKEY
+        )
+    }
+    factory(named(VERIFICATION_SMS_PHONE_USERID)) {
+        applicationEnvironment.config.propertyConfig(
+            VERIFICATION_SMS_PHONE_USERID
+        )
+    }
+
+    single<JwtTokenService> {
+        fun property(property: String): String = applicationEnvironment.config.propertyConfig("jwt.$property")
+        val jwtConfiguration = JWTConfiguration(property("secret"), property("audience"), property("issuer"), property("realm"))
+        JwtTokenServiceImpl(jwtConfiguration, get())
+    }
 
     single<AppLogger> { AppLoggerImpl() }
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }.withOptions {
@@ -51,8 +68,12 @@ val koinAppDBModule = module {
 
         fun property(property: String): String = config.propertyConfig("storage.$property")
 
-        DefaultDatabaseFactory((DatabaseConfig(property("driverClassName"), property("databaseName"),
-            property("portNumber").toInt(), property("serverName"), property("userName"), property("password"))))
+        DefaultDatabaseFactory(
+            (DatabaseConfig(
+                property("driverClassName"), property("databaseName"),
+                property("portNumber").toInt(), property("serverName"), property("userName"), property("password")
+            ))
+        )
 
     }
 }
@@ -122,16 +143,17 @@ val koinAppNetworkModule = module {
                     append(HttpHeaders.ContentType, "application/json")
 
                     val apiType = providerType == APIS.EXTERNAL_OTP_VERIFICATION
-                    if(apiType) {
+                    if (apiType) {
                         append("API-Key", get<String>(named(VERIFICATION_SMS_PHONE_APIKEY)))
                         append("User-ID", get<String>(named(VERIFICATION_SMS_PHONE_USERID)))
                     }
                 }
 
                 url {
-                    val apiHost = when(providerType) {
+                    val apiHost = when (providerType) {
                         APIS.EXTERNAL_OTP_VERIFICATION ->
                             API_BASE_URL.EXTERNAL_OTP_VERIFICATION.value
+
                         else -> API_BASE_URL.INTERNAL_APP.value
                     }
                     host = apiHost

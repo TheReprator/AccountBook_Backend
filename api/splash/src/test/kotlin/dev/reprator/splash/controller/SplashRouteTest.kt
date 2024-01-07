@@ -6,7 +6,7 @@ import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.splash.modal.SplashModal
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
+import dev.reprator.testModule.KtorServerExtension.Companion.TEST_BASE_URL
 import dev.reprator.testModule.createHttpClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -54,7 +54,7 @@ internal class SplashController : KoinTest {
 
 
         val client = createHttpClient()
-        val response: ResultDTOResponse<SplashModal> = client.get("$BASE_URL$ENDPOINT_SPLASH").body()
+        val response: ResultDTOResponse<SplashModal> = client.get("$TEST_BASE_URL$ENDPOINT_SPLASH").body()
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(langList.size, response.data.languageList.size)

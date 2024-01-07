@@ -1,8 +1,6 @@
 package dev.reprator.userIdentity.modal
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import dev.reprator.core.usecase.ACCESS_TOKEN
-import dev.reprator.core.usecase.REFRESH_TOKEN
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.country.modal.CountryModal.DTO.Companion.emptyCountryModal
 import dev.reprator.userIdentity.data.USER_CATEGORY
@@ -25,6 +23,7 @@ interface UserIdentityOTPModal {
     val isPhoneVerified: Boolean
     val id: CountryModal.DTO
     val refreshToken: String
+    val accessToken: String
     val userType: USER_CATEGORY
 
     data class DTO (
@@ -33,6 +32,7 @@ interface UserIdentityOTPModal {
         override val isPhoneVerified: Boolean,
         override val id: CountryModal.DTO,
         override val refreshToken: String,
+        override val accessToken: String,
         override val userType: USER_CATEGORY
     ) : UserIdentityOTPModal
 }
@@ -45,8 +45,8 @@ interface UserIdentityFullModal {
     val phoneOtp: UserPhoneOTP
     val isPhoneVerified: Boolean
     val userType: USER_CATEGORY
-    val accessToken: ACCESS_TOKEN
-    val refreshToken: REFRESH_TOKEN
+    val accessToken: String
+    val refreshToken: String
     val otpCount: Int
     val updateTime: DateTime
 
@@ -55,17 +55,19 @@ interface UserIdentityFullModal {
         override val phoneNumber: PhoneNumber,
         override val isPhoneVerified: Boolean,
         override val country: CountryModal.DTO,
-        override val refreshToken: REFRESH_TOKEN,
+        override val refreshToken: String,
+        override val accessToken: String = "",
         override val userType: USER_CATEGORY,
         override val phoneOtp: UserPhoneOTP,
         override val otpCount: Int,
-        override val updateTime: DateTime, override val accessToken: ACCESS_TOKEN = ""
+        override val updateTime: DateTime
     ) : UserIdentityFullModal {
 
         companion object {
             fun emptyFullModalByUserId(userId: UserIdentityId): DTO =
                 DTO(userId, "", false,
-                    emptyCountryModal(), "", USER_CATEGORY.admin, -1, -1, DateTime.now().toDateTimeISO())
+                    emptyCountryModal(), "", "",
+                    USER_CATEGORY.admin, -1, -1, DateTime.now().toDateTimeISO())
         }
     }
 }

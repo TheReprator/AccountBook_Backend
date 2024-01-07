@@ -15,7 +15,7 @@ dependencies {
     api(libs.exposed.jodatime)
 
     api(libs.ktor.client.core)
-
+    api(libs.ktor.server.auth.jwt)
     //For testing of api, else we jackson response get parsing error
     api(libs.ktor.server.serialization)
 }

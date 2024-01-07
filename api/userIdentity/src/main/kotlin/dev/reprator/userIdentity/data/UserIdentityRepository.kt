@@ -3,7 +3,6 @@ package dev.reprator.userIdentity.data
 import dev.reprator.userIdentity.modal.*
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 interface UserIdentityRepository {
 
@@ -16,4 +15,8 @@ interface UserIdentityRepository {
      }): Int
 
     suspend fun verifyOtp(userModal: UserIdentityFullModal): UserIdentityOTPModal
+
+    suspend fun refreshToken(refreshToken: String, userModal: UserIdentityFullModal): UserIdentityOTPModal.DTO
+
+    suspend fun logout(userId: UserIdentityId): Boolean
 }

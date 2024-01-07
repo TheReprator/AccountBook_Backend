@@ -20,17 +20,15 @@ storage:
 
 secrets:
   phone:
-      apiKey: "dQzSARrkyBgkLpNKLnswaqnktfC2EvrB7IwiPCLbIUUKJtIj"
-      userId: "Reprator"
+      apiKey: $PHONE_EMAIL_API_KEY
+      userId: $PHONE_EMAIL_USER_ID
 
 
 jwt:
-  secret: "RepratorKhataBookSecret"
+  secret: $JWT_SECRET
   issuer: "khataBookIssuer"
   audience: "khatabookAudience"
   realm: "khatabookRealm"
-  realmRole: "khatabookRealmRole"
-
 
 khatabook:
   splash:

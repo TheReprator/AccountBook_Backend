@@ -6,8 +6,10 @@ import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.userIdentity.data.mapper.UserIdentityResponseRegisterMapper
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
+import dev.reprator.userIdentity.domain.InvalidTokenException
 import dev.reprator.userIdentity.modal.*
 import org.jetbrains.exposed.sql.*
+import org.joda.time.DateTime
 
 class UserIdentityRepositoryImpl(
     private val mapper: UserIdentityResponseRegisterMapper,
@@ -59,7 +61,6 @@ class UserIdentityRepositoryImpl(
     }
 
     override suspend fun verifyOtp(userModal: UserIdentityFullModal): UserIdentityOTPModal {
-
         val result = updateUserById(userModal) {
             (TableUserIdentity.id eq userModal.userId) and (TableUserIdentity.phoneOtp eq userModal.phoneOtp)
         }
@@ -68,5 +69,29 @@ class UserIdentityRepositoryImpl(
             return mapper.mapToOtpModal(userModal)
         }
         throw IllegalUserIdentityException()
+    }
+
+    override suspend fun refreshToken(refreshToken: String, userModal: UserIdentityFullModal): UserIdentityOTPModal.DTO {
+        val result = updateUserById(userModal) {
+            (TableUserIdentity.id eq userModal.userId) and (TableUserIdentity.refreshToken eq refreshToken)
+        }
+
+        if(0 < result) {
+            return mapper.mapToOtpModal(userModal)
+        }
+        throw InvalidTokenException()
+    }
+
+    override suspend fun logout(userId: UserIdentityId): Boolean {
+        val updateCount = dbQuery {
+             TableUserIdentity.update({ TableUserIdentity.id eq userId }) {
+                it[updateTime] = DateTime.now().toDateTimeISO()
+                it[refreshToken] = ""
+                it[otpCount] = 0
+                it[phoneOtp] = -1
+                it[isPhoneVerified] = false
+            }
+        }
+        return 0 < updateCount
     }
 }

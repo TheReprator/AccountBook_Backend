@@ -1,8 +1,13 @@
 package dev.reprator.impl
 
 import dev.reprator.core.util.logger.AppLogger
+import java.util.regex.Pattern
 
 class AppLoggerImpl : AppLogger {
+
+    companion object {
+        private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
+    }
 
     enum class AppLogLevel {
         Verbose,
@@ -13,20 +18,36 @@ class AppLoggerImpl : AppLogger {
     }
 
     private val tag: String
-        get() = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).callerClass.name
+        get() = Throwable().stackTrace[3]
+            .let(::createStackElementTag)
 
+    /**
+     * Extract the tag which should be used for the message from the `element`. By default
+     * this will use the class name without any anonymous class suffixes (e.g., `Foo$1`
+     * becomes `Foo`).
+     *
+     * Note: This will not be called if a [manual tag][.tag] was specified.
+     */
+    private fun createStackElementTag(element: StackTraceElement): String {
+        var tag = element.fileName ?: element.className.substringAfterLast('.')
+        val m = ANONYMOUS_CLASS.matcher(tag)
+        if (m.find()) {
+            tag = m.replaceAll("")
+        }
+        return tag
+    }
 
     private fun log(
         severity: AppLogLevel,
-        tag: String = this.tag,
+        tag: String? = this.tag,
         throwable: Throwable?,
         message: String
     ) {
         println(formatMessage(severity, message, tag, throwable))
-
     }
 
-    private fun formatMessage(severity: AppLogLevel, message: String, tag: String, throwable: Throwable?): String = "$severity: ($tag) $message"
+    private fun formatMessage(severity: AppLogLevel, message: String, tag: String?, throwable: Throwable?): String =
+        "$severity: ($tag) $message"
 
     private fun processLog(
         severity: AppLogLevel,

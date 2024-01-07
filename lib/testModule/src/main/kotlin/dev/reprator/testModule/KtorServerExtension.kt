@@ -18,12 +18,11 @@ class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
 
     companion object {
 
-        private lateinit var server: NettyApplicationEngine
-
+        var TEST_SERVER: NettyApplicationEngine ?= null
 
         private var testPort: Int = 0
 
-        val BASE_URL: String
+        val TEST_BASE_URL: String
             get() = "http://${API_BASE_URL.INTERNAL_APP.value}:$testPort"
     }
 
@@ -37,11 +36,12 @@ class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
                 testPort = port
             }
         }
-        server = embeddedServer(Netty, env).start(false)
+
+        TEST_SERVER = embeddedServer(Netty, env).start(false)
     }
 
     override fun afterEach(context: ExtensionContext?) {
-            server.stop(100, 100)
+            TEST_SERVER?.stop(100, 100)
     }
 }
 

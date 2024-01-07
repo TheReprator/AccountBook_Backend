@@ -27,9 +27,10 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
 
-    implementation(libs.ktor.server.netty)
+    api(libs.ktor.server.netty)
     implementation(libs.ktor.server.common)
     implementation(libs.ktor.server.status.page)
+    api(libs.ktor.server.auth)
     implementation(libs.ktor.server.logging)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.serialization)

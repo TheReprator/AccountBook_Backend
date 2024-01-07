@@ -10,10 +10,12 @@ import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.setUpKoinCountry
+import dev.reprator.testModule.JWT_SERVICE
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.setupCoreNetworkModule
 import dev.reprator.userIdentity.data.TableUserIdentity
+import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.core.component.get
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -60,12 +63,26 @@ internal class UserIdentityRouteTest : KoinTest {
 
         setUpKoinCountry()
         setUpKoinUserIdentityModule()
-
         setupCoreNetworkModule()
+
         modules(
             module {
                 singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
                 singleOf(::SMScodeGeneratorTestImpl) bind SMScodeGenerator::class
+                single<(Int) -> Boolean>(named(JWT_SERVICE)) {
+                    val isUserValid:(Int) -> Boolean = {
+                        runBlocking {
+                            val userController = get<UserIdentityRepository>()
+                            try {
+                                userController.getUserById(it)
+                                true
+                            } catch (exception: Exception) {
+                                false
+                            }
+                        }
+                    }
+                    isUserValid
+                }
             })
     }
 
@@ -169,7 +186,7 @@ internal class UserIdentityRouteTest : KoinTest {
         val otpModal = verifyOtp.body.data
 
         Assertions.assertTrue(otpModal.isPhoneVerified)
-        Assertions.assertTrue(LENGTH_OTP == otpModal.refreshToken.length)
+        Assertions.assertTrue(otpModal.refreshToken.trim().isNotEmpty())
         Assertions.assertEquals(userFullModal.userId, otpModal.userId)
         Assertions.assertEquals(userFullModal.phoneNumber, otpModal.phoneNumber)
     }

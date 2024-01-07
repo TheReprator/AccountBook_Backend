@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.domain
 
-import dev.reprator.core.usecase.JWTToken
+import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.*
@@ -11,7 +11,7 @@ import kotlin.random.Random
 class UserIdentityFacadeImpl(
     private val repository: UserIdentityRepository,
     private val smsUseCase: SMScodeGenerator,
-    private val jwtToken: JWTToken
+    private val tokenService: JwtTokenService
 ) : UserIdentityFacade {
 
     override suspend fun addNewUserIdentity(userInfo: UserIdentityRegisterEntity): UserIdentityRegisterModal {
@@ -27,10 +27,12 @@ class UserIdentityFacadeImpl(
         val userModal = repository.getUserById(userId)
         val otpCode = generateCode()
         return smsUseCase.sendOtpToMobileNumber(userModal.country.callingCode, userModal.phoneNumber, otpCode).also {
-            if(!it)
+            if (!it)
                 return@also
-            val updateModal = userModal.copy(phoneOtp= otpCode,
-                otpCount = (userModal.otpCount.plus(1)), updateTime = DateTime.now().toDateTimeISO())
+            val updateModal = userModal.copy(
+                phoneOtp = otpCode,
+                otpCount = (userModal.otpCount.plus(1)), updateTime = DateTime.now().toDateTimeISO()
+            )
             repository.updateUserById(updateModal)
         }
     }
@@ -39,10 +41,27 @@ class UserIdentityFacadeImpl(
 
     override suspend fun verifyOTP(otpInfo: UserIdentityOtpEntity): UserIdentityOTPModal {
         val fullUserInfo = repository.getUserById(otpInfo.userId)
-        val token = jwtToken.generateToken()
-        val updatedModal = fullUserInfo.copy(phoneOtp = otpInfo.phoneOtp, refreshToken = token.second,
-            accessToken = token.first, isPhoneVerified = true)
+        val updatedModal = fullUserInfo.copy(
+            phoneOtp = otpInfo.phoneOtp,
+            refreshToken = tokenService.generateRefreshToken(fullUserInfo.userId.toString()),
+            accessToken = tokenService.generateAccessToken(fullUserInfo.userId.toString()),
+            isPhoneVerified = true
+        )
         return repository.verifyOtp(updatedModal)
     }
+
+    override suspend fun refreshToken(accessToken: String): UserIdentityOTPModal.DTO {
+        val (isTokenValid, userId) = tokenService.isTokenValid(accessToken)
+        if (!isTokenValid)
+            throw IllegalUserIdentityException()
+
+        val fullModal = repository.getUserById(userId).copy(refreshToken = tokenService.generateAccessToken(userId.toString()))
+        val updatedModal = repository.refreshToken(accessToken, fullModal)
+
+        return updatedModal.copy(
+            accessToken = tokenService.generateAccessToken(userId.toString()))
+    }
+
+    override suspend fun logout(userId: UserIdentityId): Boolean = repository.logout(userId)
 
 }

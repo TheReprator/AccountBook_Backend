@@ -3,12 +3,13 @@ package dev.reprator.testModule
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
-import dev.reprator.core.usecase.JWTToken
+import dev.reprator.core.usecase.JWTConfiguration
+import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
 import dev.reprator.core.util.logger.AppLogger
 import impl.AppLoggerImpl
-import impl.JWTTokenImpl
+import impl.JwtTokenServiceImpl
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
@@ -22,18 +23,38 @@ import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.config.*
 import io.ktor.util.*
+import kotlinx.coroutines.runBlocking
 import org.koin.core.KoinApplication
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 private const val MILLISECONDS = 1000L
+
+const val JWT_PARAMETER_SECRET = "sdfrw35r3534"
+const val JWT_PARAMETER_AUDIENCE = "JWTaudience"
+const val JWT_PARAMETER_ISSUER = "JWTissuer"
+const val JWT_PARAMETER_REALM = "realm"
+
+const val JWT_SERVICE = "jwtRealmTest"
 
 fun KoinApplication.setupCoreNetworkModule() {
     modules(appCoreModule, koinAppTestNetworkModule)
 }
 
 private val appCoreModule = module {
+
     single<AppLogger> { AppLoggerImpl() }
-    single<JWTToken> { JWTTokenImpl() }
+
+/*    single<(Int) -> Boolean>(named(JWT_SERVICE)) {
+         {
+           true
+        }
+    }*/
+
+    single<JwtTokenService> {
+        JwtTokenServiceImpl( JWTConfiguration(JWT_PARAMETER_SECRET,JWT_PARAMETER_AUDIENCE, JWT_PARAMETER_ISSUER,
+            JWT_PARAMETER_REALM) , isUserValid = get<(Int) -> Boolean>(named(JWT_SERVICE))
+    ) }
 }
 
 private val koinAppTestNetworkModule = module {
@@ -128,10 +149,10 @@ private val koinAppTestNetworkModule = module {
                             else -> "Network error!"
                         }
 
-                        val rp = response.bodyAsText()
+                        val responseBodyTest = response.bodyAsText()
                         logger.e {  "vikramTest:: koinTest:: validateResponse:: $response" }
                         logger.e {  "vikramTest:: koinTest:: validateResponse1:: $failureReason" }
-                        logger.e {  "vikramTest:: koinTest:: validateResponse1:: $rp" }
+                        logger.e {  "vikramTest:: koinTest:: validateResponse1:: $responseBodyTest" }
 
                         throw HttpExceptions(
                             response = response,

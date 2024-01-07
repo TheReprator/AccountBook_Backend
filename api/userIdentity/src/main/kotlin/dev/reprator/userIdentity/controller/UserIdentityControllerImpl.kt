@@ -19,5 +19,11 @@ class UserIdentityControllerImpl(private val userIdentityFacade: UserIdentityFac
     override suspend fun verifyOtp(userInfo: UserIdentityOtpEntity): UserIdentityOTPModal =
         userIdentityFacade.verifyOTP(userInfo)
 
+    override suspend fun refreshToken(accessToken: String): UserIdentityOTPModal {
+        return userIdentityFacade.refreshToken(accessToken)
+    }
+
+    override suspend fun logout(userId: UserIdentityId): Boolean = userIdentityFacade.logout(userId)
+
 }
 

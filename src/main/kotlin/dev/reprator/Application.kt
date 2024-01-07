@@ -11,6 +11,7 @@ import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
 import org.koin.ktor.ext.get
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
 
@@ -42,13 +43,16 @@ fun Application.module() {
         anyHost()
     }
 
-    get<DatabaseFactory>().connect()
+    val dbInstance by inject<DatabaseFactory>()
+    dbInstance.connect()
 
     install(ShutDownUrl.ApplicationCallPlugin) {
+        dbInstance.close()
         shutDownUrl = "/shutdown"
         exitCodeSupplier = { 0 }
     }
 
+    configureJWTAuthentication()
     configureMonitoring()
     configureContentNegotiation()
     configureRouting()

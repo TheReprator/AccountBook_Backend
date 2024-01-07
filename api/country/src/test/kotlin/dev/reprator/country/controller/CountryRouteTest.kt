@@ -10,7 +10,7 @@ import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.country.setUpKoinCountry
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
+import dev.reprator.testModule.KtorServerExtension.Companion.TEST_BASE_URL
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.createHttpClient
 import io.ktor.client.call.*
@@ -67,7 +67,7 @@ internal class CountryRouteTest : KoinTest {
 
     private fun addCountryInDb(countryInfo: CountryEntity.DTO) = runBlocking {
         val client = createHttpClient()
-        client.post("$BASE_URL$ENDPOINT_COUNTRY") {
+        client.post("$TEST_BASE_URL$ENDPOINT_COUNTRY") {
             contentType(ContentType.Application.Json)
             setBody(countryInfo)
         }
@@ -120,7 +120,7 @@ internal class CountryRouteTest : KoinTest {
         }
 
         val client = createHttpClient()
-        val response = client.get("$BASE_URL$ENDPOINT_COUNTRY")
+        val response = client.get("$TEST_BASE_URL$ENDPOINT_COUNTRY")
 
         Assertions.assertEquals(response.status, HttpStatusCode.OK)
         val resultBody = response.body<ResultDTOResponse<List<CountryModal.DTO>>>()
@@ -138,7 +138,7 @@ internal class CountryRouteTest : KoinTest {
         Assertions.assertNotNull(addResultBody)
 
         val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}")
+        val findResponseSuccess = client.get("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}")
 
         val findResultBody = findResponseSuccess.body<ResultDTOResponse<CountryModal.DTO>>()
         Assertions.assertNotNull(findResultBody)
@@ -150,7 +150,7 @@ internal class CountryRouteTest : KoinTest {
         val countryId = 90
 
         val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_COUNTRY/$countryId")
+        val findResponseSuccess = client.get("$TEST_BASE_URL$ENDPOINT_COUNTRY/$countryId")
 
         Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.NotFound)
 
@@ -169,7 +169,7 @@ internal class CountryRouteTest : KoinTest {
         val changedRequestBody = CountryEntity.DTO("United Arab Emirates",971,"UAE")
 
         val client = createHttpClient()
-        val editResponse = client.put("$BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
+        val editResponse = client.put("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
             contentType(ContentType.Application.Json)
             setBody(changedRequestBody)
         }
@@ -185,7 +185,7 @@ internal class CountryRouteTest : KoinTest {
         val countryId = 21
 
         val client = createHttpClient()
-        val editResponse = client.put("$BASE_URL$ENDPOINT_COUNTRY/$countryId") {
+        val editResponse = client.put("$TEST_BASE_URL$ENDPOINT_COUNTRY/$countryId") {
             contentType(ContentType.Application.Json)
             setBody(INPUT_COUNTRY)
         }
@@ -204,7 +204,7 @@ internal class CountryRouteTest : KoinTest {
         val changedRequestBody = INPUT_COUNTRY.copy(name ="United Arab Emirates")
 
         val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
+        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
             contentType(ContentType.Application.Json)
             setBody(changedRequestBody)
         }
@@ -225,7 +225,7 @@ internal class CountryRouteTest : KoinTest {
         val changedRequestBody = INPUT_COUNTRY.copy(name = "    ")
 
         val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
+        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
             contentType(ContentType.Application.Json)
             setBody(changedRequestBody)
         }
@@ -239,7 +239,7 @@ internal class CountryRouteTest : KoinTest {
         val countryId = 21
 
         val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_COUNTRY/$countryId") {
+        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_COUNTRY/$countryId") {
             contentType(ContentType.Application.Json)
             setBody(INPUT_COUNTRY)
         }
@@ -256,7 +256,7 @@ internal class CountryRouteTest : KoinTest {
         Assertions.assertEquals(INPUT_COUNTRY.shortCode, addResultBody.data.shortCode)
 
         val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}")
+        val deleteResponse = client.delete("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}")
 
         val editBody = deleteResponse.body<ResultDTOResponse<Boolean>>()
         Assertions.assertEquals(editBody.data, true)
@@ -272,7 +272,7 @@ internal class CountryRouteTest : KoinTest {
         val countryId = 21
 
         val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_COUNTRY/$countryId")
+        val deleteResponse = client.delete("$TEST_BASE_URL$ENDPOINT_COUNTRY/$countryId")
 
         val deleteBody = deleteResponse.body<FailDTOResponse>()
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, deleteBody.statusCode)

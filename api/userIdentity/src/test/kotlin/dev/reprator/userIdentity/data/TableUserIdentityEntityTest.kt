@@ -4,7 +4,6 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
-import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.setupCoreNetworkModule
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
@@ -15,7 +14,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -29,7 +27,6 @@ import org.koin.test.junit5.KoinTestExtension
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(KtorServerExtension::class)
 internal class TableUserIdentityEntityTest : KoinTest {
 
     companion object {
@@ -167,7 +164,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
                     UserIdentityOTPModal.DTO(
                         from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
                         from[TableUserIdentity.isPhoneVerified], countryModal,
-                        from[TableUserIdentity.refreshToken] ?: "",
+                        from[TableUserIdentity.refreshToken] ?: "", "",
                         from[TableUserIdentity.userType]
                     )
                 }

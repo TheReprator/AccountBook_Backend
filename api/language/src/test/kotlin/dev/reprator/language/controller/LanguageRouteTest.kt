@@ -10,7 +10,7 @@ import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.language.setUpKoinLanguage
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
+import dev.reprator.testModule.KtorServerExtension.Companion.TEST_BASE_URL
 import dev.reprator.testModule.TestDatabaseFactory
 import dev.reprator.testModule.createHttpClient
 import io.ktor.client.call.*
@@ -68,7 +68,7 @@ internal class LanguageRouteTest : KoinTest {
 
     private fun addLanguageInDb(languageName: String) = runBlocking {
         val client = createHttpClient()
-        client.post("$BASE_URL$ENDPOINT_LANGUAGE") {
+        client.post("$TEST_BASE_URL$ENDPOINT_LANGUAGE") {
             setBody(languageName)
         }
     }
@@ -111,7 +111,7 @@ internal class LanguageRouteTest : KoinTest {
         }
 
         val client = createHttpClient()
-        val response = client.get("$BASE_URL$ENDPOINT_LANGUAGE")
+        val response = client.get("$TEST_BASE_URL$ENDPOINT_LANGUAGE")
 
         Assertions.assertEquals(response.status, HttpStatusCode.OK)
         val resultBody = response.body<ResultDTOResponse<List<LanguageModal.DTO>>>()
@@ -130,7 +130,7 @@ internal class LanguageRouteTest : KoinTest {
         Assertions.assertNotNull(addResultBody)
 
         val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
+        val findResponseSuccess = client.get("$TEST_BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
 
         Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.OK)
         val findResultBody = findResponseSuccess.body<ResultDTOResponse<LanguageModal.DTO>>()
@@ -143,7 +143,7 @@ internal class LanguageRouteTest : KoinTest {
         val languageId = 90
 
         val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_LANGUAGE/$languageId")
+        val findResponseSuccess = client.get("$TEST_BASE_URL$ENDPOINT_LANGUAGE/$languageId")
 
         Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.NotFound)
         val findResultBody = findResponseSuccess.body<FailDTOResponse>()
@@ -160,7 +160,7 @@ internal class LanguageRouteTest : KoinTest {
         Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.data.name)
 
         val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}") {
+        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}") {
             contentType(ContentType.Application.Json)
             setBody(LanguageEntity.DTO(addResultBody.data.id, editLanguage))
         }
@@ -176,7 +176,7 @@ internal class LanguageRouteTest : KoinTest {
         val languageId = 21
 
         val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_LANGUAGE/$languageId") {
+        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_LANGUAGE/$languageId") {
             contentType(ContentType.Application.Json)
             setBody(LanguageEntity.DTO(languageId, "vikram"))
         }
@@ -196,7 +196,7 @@ internal class LanguageRouteTest : KoinTest {
         Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.data.name)
 
         val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
+        val deleteResponse = client.delete("$TEST_BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
 
         val editBody = deleteResponse.body<ResultDTOResponse<Boolean>>()
         Assertions.assertEquals(editBody.data, true)
@@ -212,7 +212,7 @@ internal class LanguageRouteTest : KoinTest {
         val languageId = 21
 
         val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_LANGUAGE/$languageId")
+        val deleteResponse = client.delete("$TEST_BASE_URL$ENDPOINT_LANGUAGE/$languageId")
 
         Assertions.assertEquals(deleteResponse.status, HttpStatusCode.OK)
         val editBody = deleteResponse.body<ResultDTOResponse<Boolean>>()

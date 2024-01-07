@@ -26,11 +26,12 @@ class UserIdentityResponseRegisterMapper : AppMarkerMapper {
             from[TableUserIdentity.isPhoneVerified],
             countryModal,
             from[TableUserIdentity.refreshToken] ?: "",
+            "",
             from[TableUserIdentity.userType]
         )
     }
 
-    suspend fun mapToOtpModal(from: UserIdentityFullModal): UserIdentityOTPModal {
+    suspend fun mapToOtpModal(from: UserIdentityFullModal): UserIdentityOTPModal.DTO {
 
         return UserIdentityOTPModal.DTO(
             from.userId,
@@ -38,6 +39,7 @@ class UserIdentityResponseRegisterMapper : AppMarkerMapper {
             from.isPhoneVerified,
             from.country,
             from.refreshToken,
+            from.accessToken,
             from.userType
         )
     }
@@ -50,6 +52,7 @@ class UserIdentityResponseRegisterMapper : AppMarkerMapper {
             from[TableUserIdentity.id], from[TableUserIdentity.phoneNumber].toString(),
             from[TableUserIdentity.isPhoneVerified], countryModal,
             from[TableUserIdentity.refreshToken] ?: "",
+            "",
             from[TableUserIdentity.userType],
             from[TableUserIdentity.phoneOtp] ?: 0,
             from[TableUserIdentity.otpCount],
