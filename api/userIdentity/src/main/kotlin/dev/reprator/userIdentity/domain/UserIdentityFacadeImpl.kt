@@ -53,7 +53,7 @@ class UserIdentityFacadeImpl(
     override suspend fun refreshToken(accessToken: String): UserIdentityOTPModal.DTO {
         val (isTokenValid, userId) = tokenService.isTokenValid(accessToken)
         if (!isTokenValid)
-            throw IllegalUserIdentityException()
+            throw InvalidTokenException()
 
         val fullModal = repository.getUserById(userId).copy(refreshToken = tokenService.generateAccessToken(userId.toString()))
         return repository.refreshToken(accessToken, fullModal).copy(accessToken = tokenService.generateAccessToken(userId.toString()))

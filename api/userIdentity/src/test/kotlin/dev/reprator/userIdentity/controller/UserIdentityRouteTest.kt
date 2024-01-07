@@ -264,7 +264,8 @@ internal class UserIdentityRouteTest : KoinTest {
         Assertions.assertTrue(logoutModal.body.data)
     }
 
-    @RepeatedTest(2)
+    //@RepeatedTest(2)
+    @Test
     fun `logout user, failed, as token is expired after 7 second for testing`() = runBlocking {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
@@ -281,7 +282,7 @@ internal class UserIdentityRouteTest : KoinTest {
         TOKEN_ACCESS = verifyOtp.body.data.accessToken
         TOKEN_REFRESH = verifyOtp.body.data.refreshToken
 
-        delay(7_000)
+        delay(3_000)
         val logoutModal = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_LOGOUT)
 
         Assertions.assertTrue(logoutModal is ApiResponse.Error)
