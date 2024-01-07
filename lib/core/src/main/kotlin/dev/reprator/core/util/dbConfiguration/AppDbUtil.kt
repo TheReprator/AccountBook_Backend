@@ -1,4 +1,4 @@
-package dev.reprator.core
+package dev.reprator.core.util.dbConfiguration
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction

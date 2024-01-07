@@ -1,7 +1,7 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.Mapper
-import dev.reprator.core.dbQuery
+import dev.reprator.core.util.AppMapper
+import dev.reprator.core.util.dbConfiguration.dbQuery
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
 import dev.reprator.country.modal.CountryEntity
@@ -10,7 +10,7 @@ import dev.reprator.country.modal.CountryModal
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, CountryModal>) : CountryRepository {
+class CountryRepositoryImpl(private val mapper: AppMapper<TableCountryEntity, CountryModal>) : CountryRepository {
 
     private suspend fun resultRowToCountry(row: TableCountryEntity): CountryModal = mapper.map(row)
 
@@ -28,7 +28,7 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
     }
 
     override suspend fun addNewCountry(countryInfo: CountryEntity): CountryModal = dbQuery {
-        val existingCountry = TableCountryEntity.find { TableCountry.isocode eq countryInfo.code }.firstOrNull()
+        val existingCountry = TableCountryEntity.find { TableCountry.callingCode eq countryInfo.callingCode }.firstOrNull()
 
         if(null != existingCountry)
             throw IllegalCountryException()
@@ -36,7 +36,7 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
         val newCountry = TableCountryEntity.new {
             name = countryInfo.name.trimStart()
             shortcode = countryInfo.shortCode.trimStart()
-            isocode = countryInfo.code
+            isocode = countryInfo.callingCode
         }
         resultRowToCountry(newCountry)
     }
@@ -49,8 +49,8 @@ class CountryRepositoryImpl(private val mapper: Mapper<TableCountryEntity, Count
                 it[name] = countryInfo.name.trimStart()
             if(countryInfo.shortCode.isNotBlank())
                 it[shortcode] = countryInfo.shortCode.trimStart()
-            if(0 < countryInfo.code)
-                it[isocode] = countryInfo.code
+            if(0 < countryInfo.callingCode)
+                it[callingCode] = countryInfo.callingCode
         } > 0
     }
 

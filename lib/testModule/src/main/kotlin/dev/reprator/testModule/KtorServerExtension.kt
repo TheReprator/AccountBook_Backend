@@ -1,27 +1,27 @@
 package dev.reprator.testModule
 
+import dev.reprator.core.util.api.safeRequest
+import dev.reprator.core.util.constants.APIS
+import dev.reprator.core.util.constants.API_BASE_URL
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.jackson.jackson
+import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.util.*
 import org.junit.jupiter.api.extension.*
+import org.koin.core.Koin
 
 class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
+
+
     companion object {
-        const val BASE_HOST = "0.0.0.0"
-        private lateinit var server: NettyApplicationEngine
 
-        var testPort: Int = 0
-            private set
-
-        val BASE_URL: String
-            get() = "http://$BASE_HOST:$testPort"
+        private var TEST_SERVER: NettyApplicationEngine ?= null
     }
 
     override fun beforeEach(context: ExtensionContext?) {
@@ -29,32 +29,33 @@ class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
             config = ApplicationConfig("application-test.conf")
             // Public API
             connector {
-                host = BASE_HOST
+                host = API_BASE_URL.INTERNAL_APP.value
                 port = config.property("ktor.deployment.port").getString().toInt()
-                testPort = port
             }
         }
-        server = embeddedServer(Netty, env).start(false)
+
+        TEST_SERVER = embeddedServer(Netty, env).start(false)
     }
 
     override fun afterEach(context: ExtensionContext?) {
-        server.stop(100, 100)
+            TEST_SERVER?.stop(100, 100)
     }
 }
 
-fun createHttpClient(): HttpClient {
-    val client = HttpClient {
-
-        install(ContentNegotiation) {
-            jackson()
+suspend inline fun <reified T> hitApiWithClient(
+    koin: Koin,
+    fullUrl: String ="",
+    methodName: HttpMethod = HttpMethod.Post,
+    crossinline block: HttpRequestBuilder.() -> Unit ={}
+) =
+    koin.get<HttpClient>().safeRequest<T>(
+        apiType = APIS.INTERNAL_APP,
+        attributes = koin.get<Attributes>()
+    ) {
+        url {
+            method = methodName
+            path(fullUrl)
         }
-
-        install(HttpTimeout) {
-            connectTimeoutMillis = 30000
-            socketTimeoutMillis = 30000
-            requestTimeoutMillis = 30000
-        }
+        contentType(ContentType.Application.Json)
+        block(this@safeRequest)
     }
-
-    return client
-}

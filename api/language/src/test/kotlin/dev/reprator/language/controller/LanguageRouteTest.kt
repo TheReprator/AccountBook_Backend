@@ -1,8 +1,8 @@
 package dev.reprator.language.controller
 
-import dev.reprator.core.DatabaseFactory
-import dev.reprator.core.FailResponse
-import dev.reprator.core.ResultResponse
+import dev.reprator.core.usecase.FailDTOResponse
+import dev.reprator.core.util.api.ApiResponse
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.language.data.LanguageRepository
 import dev.reprator.language.data.TableLanguage
 import dev.reprator.language.domain.LanguageNotFoundException
@@ -10,17 +10,11 @@ import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.language.setUpKoinLanguage
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.KtorServerExtension.Companion.BASE_URL
 import dev.reprator.testModule.TestDatabaseFactory
-import dev.reprator.testModule.createHttpClient
-import io.ktor.client.call.*
-import io.ktor.client.network.sockets.*
-import io.ktor.client.plugins.*
+import dev.reprator.testModule.hitApiWithClient
+import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
-import io.ktor.test.dispatcher.*
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -33,7 +27,6 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
-import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
@@ -52,6 +45,7 @@ internal class LanguageRouteTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
 
         setUpKoinLanguage()
+        setupCoreNetworkModule()
 
         modules(
             module {
@@ -72,144 +66,135 @@ internal class LanguageRouteTest : KoinTest {
         databaseFactory.close()
     }
 
-    private fun addLanguageInDb(languageName: String) = runBlocking {
-        val client = createHttpClient()
-        client.post("$BASE_URL$ENDPOINT_LANGUAGE") {
-            setBody(languageName)
-        }
-    }
+    private suspend inline fun <reified T> languageClient(
+        endPoint: String = "",
+        methodName: HttpMethod = HttpMethod.Post,
+        crossinline block: HttpRequestBuilder.() -> Unit = {}
+    ) = hitApiWithClient<T>(this.getKoin(), "$ENDPOINT_LANGUAGE$endPoint", methodName, block)
 
     @Test
     fun `Add new language And Verify from db by id for existence`(): Unit = runBlocking {
-        val response = addLanguageInDb(LANGUAGE_ENGLISH)
+        val resultBody = languageClient<LanguageModal.DTO> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
 
-        Assertions.assertEquals(response.status, HttpStatusCode.OK)
-        val resultBody = response.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(resultBody)
 
-        Assertions.assertEquals(languageRepository.language(resultBody.data.id)?.name, LANGUAGE_ENGLISH)
-        Assertions.assertEquals(resultBody.data.name, LANGUAGE_ENGLISH)
+        Assertions.assertEquals(languageRepository.language(resultBody.body.id).name, LANGUAGE_ENGLISH)
+        Assertions.assertEquals(resultBody.body.name, LANGUAGE_ENGLISH)
     }
 
     @Test
     fun `Failed to add new language, if language already exist`(): Unit = runBlocking {
-        val addEnglishLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
+        val addEnglishLanguageResponse = languageClient<LanguageModal.DTO> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
 
-        Assertions.assertEquals(addEnglishLanguageResponse.status, HttpStatusCode.OK)
-        val resultBody = addEnglishLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
-        Assertions.assertNotNull(resultBody)
+        val resultBody = addEnglishLanguageResponse.body
+        Assertions.assertNotNull(addEnglishLanguageResponse.body)
+        Assertions.assertEquals(languageRepository.language(resultBody.id).name, LANGUAGE_ENGLISH)
+        Assertions.assertEquals(resultBody.name, LANGUAGE_ENGLISH)
 
-        Assertions.assertEquals(languageRepository.language(resultBody.data.id)?.name, LANGUAGE_ENGLISH)
-        Assertions.assertEquals(resultBody.data.name, LANGUAGE_ENGLISH)
+        val addAgainEnglishLanguageResponse = languageClient<FailDTOResponse> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Error.GenericError
 
-        val addAgainEnglishLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
-        Assertions.assertEquals(addAgainEnglishLanguageResponse.status, HttpStatusCode.OK)
-        val resultBodyAgain = addAgainEnglishLanguageResponse.body<FailResponse>()
-        Assertions.assertEquals(resultBodyAgain.statusCode, HttpStatusCode.InternalServerError.value)
-        Assertions.assertNotNull(resultBodyAgain)
+        Assertions.assertNotNull(addAgainEnglishLanguageResponse.message)
     }
 
     @Test
     fun `Get all language from db`(): Unit = runBlocking {
         val languageList = listOf(LANGUAGE_ENGLISH, LANGUAGE_HINDI)
         languageList.forEach {
-            addLanguageInDb(it)
+            languageClient<LanguageModal.DTO> {
+                setBody(it)
+            }
         }
 
-        val client = createHttpClient()
-        val response = client.get("$BASE_URL$ENDPOINT_LANGUAGE")
-
-        Assertions.assertEquals(response.status, HttpStatusCode.OK)
-        val resultBody = response.body<ResultResponse<List<LanguageModal.DTO>>>()
+        val resultBody = languageClient<List<LanguageModal.DTO>>(methodName = HttpMethod.Get) as ApiResponse.Success
         Assertions.assertNotNull(resultBody)
 
-        Assertions.assertEquals(resultBody.data.size, languageList.size)
-        Assertions.assertEquals(resultBody.data.first().name, languageList.first())
+        Assertions.assertEquals(resultBody.body.size, languageList.size)
+        Assertions.assertEquals(resultBody.body.first().name, languageList.first())
     }
 
     @Test
     fun `Get language from db by ID, if exist`(): Unit = runBlocking {
-        val addLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
+        val addResultBody = languageClient<LanguageModal.DTO> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
 
-        Assertions.assertEquals(addLanguageResponse.status, HttpStatusCode.OK)
-        val addResultBody = addLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(addResultBody)
 
-        val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
+        val findResultBody = languageClient<LanguageModal.DTO>(
+            methodName = HttpMethod.Get,
+            endPoint = "/${addResultBody.body.id}"
+        ) as ApiResponse.Success
 
-        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.OK)
-        val findResultBody = findResponseSuccess.body<ResultResponse<LanguageModal.DTO>>()
         Assertions.assertNotNull(findResultBody)
-        Assertions.assertEquals(findResultBody.data.name, LANGUAGE_ENGLISH)
+        Assertions.assertEquals(findResultBody.body.name, LANGUAGE_ENGLISH)
     }
 
     @Test
     fun `Failed to get language from db by ID, as it didn't exit in db`(): Unit = runBlocking {
         val languageId = 90
 
-        val client = createHttpClient()
-        val findResponseSuccess = client.get("$BASE_URL$ENDPOINT_LANGUAGE/$languageId")
+        val findResultBody = languageClient<FailDTOResponse>(
+            endPoint = "/$languageId",
+            methodName = HttpMethod.Get
+        ) as ApiResponse.Error.HttpError
 
-        Assertions.assertEquals(findResponseSuccess.status, HttpStatusCode.OK)
-        val findResultBody = findResponseSuccess.body<FailResponse>()
-        Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.statusCode)
+        Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.code)
+        Assertions.assertNotNull(findResultBody.errorBody)
     }
 
     @Test
     fun `Edit language from db by ID, as it exists`(): Unit = runBlocking {
-        val addLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
+        val addResultBody = languageClient<LanguageModal.DTO> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
+
+        Assertions.assertNotNull(addResultBody)
+        Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.body.name)
 
         val editLanguage = "Khatabook"
-        val addResultBody = addLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
-        Assertions.assertNotNull(addResultBody)
-        Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.data.name)
 
-        val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}") {
-            contentType(ContentType.Application.Json)
-            setBody(LanguageEntity.DTO(addResultBody.data.id, editLanguage))
-        }
+        val editBody = languageClient<Boolean>(methodName = HttpMethod.Patch, endPoint = "/${addResultBody.body.id}") {
+            setBody(LanguageEntity.DTO(addResultBody.body.id, editLanguage))
+        } as ApiResponse.Success
 
-        val editBody = editResponse.body<ResultResponse<Boolean>>()
-        Assertions.assertEquals(HttpStatusCode.OK.value, editBody.statusCode)
-
-        Assertions.assertEquals(editLanguage, languageRepository.language(addResultBody.data.id).name)
+        Assertions.assertTrue(editBody.body)
+        Assertions.assertEquals(editLanguage, languageRepository.language(addResultBody.body.id).name)
     }
 
     @Test
     fun `Edit language from db by ID got failed, as it didn't exists`(): Unit = runBlocking {
         val languageId = 21
 
-        val client = createHttpClient()
-        val editResponse = client.patch("$BASE_URL$ENDPOINT_LANGUAGE/$languageId") {
-            contentType(ContentType.Application.Json)
+        val editBody = languageClient<Boolean>(endPoint = "/$languageId", methodName = HttpMethod.Patch) {
             setBody(LanguageEntity.DTO(languageId, "vikram"))
-        }
+        } as ApiResponse.Success
 
-        Assertions.assertEquals(editResponse.status, HttpStatusCode.OK)
-        val editBody = editResponse.body<ResultResponse<Boolean>>()
-        Assertions.assertEquals(editBody.statusCode, HttpStatusCode.OK.value)
-        Assertions.assertEquals(editBody.data, false)
+        Assertions.assertFalse(editBody.body)
     }
 
     @Test
     fun `Delete language from db by ID, as it exists`(): Unit = runBlocking {
-        val addLanguageResponse = addLanguageInDb(LANGUAGE_ENGLISH)
+        val addResultBody = languageClient<LanguageModal.DTO> {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
 
-        val addResultBody = addLanguageResponse.body<ResultResponse<LanguageModal.DTO>>()
-        Assertions.assertNotNull(addResultBody)
-        Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.data.name)
+        Assertions.assertNotNull(addResultBody.body)
+        Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.body.name)
 
-        val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_LANGUAGE/${addResultBody.data.id}")
+        val editBody = languageClient<Boolean>(methodName = HttpMethod.Delete, endPoint = "/${addResultBody.body.id}") {
+            setBody(LANGUAGE_ENGLISH)
+        } as ApiResponse.Success
 
-        val editBody = deleteResponse.body<ResultResponse<Boolean>>()
-        Assertions.assertEquals(editBody.data, true)
-        Assertions.assertEquals(HttpStatusCode.OK.value, editBody.statusCode)
+        Assertions.assertTrue(editBody.body)
 
         assertThrows<LanguageNotFoundException> {
-            languageRepository.language(addResultBody.data.id)
+            languageRepository.language(addResultBody.body.id)
         }
     }
 
@@ -217,12 +202,9 @@ internal class LanguageRouteTest : KoinTest {
     fun `Delete language from db by ID got failed, as it didn't exists`(): Unit = runBlocking {
         val languageId = 21
 
-        val client = createHttpClient()
-        val deleteResponse = client.delete("$BASE_URL$ENDPOINT_LANGUAGE/$languageId")
+        val deleteResponse =
+            languageClient<Boolean>(endPoint = "/$languageId", methodName = HttpMethod.Delete) as ApiResponse.Success
 
-        Assertions.assertEquals(deleteResponse.status, HttpStatusCode.OK)
-        val editBody = deleteResponse.body<ResultResponse<Boolean>>()
-        Assertions.assertEquals(HttpStatusCode.OK.value, editBody.statusCode)
-        Assertions.assertEquals(editBody.data, false)
+        Assertions.assertFalse(deleteResponse.body)
     }
 }

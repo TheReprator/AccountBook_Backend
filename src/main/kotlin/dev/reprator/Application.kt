@@ -1,16 +1,16 @@
 package dev.reprator
 
-import dev.reprator.configuration.setupApplicationConfiguration
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.setUpKoinCountry
 import dev.reprator.language.setUpKoinLanguage
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import dev.reprator.plugins.*
+import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
-import org.koin.core.parameter.parametersOf
+import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.SLF4JLogger
@@ -21,9 +21,10 @@ fun Application.module() {
 
     install(Koin) {
         SLF4JLogger()
-        modules(koinAppModule)
+        modules(koinAppModule(this@module.environment), koinAppDBModule, koinAppNetworkModule)
         setUpKoinLanguage()
         setUpKoinCountry()
+        setUpKoinUserIdentityModule()
     }
 
     install(CORS) {
@@ -42,14 +43,16 @@ fun Application.module() {
         anyHost()
     }
 
-    val databaseFactory : DatabaseFactory by inject { parametersOf(environment.config.setupApplicationConfiguration()) }
-    databaseFactory.connect()
+    val dbInstance by inject<DatabaseFactory>()
+    dbInstance.connect()
 
     install(ShutDownUrl.ApplicationCallPlugin) {
+        dbInstance.close()
         shutDownUrl = "/shutdown"
         exitCodeSupplier = { 0 }
     }
 
+    configureJWTAuthentication()
     configureMonitoring()
     configureContentNegotiation()
     configureRouting()

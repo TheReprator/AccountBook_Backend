@@ -1,6 +1,6 @@
 package dev.reprator.language.modal
 
-import dev.reprator.core.Validator
+import dev.reprator.core.usecase.AppEntityValidator
 import dev.reprator.language.domain.IllegalLanguageException
 
 typealias LanguageId = Int
@@ -16,7 +16,7 @@ interface LanguageEntity {
     ) : LanguageEntity {
 
         companion object {
-            fun Map<String, String>?.mapToModal(): DTO = object: Validator<DTO> {
+            fun Map<String, String>?.mapToModal(): DTO = object: AppEntityValidator<DTO> {
 
                 val data = this@mapToModal ?: throw IllegalLanguageException()
 
