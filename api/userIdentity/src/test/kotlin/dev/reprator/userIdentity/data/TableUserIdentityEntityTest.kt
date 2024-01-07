@@ -12,6 +12,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.joda.time.DateTime
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -80,6 +81,42 @@ internal class TableUserIdentityEntityTest : KoinTest {
     @AfterEach
     fun clearAndCloseDatabase() {
         databaseFactory.close()
+    }
+
+    @Test
+    fun `Logout user, and set refreshed token to empty with isphone verified as false`() {
+        val inputUser = UserIdentityRegisterEntity.DTO("9041866055", 1)
+
+        val insertedUserId = transaction {
+            TableUserIdentity.insert {
+                it[phoneNumber] = inputUser.phoneNumber
+                it[phoneCountryId] = inputUser.countryId
+            }.resultedValues?.first()?.get(TableUserIdentity.id) ?: -1
+        }
+
+        assertNotEquals(-1, insertedUserId)
+
+        val isLogoutSuccessful = transaction {
+            TableUserIdentity.update({ TableUserIdentity.id eq insertedUserId }) {
+                it[updateTime] = DateTime.now().toDateTimeISO()
+                it[refreshToken] = ""
+                it[otpCount] = 0
+                it[phoneOtp] = -1
+                it[isPhoneVerified] = false
+            } > 0
+        }
+
+        assertEquals(true, isLogoutSuccessful)
+
+        val userData = transaction {
+            (TableUserIdentity innerJoin TableCountryEntity.table)
+                .select { TableUserIdentity.id eq insertedUserId }.first()
+        }
+
+        assertTrue(userData[TableUserIdentity.refreshToken]!!.trim().isEmpty())
+        assertTrue(0 ==userData[TableUserIdentity.otpCount])
+        assertTrue(-1 ==userData[TableUserIdentity.phoneOtp])
+        assertTrue(!userData[TableUserIdentity.isPhoneVerified])
     }
 
     @Test

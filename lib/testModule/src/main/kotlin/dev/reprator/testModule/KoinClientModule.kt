@@ -15,6 +15,8 @@ import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
@@ -36,6 +38,9 @@ const val JWT_PARAMETER_ISSUER = "JWTissuer"
 const val JWT_PARAMETER_REALM = "realm"
 
 const val JWT_SERVICE = "jwtRealmTest"
+
+var TOKEN_ACCESS : String = ""
+var TOKEN_REFRESH : String = ""
 
 fun KoinApplication.setupCoreNetworkModule() {
     modules(appCoreModule, koinAppTestNetworkModule)
@@ -76,6 +81,28 @@ private val koinAppTestNetworkModule = module {
                 logger = Logger.DEFAULT
                 level = LogLevel.ALL
                 sanitizeHeader { header -> header == HttpHeaders.Authorization }
+            }
+
+
+            install(Auth) {
+                bearer {
+                    val  logger by inject<AppLogger>()
+
+                    loadTokens {
+                        logger.e { "vikram:: install :: loadToken, $TOKEN_ACCESS, $TOKEN_REFRESH" }
+                        BearerTokens(TOKEN_ACCESS, TOKEN_REFRESH)
+                    }
+
+                    refreshTokens {
+                        logger.e { "vikram:: install :: refreshTokens, $TOKEN_ACCESS, $TOKEN_REFRESH" }
+                        BearerTokens(TOKEN_ACCESS, TOKEN_REFRESH)
+                    }
+
+                    sendWithoutRequest { request ->
+                        logger.e { "vikram:: install :: sendWithoutRequest:: ${request.url.host}" }
+                        request.url.host == "www.googleapis.com"
+                    }
+                }
             }
 
 

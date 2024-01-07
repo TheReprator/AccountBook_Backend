@@ -56,10 +56,7 @@ class UserIdentityFacadeImpl(
             throw IllegalUserIdentityException()
 
         val fullModal = repository.getUserById(userId).copy(refreshToken = tokenService.generateAccessToken(userId.toString()))
-        val updatedModal = repository.refreshToken(accessToken, fullModal)
-
-        return updatedModal.copy(
-            accessToken = tokenService.generateAccessToken(userId.toString()))
+        return repository.refreshToken(accessToken, fullModal).copy(accessToken = tokenService.generateAccessToken(userId.toString()))
     }
 
     override suspend fun logout(userId: UserIdentityId): Boolean = repository.logout(userId)

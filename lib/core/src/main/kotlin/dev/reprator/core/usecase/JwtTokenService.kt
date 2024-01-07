@@ -6,9 +6,10 @@ import io.ktor.server.auth.jwt.*
 interface JwtTokenService {
 
     companion object {
-        private const val SECOND_1 = 1_000L
-        private const val tokenExpiration: Long = 2 * SECOND_1   // 1 day
-        private const val refreshTokenExpiration: Long = 3 * SECOND_1 // 10 day
+        const val JWT_USER_ID = "userId"
+        private const val HOUR_1 = 60 * 60 * 1_000L
+        private const val tokenExpiration: Long = 12 * HOUR_1   // 1 day
+        private const val refreshTokenExpiration: Long = 2 * HOUR_1 // 2 day
     }
 
     val jwtConfiguration: JWTConfiguration

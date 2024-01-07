@@ -10,10 +10,7 @@ import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.setUpKoinCountry
-import dev.reprator.testModule.JWT_SERVICE
-import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
-import dev.reprator.testModule.setupCoreNetworkModule
+import dev.reprator.testModule.*
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
@@ -27,7 +24,9 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.util.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
@@ -74,8 +73,8 @@ internal class UserIdentityRouteTest : KoinTest {
                         runBlocking {
                             val userController = get<UserIdentityRepository>()
                             try {
-                                userController.getUserById(it)
-                                true
+                                val result = userController.getUserById(it)
+                                result.refreshToken.trim().isNotEmpty()
                             } catch (exception: Exception) {
                                 false
                             }
@@ -104,7 +103,7 @@ internal class UserIdentityRouteTest : KoinTest {
     private suspend inline fun <reified T> clientBody(
         endPoint: String,
         methodName: HttpMethod = HttpMethod.Post,
-        crossinline block: HttpRequestBuilder.() -> Unit
+        crossinline block: HttpRequestBuilder.() -> Unit ={}
     ) =
         get<HttpClient>().safeRequest<T>(
             apiType = APIS.INTERNAL_APP,
@@ -118,9 +117,9 @@ internal class UserIdentityRouteTest : KoinTest {
             block(this@safeRequest)
         }
 
-    @Test
+    @RepeatedTest(2)
     fun `Register a user as new user, for valid country id, with otp being sent by server to client successfully`() =
-        runBlocking {
+        runTest {
 
             val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
             val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
@@ -170,7 +169,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `Verify user with otp, when user exist in db`() = runBlocking {
+    fun `Verify user with otp, when user exist in db`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
@@ -216,6 +215,77 @@ internal class UserIdentityRouteTest : KoinTest {
 
         Assertions.assertTrue(addCountryResponse is ApiResponse.Error.GenericError)
         Assertions.assertNotNull(addCountryResponse)
+    }
+
+    @Test
+    fun `update access and refresh token, if user is logged in successful`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+
+        val verifyOtp = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
+        } as ApiResponse.Success
+
+        val accessTokenFullModal = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_TOKEN_REFRESH) {
+            setBody(FormDataContent(Parameters.build {
+                append(PARAMETER_ACCESS_TOKEN, verifyOtp.body.data.refreshToken)
+            }))
+        } as ApiResponse.Success
+
+
+        Assertions.assertNotEquals(verifyOtp.body.data.refreshToken, accessTokenFullModal.body.data.refreshToken)
+        Assertions.assertNotEquals(verifyOtp.body.data.accessToken, accessTokenFullModal.body.data.accessToken)
+    }
+
+    @Test
+    fun `logout user, successfully, if token is valid`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+
+        val verifyOtp = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
+        } as ApiResponse.Success
+
+        TOKEN_ACCESS = verifyOtp.body.data.accessToken
+        TOKEN_REFRESH = verifyOtp.body.data.refreshToken
+
+        val logoutModal = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_LOGOUT) as ApiResponse.Success
+
+        Assertions.assertTrue(logoutModal.body.data)
+    }
+
+    @RepeatedTest(2)
+    fun `logout user, failed, as token is expired after 7 second for testing`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = clientBody<ResultDTOResponse<UserIdentityRegisterModal>>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as ApiResponse.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.data.userId)
+
+        val verifyOtp = clientBody<ResultDTOResponse<UserIdentityOTPModal>>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
+        } as ApiResponse.Success
+
+        TOKEN_ACCESS = verifyOtp.body.data.accessToken
+        TOKEN_REFRESH = verifyOtp.body.data.refreshToken
+
+        delay(7_000)
+        val logoutModal = clientBody<ResultDTOResponse<Boolean>>(ACCOUNT_LOGOUT)
+
+        Assertions.assertTrue(logoutModal is ApiResponse.Error)
+        Assertions.assertEquals(401, (logoutModal as ApiResponse.Error.HttpError).code)
     }
 }
 

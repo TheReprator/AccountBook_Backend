@@ -23,14 +23,15 @@ dependencies {
     api(libs.test.koin.junit5)
     api(libs.test.kotlin)
 
+    api(libs.ktor.client.auth)
+
     api(libs.ktor.client.mock)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
 
-    api(libs.ktor.server.netty)
+    implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.common)
     implementation(libs.ktor.server.status.page)
-    api(libs.ktor.server.auth)
     implementation(libs.ktor.server.logging)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.serialization)

@@ -5,12 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
 import dev.reprator.core.usecase.JWTConfiguration
 import dev.reprator.core.usecase.JwtTokenService
-import dev.reprator.userIdentity.controller.UserIdentityController
+import dev.reprator.core.usecase.JwtTokenService.Companion.JWT_USER_ID
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import io.ktor.server.auth.jwt.*
 import java.util.*
 
-private const val JWT_USER_ID = "userId"
+private const val JWT_RANDOM_UUID = "randomUUID"
 
 class JwtTokenServiceImpl(
     override val jwtConfiguration: JWTConfiguration,
@@ -21,6 +21,7 @@ class JwtTokenServiceImpl(
         .withAudience(jwtConfiguration.audience)
         .withIssuer(jwtConfiguration.issuer)
         .withClaim(JWT_USER_ID, userId)
+        .withClaim(JWT_RANDOM_UUID, UUID.randomUUID().toString())
         .withExpiresAt(Date(System.currentTimeMillis() + time))
         .sign(Algorithm.HMAC256(jwtConfiguration.secret))
 
@@ -43,8 +44,11 @@ class JwtTokenServiceImpl(
         }
 
         return try {
-            userController.getUserById(userId.toInt())
-            JWTPrincipal(credential.payload)
+            val fullModal = userController.getUserById(userId.toInt())
+            if(fullModal.refreshToken.trim().isNotEmpty())
+                JWTPrincipal(credential.payload)
+            else
+                null
         } catch (exception: Exception) {
             null
         }
