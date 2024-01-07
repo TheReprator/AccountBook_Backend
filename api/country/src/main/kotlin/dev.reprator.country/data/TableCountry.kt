@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 
 class TableCountryEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by TableCountry.name
-    var isocode by TableCountry.isocode
+    var isocode by TableCountry.callingCode
     var shortcode by TableCountry.shortcode
 
     companion object : IntEntityClass<TableCountryEntity>(TableCountry)
@@ -16,10 +16,10 @@ class TableCountryEntity(id: EntityID<Int>) : IntEntity(id) {
 
 object TableCountry : IntIdTable("country", "id") {
     val name = text("name").uniqueIndex()
-    val isocode = integer("isocode").uniqueIndex()
+    val callingCode = integer("callingcode").uniqueIndex()
     val shortcode = text("shortcode").uniqueIndex()
 
     init {
-        uniqueIndex(name, isocode, shortcode)
+        uniqueIndex(name, callingCode, shortcode)
     }
 }

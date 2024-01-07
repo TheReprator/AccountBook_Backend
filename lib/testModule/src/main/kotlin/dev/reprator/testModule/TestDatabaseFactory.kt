@@ -2,9 +2,11 @@ package dev.reprator.testModule
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.reprator.core.DatabaseFactory
+import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import org.h2.tools.RunScript
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.DatabaseConfig
+import org.jetbrains.exposed.sql.ExperimentalKeywordApi
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.UUID
@@ -16,7 +18,10 @@ class TestDatabaseFactory : DatabaseFactory {
     override fun connect() {
         source = hikari()
         SchemaDefinition.createSchema(source)
-        Database.connect(source)
+        Database.connect(source, databaseConfig = DatabaseConfig {
+            @OptIn(ExperimentalKeywordApi::class)
+            preserveKeywordCasing = false
+        })
     }
 
     private fun hikari(): HikariDataSource {
@@ -26,7 +31,7 @@ class TestDatabaseFactory : DatabaseFactory {
         config.username = "root"
         config.password = "password"
         config.maximumPoolSize = 2
-        config.isAutoCommit = true
+        config.isAutoCommit = false
         config.validate()
         return HikariDataSource(config)
     }

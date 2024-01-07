@@ -1,7 +1,7 @@
 package dev.reprator.language.data
 
-import dev.reprator.core.Mapper
-import dev.reprator.core.dbQuery
+import dev.reprator.core.util.AppMapper
+import dev.reprator.core.util.dbConfiguration.dbQuery
 import dev.reprator.language.domain.IllegalLanguageException
 import dev.reprator.language.domain.LanguageNotFoundException
 import dev.reprator.language.modal.LanguageModal
@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
-class LanguageRepositoryImpl(private val mapper: Mapper<ResultRow, LanguageModal>) : LanguageRepository {
+class LanguageRepositoryImpl(private val mapper: AppMapper<ResultRow, LanguageModal>) : LanguageRepository {
 
     private suspend fun resultRowToLanguage(row: ResultRow): LanguageModal = mapper.map(row)
 
@@ -23,8 +23,8 @@ class LanguageRepositoryImpl(private val mapper: Mapper<ResultRow, LanguageModal
 
     override suspend fun language(id: Int): LanguageModal = dbQuery {
         TableLanguage
-            .select { TableLanguage.id eq id }
-            .map{
+            .selectAll().where { TableLanguage.id eq id }
+            .map {
                 resultRowToLanguage(it)
             }
             .singleOrNull() ?: throw LanguageNotFoundException()
