@@ -13,7 +13,7 @@ java {
 dependencies {
     implementation(projects.lib.core)
     implementation(projects.api.country)
-    implementation("com.google.api-client:google-api-client:1.32.1")
+    implementation("com.google.api-client:google-api-client:1.35.2")
 
     implementation(libs.exposed.postgres)
     implementation(libs.test.coroutine)
