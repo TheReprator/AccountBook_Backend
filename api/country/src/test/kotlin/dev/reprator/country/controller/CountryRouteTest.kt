@@ -3,7 +3,7 @@ package dev.reprator.country.controller
 import dev.reprator.core.usecase.FailDTOResponse
 import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
-import dev.reprator.country.CountryComponent
+import dev.reprator.country.di.CountryComponent
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.domain.CountryNotFoundException
