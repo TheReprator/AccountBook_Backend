@@ -186,7 +186,7 @@ fun pluginClientHttpResponseValidator(httpClientConfig: HttpClientConfig<*>, log
     }
 }
 
-private fun MockRequestHandleScope.errorResponse(): HttpResponseData {
+fun MockRequestHandleScope.errorResponse(): HttpResponseData {
     return respond(
         content = "",
         status = HttpStatusCode.BadRequest,

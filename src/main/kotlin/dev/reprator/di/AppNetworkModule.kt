@@ -1,15 +1,7 @@
-package dev.reprator
+package dev.reprator.di
 
-import dev.reprator.core.usecase.JWTConfiguration
-import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.util.api.HttpExceptions
 import dev.reprator.core.util.constants.*
-import dev.reprator.core.util.dbConfiguration.DatabaseConfig
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
-import dev.reprator.core.util.logger.AppLogger
-import dev.reprator.dao.DefaultDatabaseFactory
-import dev.reprator.impl.AppLoggerImpl
-import dev.reprator.impl.JwtTokenServiceImpl
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -18,73 +10,25 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import io.ktor.server.application.*
-import io.ktor.server.config.*
 import io.ktor.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import org.koin.core.module.dsl.withOptions
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 private const val MILLISECONDS = 1000L
 
-private val propertyConfig: ApplicationConfig.(String) -> String = {
-    this.property(it).getString()
-}
+@Module(includes = [AppModule::class])
+class AppNetworkModule {
 
-fun koinAppModule(applicationEnvironment: ApplicationEnvironment) = module {
-
-    single<ApplicationConfig> { applicationEnvironment.config }
-
-    factory(named(UPLOAD_FOLDER_SPLASH)) { applicationEnvironment.config.propertyConfig(UPLOAD_FOLDER_SPLASH) }
-    factory(named(VERIFICATION_SMS_PHONE_APIKEY)) {
-        applicationEnvironment.config.propertyConfig(
-            VERIFICATION_SMS_PHONE_APIKEY
-        )
-    }
-    factory(named(VERIFICATION_SMS_PHONE_USERID)) {
-        applicationEnvironment.config.propertyConfig(
-            VERIFICATION_SMS_PHONE_USERID
-        )
+    @Single
+    fun provideHttpClientAttribute(): Attributes {
+        return Attributes(true)
     }
 
-    single<JwtTokenService> {
-        fun property(property: String): String = applicationEnvironment.config.propertyConfig("jwt.$property")
-        val jwtConfiguration = JWTConfiguration(property("secret"), property("audience"), property("issuer"), property("realm"))
-        JwtTokenServiceImpl(jwtConfiguration, get())
-    }
-
-    single<AppLogger> { AppLoggerImpl() }
-    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }.withOptions {
-        qualifier = named(APP_COROUTINE_SCOPE)
-    }
-}
-
-val koinAppDBModule = module {
-    single<DatabaseFactory> {
-        val config: ApplicationConfig = get<ApplicationConfig>()
-
-        fun property(property: String): String = config.propertyConfig("storage.$property")
-
-        DefaultDatabaseFactory(
-            (DatabaseConfig(
-                property("driverClassName"), property("databaseName"),
-                property("portNumber").toInt(), property("serverName"), property("userName"), property("password")
-            ))
-        )
-
-    }
-}
-
-val koinAppNetworkModule = module {
-    single<Attributes> { Attributes(true) }
-
-    single<HttpClient> {
-        val clientAttributes: Attributes = get()
-
-        HttpClient(CIO) {
+    @Single
+    fun provideHttpClient(clientAttributes: Attributes, @Named(VERIFICATION_SMS_PHONE_APIKEY) apiKey: String,
+                          @Named(VERIFICATION_SMS_PHONE_USERID) userId: String): HttpClient {
+        return HttpClient(CIO) {
 
             expectSuccess = true
 
@@ -144,8 +88,8 @@ val koinAppNetworkModule = module {
 
                     val apiType = providerType == APIS.EXTERNAL_OTP_VERIFICATION
                     if (apiType) {
-                        append("API-Key", get<String>(named(VERIFICATION_SMS_PHONE_APIKEY)))
-                        append("User-ID", get<String>(named(VERIFICATION_SMS_PHONE_USERID)))
+                        append("API-Key", apiKey)
+                        append("User-ID", userId)
                     }
                 }
 

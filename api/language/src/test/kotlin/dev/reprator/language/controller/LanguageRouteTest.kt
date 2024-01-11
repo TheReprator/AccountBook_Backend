@@ -5,14 +5,13 @@ import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.language.data.LanguageRepository
 import dev.reprator.language.data.TableLanguage
+import dev.reprator.language.di.LanguageComponent
 import dev.reprator.language.domain.LanguageNotFoundException
 import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
-import dev.reprator.language.setUpKoinLanguage
 import dev.reprator.testModule.KtorServerExtension
-import impl.DatabaseFactoryImpl
+import dev.reprator.testModule.di.AppCoreComponent
 import dev.reprator.testModule.hitApiWithClient
-import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -21,9 +20,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -43,14 +40,7 @@ internal class LanguageRouteTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-
-        setUpKoinLanguage()
-        setupCoreNetworkModule()
-
-        modules(
-            module {
-                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
-            })
+        modules( AppCoreComponent().module, LanguageComponent().module)
     }
 
     @BeforeEach

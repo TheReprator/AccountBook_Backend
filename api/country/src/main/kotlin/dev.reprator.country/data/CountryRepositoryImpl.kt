@@ -2,6 +2,7 @@ package dev.reprator.country.data
 
 import dev.reprator.core.util.AppMapper
 import dev.reprator.core.util.dbConfiguration.dbQuery
+import dev.reprator.country.di.KOIN_NAMED_MAPPER_COUNTRY
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
 import dev.reprator.country.modal.CountryEntity
@@ -9,10 +10,9 @@ import dev.reprator.country.modal.CountryId
 import dev.reprator.country.modal.CountryModal
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
-import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Property
 
-@Factory(binds = [CountryRepository::class])
-class CountryRepositoryImpl(private val mapper: AppMapper<TableCountryEntity, CountryModal>) : CountryRepository {
+class CountryRepositoryImpl(@Property(KOIN_NAMED_MAPPER_COUNTRY) private val mapper: AppMapper<TableCountryEntity, CountryModal>) : CountryRepository {
 
     private suspend fun resultRowToCountry(row: TableCountryEntity): CountryModal = mapper.map(row)
 

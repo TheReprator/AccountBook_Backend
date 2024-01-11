@@ -6,8 +6,8 @@ import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.splash.modal.SplashModal
 import dev.reprator.testModule.KtorServerExtension
+import dev.reprator.testModule.di.AppCoreComponent
 import dev.reprator.testModule.hitApiWithClient
-import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.http.*
 import io.mockk.coEvery
 import io.mockk.mockkClass
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.junit5.mock.MockProviderExtension
 import org.koin.test.mock.declareMock
@@ -37,11 +38,8 @@ internal class SplashController : KoinTest {
     fun `Fetch Splash api`(): Unit = runBlocking {
 
         val koinApp = startKoin {
-            setupCoreNetworkModule()
-            modules(
-                module {
-                factory(named(UPLOAD_FOLDER_SPLASH)) { "splashFileDirectory" }
-            })
+            modules( AppCoreComponent().module,
+                module { factory(named(UPLOAD_FOLDER_SPLASH)) { "splashFileDirectory" } })
         }
 
         val mockLanguageFacade = declareMock<LanguageFacade>()

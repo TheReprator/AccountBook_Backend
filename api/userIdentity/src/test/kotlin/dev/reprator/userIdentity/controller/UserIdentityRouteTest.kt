@@ -5,18 +5,21 @@ import dev.reprator.core.util.constants.LENGTH_OTP
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
+import dev.reprator.country.di.CountryComponent
 import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.setUpKoinCountry
 import dev.reprator.testModule.*
+import dev.reprator.testModule.di.AppCoreComponent
+import dev.reprator.testModule.di.JWT_SERVICE
+import dev.reprator.testModule.di.TOKEN_ACCESS
+import dev.reprator.testModule.di.TOKEN_REFRESH
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
+import dev.reprator.userIdentity.di.UserdentityComponent
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
-import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
-import impl.DatabaseFactoryImpl
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -32,6 +35,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -55,13 +59,8 @@ internal class UserIdentityRouteTest : KoinTest {
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
 
-        setUpKoinCountry()
-        setUpKoinUserIdentityModule()
-        setupCoreNetworkModule()
-
-        modules(
+        modules(CountryComponent().module, UserdentityComponent().module, AppCoreComponent().module,
             module {
-                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
                 singleOf(::SMScodeGeneratorTestImpl) bind SMScodeGenerator::class
                 single<(Int) -> Boolean>(named(JWT_SERVICE)) {
                     val isUserValid:(Int) -> Boolean = {

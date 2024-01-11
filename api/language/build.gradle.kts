@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version libs.versions.kotlin
+    alias(libs.plugins.ksp)
 }
 
 java {
@@ -16,9 +17,19 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)
 
+    ksp(libs.koin.compiler)
+
     // testing
     testImplementation(libs.test.ktor.server)
     testImplementation(projects.lib.testModule)
+}
+
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
+}
+
+ksp {
+    arg("KOIN_CONFIG_CHECK","true")
 }
 
 tasks {

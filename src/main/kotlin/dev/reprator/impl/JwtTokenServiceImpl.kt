@@ -8,13 +8,16 @@ import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.usecase.JwtTokenService.Companion.JWT_USER_ID
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import io.ktor.server.auth.jwt.*
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.Single
 import java.util.*
 
 private const val JWT_RANDOM_UUID = "randomUUID"
 
+@Single
 class JwtTokenServiceImpl(
     override val jwtConfiguration: JWTConfiguration,
-    private val userController: UserIdentityRepository
+    @InjectedParam private val userController: UserIdentityRepository
 ) : JwtTokenService {
 
     private fun createJWTToken(userId: String, time: Long): String = JWT.create()

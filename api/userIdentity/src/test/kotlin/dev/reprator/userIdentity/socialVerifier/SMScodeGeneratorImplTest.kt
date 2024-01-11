@@ -1,9 +1,11 @@
 package dev.reprator.userIdentity.socialVerifier
 
 import dev.reprator.core.util.logger.AppLogger
+import dev.reprator.country.di.CountryComponent
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.errorResponse
-import dev.reprator.testModule.setupCoreNetworkModule
+import dev.reprator.testModule.di.AppCoreComponent
+import dev.reprator.testModule.plugin.errorResponse
+import dev.reprator.userIdentity.di.UserdentityComponent
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.mock.*
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.junit5.KoinTestExtension
@@ -27,7 +30,7 @@ internal class SMScodeGeneratorImplTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-        setupCoreNetworkModule()
+        modules( CountryComponent().module, UserdentityComponent().module, AppCoreComponent().module)
 
         val engine = MockEngine { request ->
 

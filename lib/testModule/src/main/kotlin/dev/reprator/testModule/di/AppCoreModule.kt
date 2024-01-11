@@ -1,10 +1,12 @@
 package dev.reprator.testModule.di
 
 import dev.reprator.core.usecase.JWTConfiguration
+import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.core.util.logger.AppLogger
 import impl.AppLoggerImpl
 import impl.DatabaseFactoryImpl
+import impl.JwtTokenServiceImpl
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
@@ -27,6 +29,13 @@ class AppCoreModule {
             JWT_PARAMETER_SECRET, JWT_PARAMETER_AUDIENCE, JWT_PARAMETER_ISSUER,
             JWT_PARAMETER_REALM
         )
+    }
+
+    @Single
+    fun provideJwtTokenService(jwtConfiguration: JWTConfiguration): JwtTokenService {
+        return JwtTokenServiceImpl(jwtConfiguration) {
+            true
+        }
     }
 
     @Single

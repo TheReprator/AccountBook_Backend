@@ -4,8 +4,9 @@ import dev.reprator.core.util.AppMapper
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
 import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Single
 
-@Factory(binds = [AppMapper::class])
+@Factory
 class CountryResponseMapper : AppMapper<TableCountryEntity, CountryModal> {
 
     override suspend fun map(from: TableCountryEntity): CountryModal {

@@ -8,16 +8,13 @@ import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.core.usecase.JwtTokenService.Companion.JWT_USER_ID
 import dev.reprator.testModule.di.JWT_SERVICE
 import io.ktor.server.auth.jwt.*
-import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Property
-import org.koin.core.annotation.Single
 import java.util.*
 
 private const val JWT_RANDOM_UUID = "randomUUID"
 
-@Single(binds = [JwtTokenService::class])
-class JwtTokenServiceImpl(@InjectedParam override val jwtConfiguration: JWTConfiguration,
-    @InjectedParam @Property(JWT_SERVICE) private val isUserValid:(Int) -> Boolean) : JwtTokenService {
+class JwtTokenServiceImpl(override val jwtConfiguration: JWTConfiguration,
+    @Property(JWT_SERVICE) private val isUserValid:(Int) -> Boolean) : JwtTokenService {
 
     private fun createJWTToken(userId: String, time: Long): String = JWT.create()
         .withAudience(jwtConfiguration.audience)

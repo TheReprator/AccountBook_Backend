@@ -4,8 +4,7 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
-import impl.DatabaseFactoryImpl
-import dev.reprator.testModule.setupCoreNetworkModule
+import dev.reprator.testModule.di.AppCoreComponent
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -19,9 +18,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -49,11 +46,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-        setupCoreNetworkModule()
-        modules(
-            module {
-                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
-            })
+        modules( AppCoreComponent().module)
     }
 
     @BeforeEach

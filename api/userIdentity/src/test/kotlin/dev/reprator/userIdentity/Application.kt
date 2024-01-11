@@ -6,6 +6,10 @@ import dev.reprator.core.exception.StatusCodeException
 import dev.reprator.core.usecase.JwtTokenService
 import dev.reprator.country.controller.routeCountry
 import dev.reprator.testModule.*
+import dev.reprator.testModule.di.JWT_PARAMETER_AUDIENCE
+import dev.reprator.testModule.di.JWT_PARAMETER_ISSUER
+import dev.reprator.testModule.di.JWT_PARAMETER_REALM
+import dev.reprator.testModule.di.JWT_PARAMETER_SECRET
 import dev.reprator.userIdentity.controller.routeUserIdentity
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

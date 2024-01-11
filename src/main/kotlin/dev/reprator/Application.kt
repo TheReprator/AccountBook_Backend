@@ -1,25 +1,28 @@
 package dev.reprator
 
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
-import dev.reprator.language.setUpKoinLanguage
+import dev.reprator.country.di.CountryComponent
+import dev.reprator.di.AppComponent
+import dev.reprator.language.di.LanguageComponent
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import dev.reprator.plugins.*
-import dev.reprator.userIdentity.setUpKoinUserIdentityModule
+import dev.reprator.userIdentity.di.UserdentityComponent
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
+import org.koin.ksp.generated.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
+import org.koin.logger.SLF4JLogger
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
 
     install(Koin) {
-        modules(koinAppModule(this@module.environment), koinAppDBModule, koinAppNetworkModule)
-        setUpKoinLanguage()
-        setUpKoinUserIdentityModule()
+        modules(AppComponent(this@module.environment).module, LanguageComponent().module, CountryComponent().module,
+            UserdentityComponent().module)
     }
 
     install(CORS) {
