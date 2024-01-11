@@ -10,7 +10,7 @@ import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
 import dev.reprator.language.setUpKoinLanguage
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import impl.DatabaseFactoryImpl
 import dev.reprator.testModule.hitApiWithClient
 import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
@@ -49,7 +49,7 @@ internal class LanguageRouteTest : KoinTest {
 
         modules(
             module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
             })
     }
 

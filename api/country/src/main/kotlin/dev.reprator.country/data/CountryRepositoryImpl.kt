@@ -9,7 +9,9 @@ import dev.reprator.country.modal.CountryId
 import dev.reprator.country.modal.CountryModal
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.koin.core.annotation.Factory
 
+@Factory(binds = [CountryRepository::class])
 class CountryRepositoryImpl(private val mapper: AppMapper<TableCountryEntity, CountryModal>) : CountryRepository {
 
     private suspend fun resultRowToCountry(row: TableCountryEntity): CountryModal = mapper.map(row)

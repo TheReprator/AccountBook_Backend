@@ -4,7 +4,7 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import impl.DatabaseFactoryImpl
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteAll
@@ -84,7 +84,7 @@ internal class TableCountryEntityTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
             })
     }
 

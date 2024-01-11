@@ -18,7 +18,6 @@ import org.koin.core.Koin
 
 class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
 
-
     companion object {
 
         private var TEST_SERVER: NettyApplicationEngine ?= null

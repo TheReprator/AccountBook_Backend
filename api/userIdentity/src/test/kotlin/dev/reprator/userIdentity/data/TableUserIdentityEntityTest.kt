@@ -4,7 +4,7 @@ import dev.reprator.core.util.dbConfiguration.DatabaseFactory
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
-import dev.reprator.testModule.TestDatabaseFactory
+import impl.DatabaseFactoryImpl
 import dev.reprator.testModule.setupCoreNetworkModule
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
@@ -52,7 +52,7 @@ internal class TableUserIdentityEntityTest : KoinTest {
         setupCoreNetworkModule()
         modules(
             module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
             })
     }
 

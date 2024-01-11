@@ -4,7 +4,9 @@ import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryId
 import dev.reprator.country.modal.CountryModal
+import org.koin.core.annotation.Factory
 
+@Factory(binds = [CountryFacade::class])
 class CountryFacadeImpl(private val repository: CountryRepository): CountryFacade {
 
     override suspend fun getAllCountry(): Iterable<CountryModal> {

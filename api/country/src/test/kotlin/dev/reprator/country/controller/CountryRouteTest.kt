@@ -8,11 +8,10 @@ import dev.reprator.country.data.TableCountry
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
-import dev.reprator.country.setUpKoinCountry
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.di.AppCoreComponent
+import impl.DatabaseFactoryImpl
 import dev.reprator.testModule.hitApiWithClient
-import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -43,11 +43,11 @@ internal class CountryRouteTest : KoinTest {
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
 
-        setUpKoinCountry()
-        setupCoreNetworkModule()
+        AppCoreComponent().module
+       // CountryComponent().module
         modules(
             module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
             })
     }
 
@@ -201,30 +201,6 @@ internal class CountryRouteTest : KoinTest {
         Assertions.assertTrue(editResponse.body)
         Assertions.assertEquals(changedRequestBody.name, countryRepository.getCountry(addCountryResponse.body.id).name)
     }
-
-
-//    @Test
-//    fun `Partial update of a country, as it exists`(): Unit = runBlocking {
-//        val addCountryResponse = countryClient(INPUT_COUNTRY)
-//
-//        val addResultBody = addCountryResponse.body<ResultDTOResponse<CountryModal.DTO>>()
-//        Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.data.callingCode)
-//
-//        val changedRequestBody = INPUT_COUNTRY.copy(name ="United Arab Emirates")
-//
-//        val client = createHttpClient()
-//        val editResponse = client.patch("$TEST_BASE_URL$ENDPOINT_COUNTRY/${addResultBody.data.id}") {
-//            contentType(ContentType.Application.Json)
-//            setBody(changedRequestBody)
-//        }
-//
-//        val editResponseBody = editResponse.body<ResultDTOResponse<Boolean>>()
-//        Assertions.assertEquals(HttpStatusCode.OK.value, editResponseBody.statusCode)
-//
-//        Assertions.assertEquals(changedRequestBody.name, countryRepository.getCountry(addResultBody.data.id).name)
-//    }
-
-
 
     @Test
     fun `Partial update of a country failed, for invalid country name`(): Unit = runBlocking {

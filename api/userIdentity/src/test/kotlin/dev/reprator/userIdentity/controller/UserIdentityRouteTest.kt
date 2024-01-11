@@ -16,6 +16,7 @@ import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
+import impl.DatabaseFactoryImpl
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
@@ -60,7 +61,7 @@ internal class UserIdentityRouteTest : KoinTest {
 
         modules(
             module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
+                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
                 singleOf(::SMScodeGeneratorTestImpl) bind SMScodeGenerator::class
                 single<(Int) -> Boolean>(named(JWT_SERVICE)) {
                     val isUserValid:(Int) -> Boolean = {

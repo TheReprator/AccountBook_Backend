@@ -2,8 +2,10 @@ package impl
 
 
 import dev.reprator.core.util.logger.AppLogger
+import org.koin.core.annotation.Single
 import java.util.regex.Pattern
 
+@Single(binds = [AppLogger::class])
 class AppLoggerImpl : AppLogger {
 
     companion object {
@@ -19,7 +21,7 @@ class AppLoggerImpl : AppLogger {
     }
 
 
-    private val tag: String?
+    private val tag: String
         get() = Throwable().stackTrace[3]
             .let(::createStackElementTag)
 

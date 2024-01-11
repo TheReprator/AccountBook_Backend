@@ -1,5 +1,6 @@
 package dev.reprator.testModule
 
+import org.koin.core.annotation.Single
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
@@ -8,9 +9,10 @@ import java.lang.reflect.TypeVariable
 import java.lang.reflect.WildcardType
 import java.util.Arrays
 
+@Single
 class Types {
 
-    companion object {
+ /*   companion object {
 
         @Volatile
         private var INSTANCE: Types? = null
@@ -23,9 +25,9 @@ class Types {
                     }
             }
         }
-    }
+    }*/
 
-    val EMPTY_TYPE_ARRAY = arrayOf<Type>()
+    private val EMPTY_TYPE_ARRAY = arrayOf<Type>()
 
     /**
      * Returns a new parameterized type, applying `typeArguments` to `rawType`.

@@ -4,10 +4,20 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     kotlin("jvm") version libs.versions.kotlin
     alias(libs.plugins.ktor)
+    alias(libs.plugins.ksp)
 }
 
 group = "dev.reprator"
 version = "0.0.1"
+
+// KSP - To use generated sources
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
+}
+
+ksp {
+    arg("KOIN_CONFIG_CHECK","true")
+}
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -48,8 +58,12 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.hikariCp)
 
-    implementation(libs.koin.ktor)
-    implementation(libs.koin.logger)
+//    implementation(libs.koin.ktor)
+//    implementation(libs.koin.core)
+//    implementation(libs.koin.annotation)
+//    implementation(libs.koin.logger)
+//    implementation(libs.ksp.processing.api)
+    ksp(libs.koin.compiler)
 
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.logging)
@@ -58,12 +72,6 @@ dependencies {
     // testing
     testImplementation(projects.lib.testModule)
     testImplementation(libs.test.ktor.server)
-}
-
-ktor {
-    fatJar {
-        archiveFileName.set("fat.jar")
-    }
 }
 
 tasks {

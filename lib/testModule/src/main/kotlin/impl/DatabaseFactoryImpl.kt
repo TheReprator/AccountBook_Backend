@@ -1,4 +1,4 @@
-package dev.reprator.testModule
+package impl
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -7,11 +7,13 @@ import org.h2.tools.RunScript
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.ExperimentalKeywordApi
+import org.koin.core.annotation.Single
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.UUID
+import java.util.*
 
-class TestDatabaseFactory : DatabaseFactory {
+@Single(binds = [DatabaseFactory::class])
+class DatabaseFactoryImpl : DatabaseFactory {
 
     private lateinit var source: HikariDataSource
 
@@ -41,7 +43,7 @@ class TestDatabaseFactory : DatabaseFactory {
     }
 }
 
-object SchemaDefinition {
+private object SchemaDefinition {
 
     fun createSchema(dataSource: HikariDataSource) {
         RunScript.execute(

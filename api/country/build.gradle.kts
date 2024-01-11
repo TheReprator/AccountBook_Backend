@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version libs.versions.kotlin
+    alias(libs.plugins.ksp)
 }
 
 java {
@@ -19,6 +20,13 @@ dependencies {
     // testing
     testImplementation(libs.test.ktor.server)
     testImplementation(projects.lib.testModule)
+
+    ksp(libs.koin.compiler)
+}
+
+// KSP - To use generated sources
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
 tasks {
