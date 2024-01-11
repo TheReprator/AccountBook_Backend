@@ -1,9 +1,11 @@
 package dev.reprator.country.data
 
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.country.CountryComponent
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension
+import dev.reprator.testModule.di.AppCoreComponent
 import impl.DatabaseFactoryImpl
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -21,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -82,10 +85,7 @@ internal class TableCountryEntityTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-        modules(
-            module {
-                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
-            })
+        modules( AppCoreComponent().module, CountryComponent().module)
     }
 
     @BeforeEach

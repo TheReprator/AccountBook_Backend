@@ -3,6 +3,7 @@ package dev.reprator.country.controller
 import dev.reprator.core.usecase.FailDTOResponse
 import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.country.CountryComponent
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.domain.CountryNotFoundException
@@ -10,7 +11,6 @@ import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.di.AppCoreComponent
-import impl.DatabaseFactoryImpl
 import dev.reprator.testModule.hitApiWithClient
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -20,9 +20,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.ksp.generated.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
@@ -42,13 +39,7 @@ internal class CountryRouteTest : KoinTest {
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-
-        AppCoreComponent().module
-       // CountryComponent().module
-        modules(
-            module {
-                singleOf(::DatabaseFactoryImpl) bind DatabaseFactory::class
-            })
+        modules( AppCoreComponent().module, CountryComponent().module)
     }
 
     @BeforeEach

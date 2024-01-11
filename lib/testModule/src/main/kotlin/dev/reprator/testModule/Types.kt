@@ -194,8 +194,8 @@ class Types {
             return componentType
         }
 
-        override fun equals(o: Any?): Boolean {
-            return o is GenericArrayType && equals(this, o as GenericArrayType)
+        override fun equals(other: Any?): Boolean {
+            return other is GenericArrayType && equals(this, other)
         }
 
         override fun hashCode(): Int {
@@ -221,13 +221,11 @@ class Types {
             if (upperBounds.size != 1) throw IllegalArgumentException()
 
             if (lowerBounds.size == 1) {
-                if (lowerBounds[0] == null) throw NullPointerException()
                 checkNotPrimitive(lowerBounds[0])
                 if (upperBounds[0] !== Any::class.java) throw IllegalArgumentException()
                 this.lowerBound = canonicalize(lowerBounds[0])
                 this.upperBound = Any::class.java
             } else {
-                if (upperBounds[0] == null) throw NullPointerException()
                 checkNotPrimitive(upperBounds[0])
                 this.lowerBound = null
                 this.upperBound = canonicalize(upperBounds[0])
@@ -243,7 +241,7 @@ class Types {
         }
 
         override fun equals(other: Any?): Boolean {
-            return other is WildcardType && equals(this, other as WildcardType)
+            return other is WildcardType && equals(this, other)
         }
 
         override fun hashCode(): Int {

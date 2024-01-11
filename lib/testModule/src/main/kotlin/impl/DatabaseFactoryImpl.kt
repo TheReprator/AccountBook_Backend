@@ -12,7 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-@Single(binds = [DatabaseFactory::class])
+@Single
 class DatabaseFactoryImpl : DatabaseFactory {
 
     private lateinit var source: HikariDataSource

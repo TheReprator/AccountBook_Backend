@@ -5,7 +5,7 @@ import dev.reprator.core.util.logger.AppLogger
 import org.koin.core.annotation.Single
 import java.util.regex.Pattern
 
-@Single(binds = [AppLogger::class])
+@Single
 class AppLoggerImpl : AppLogger {
 
     companion object {
