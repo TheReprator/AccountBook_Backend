@@ -19,6 +19,7 @@ dependencies {
 
     testImplementation(projects.lib.testModule)
     testImplementation(projects.lib.commonFeatureImpl)
+    testImplementation(libs.ktor.client.content.negotiation)
 }
 
 tasks {

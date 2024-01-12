@@ -6,8 +6,6 @@ import dev.reprator.language.domain.LanguageFacadeImplTest.Companion.LANGUAGE_LI
 import dev.reprator.language.domain.LanguageNotFoundException
 import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
-import io.ktor.client.call.*
-import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

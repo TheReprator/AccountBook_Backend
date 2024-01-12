@@ -25,10 +25,10 @@ fun pluginClientResponseTransformation(koin: Koin): ClientPlugin<Unit> {
                     val javaType: JavaType = mapper.constructType(envelopeType)
                     mapper.readValue(response.bodyAsText(), javaType)
                 } catch (e: IllegalArgumentException) {
-                    println("exception IllegalArgumentException localizedMessage")
+                    println("PluginClientResponseTransformation localizedMessage")
                     mapper.readValue(response.bodyAsText(), it)
                 } catch (e: Exception) {
-                    println("exception localizedMessage")
+                    println("PluginClientResponseTransformation localizedMessage")
                     e.stackTrace
                     null
                 }

@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import dev.reprator.commonFeatureImpl.di.APP_PLUGIN_CUSTOM_LIST
 import dev.reprator.commonFeatureImpl.di.APP_RUNNING_PORT_ADDRESS
+import dev.reprator.testModule.AppReflectionTypes
 import dev.reprator.testModule.plugin.pluginClientResponseTransformation
 import io.ktor.client.plugins.api.*
 import io.ktor.server.config.*
@@ -14,6 +15,7 @@ import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import kotlin.math.sin
 
 
 val appTestCoreModule = module {
@@ -21,12 +23,14 @@ val appTestCoreModule = module {
         ApplicationConfig("application-test.conf").property("ktor.deployment.port").getString().toInt()
     }
 
+    single <AppReflectionTypes> {
+        AppReflectionTypes()
+    }
 
-    factory<List<ClientPlugin<Unit>>>(named(APP_PLUGIN_CUSTOM_LIST)) {
+    single<List<ClientPlugin<Unit>>>(named(APP_PLUGIN_CUSTOM_LIST)) {
         listOf(pluginClientResponseTransformation(getKoin()))
     }
 }
-
 
 fun appTestDBModule(callBack: (HikariDataSource, Database) -> Unit)  = module {
 

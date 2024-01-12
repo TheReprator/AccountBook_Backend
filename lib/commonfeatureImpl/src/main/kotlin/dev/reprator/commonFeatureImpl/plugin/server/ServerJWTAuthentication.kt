@@ -9,8 +9,6 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureJWTAuthentication() {
 
-
-
     authentication {
 
         jwt {

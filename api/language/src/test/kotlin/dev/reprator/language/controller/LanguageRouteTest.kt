@@ -46,17 +46,19 @@ internal class LanguageRouteTest : KoinTest {
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
 
+        setUpKoinLanguage()
+
         modules(
-            appTestCoreModule,
+            koinAppNetworkClientModule,
             koinAppCommonModule(KtorServerExtension.TEST_SERVER!!.environment.config),
+            appTestCoreModule,
             appTestDBModule { hikariDataSource, _ ->
                 SchemaDefinition.createSchema(hikariDataSource)
             },
             koinAppCommonDBModule,
-            koinAppNetworkClientModule
         )
-        setUpKoinLanguage()
-        
+
+
         KtorServerExtension.TEST_SERVER!!.application.module()
     }
 

@@ -87,6 +87,7 @@ fun koinAppCommonModule(config: ApplicationConfig) = module {
     }
 }
 
+
 val koinAppCommonDBModule = module {
     single<AppDatabaseFactory> {
         DefaultDatabaseFactory(get(), get())
@@ -136,7 +137,7 @@ val koinAppNetworkClientModule = module {
             expectSuccess = true
 
             get<List<ClientPlugin<Unit>>>(named(APP_PLUGIN_CUSTOM_LIST)).forEach {
-                this@HttpClient.install(it)
+                install(it)
             }
 
             install(Logging) {

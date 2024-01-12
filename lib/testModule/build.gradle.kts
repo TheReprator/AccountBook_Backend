@@ -14,8 +14,11 @@ dependencies {
     implementation(projects.lib.base)
     implementation(projects.lib.commonFeatureImpl)
 
+    api(libs.ktor.server.netty)
     api(libs.ktor.server.core)
+
     api(libs.exposed.core)
+    implementation(libs.exposed.h2Db)
 
     api(libs.test.junit5)
     api(libs.test.junit5.suite)
@@ -25,9 +28,7 @@ dependencies {
     api(libs.test.kotlin)
 
     api(libs.ktor.client.mock)
-
-    api(libs.ktor.server.netty)
-    implementation(libs.exposed.h2Db)
+    //api(libs.test.coroutine)
 }
 
 tasks {
