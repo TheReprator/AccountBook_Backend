@@ -46,7 +46,7 @@ dependencies {
 
     // testing
     testImplementation(projects.lib.testModule)
-    testImplementation(libs.test.ktor.server)
+   // testImplementation(libs.test.ktor.server)
 }
 
 ktor {

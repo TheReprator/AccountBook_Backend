@@ -83,6 +83,7 @@ internal class LanguageRouteTest : KoinTest {
 
     @Test
     fun `Add new language And Verify from db by id for existence`(): Unit = runBlocking {
+
         val resultBody = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
         } as AppResult.Success

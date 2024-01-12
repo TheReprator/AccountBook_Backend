@@ -29,6 +29,7 @@ dependencies {
 
     api(libs.ktor.client.mock)
     //api(libs.test.coroutine)
+    //testImplementation(libs.test.ktor.server)
 }
 
 tasks {

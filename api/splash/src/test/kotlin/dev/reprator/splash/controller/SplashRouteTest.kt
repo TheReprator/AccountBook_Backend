@@ -10,6 +10,7 @@ import dev.reprator.language.modal.LanguageModal
 import dev.reprator.splash.modal.SplashModal
 import dev.reprator.splash.module
 import dev.reprator.testModule.KtorServerExtension
+import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestCoreModule
 import dev.reprator.testModule.di.appTestDBModule
 import dev.reprator.testModule.hitApiWithClient
@@ -47,11 +48,13 @@ internal class SplashController : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
 
         modules(
-            appTestCoreModule,
+            koinAppNetworkClientModule,
             koinAppCommonModule(KtorServerExtension.TEST_SERVER!!.environment.config),
-            appTestDBModule,
-            koinAppCommonDBModule,
-            koinAppNetworkClientModule, ownModule
+            appTestCoreModule,
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule, ownModule
         )
         KtorServerExtension.TEST_SERVER!!.application.module()
     }
