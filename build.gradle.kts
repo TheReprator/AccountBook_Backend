@@ -40,6 +40,8 @@ dependencies {
     implementation(libs.ktor.server.config.yaml)
 
     implementation(libs.koin.ktor)
+    implementation(libs.koin.logger)
+    implementation(libs.ktor.logback)
 
     // testing
     testImplementation(projects.lib.testModule)

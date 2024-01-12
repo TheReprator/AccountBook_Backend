@@ -17,12 +17,15 @@ import dev.reprator.userIdentity.setUpKoinUserIdentityModule
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
+import org.koin.logger.SLF4JLogger
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
 
     install(Koin) {
+        SLF4JLogger()
+
         modules(koinAppModule(this@module.environment), koinAppCommonModule(this@module.environment.config),
             koinAppLateInitializationModule(), koinAppDBModule, koinAppCommonDBModule, koinAppNetworkClientModule)
 

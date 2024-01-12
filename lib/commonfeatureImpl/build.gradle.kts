@@ -17,8 +17,6 @@ dependencies {
     implementation(libs.exposed.jdbc)
 
     implementation(libs.koin.ktor)
-    implementation(libs.koin.logger)
-    implementation(libs.ktor.server.logging)
 
     implementation(libs.ktor.client.auth)
     implementation(libs.ktor.client.cio)
@@ -30,7 +28,7 @@ dependencies {
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.common)
     implementation(libs.ktor.server.status.page)
-
+    implementation(libs.ktor.server.logging)
     implementation(libs.ktor.server.content.negotiation)
 }
 

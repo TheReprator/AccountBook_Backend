@@ -37,7 +37,6 @@ internal class ApplicationInvalidRoutingTest: KoinTest {
 
     @Test
     fun `throw 404, if api doesn't exist`(): Unit = runBlocking {
-        applicationEngineEnvironment {  }
         val response = hitApiWithClient<SplashModal>(getKoin(), "$ENDPOINT_LANGUAGE/InvalidApi", HttpMethod.Get) as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.NotFound.value, response.code)
