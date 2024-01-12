@@ -26,7 +26,7 @@ fun Routing.routeSplash() {
 
             val fileAsyncResult = async {
                 splashDirectory.listFiles()?.map {
-                    it.absolutePath
+                    it.canonicalPath
                 }.orEmpty()
             }
 

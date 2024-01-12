@@ -14,7 +14,6 @@ dependencies {
     implementation(projects.lib.base)
     implementation(projects.lib.commonFeatureImpl)
 
-    implementation(libs.ktor.server.netty)
     api(libs.ktor.server.core)
     api(libs.exposed.core)
 
@@ -27,6 +26,7 @@ dependencies {
 
     api(libs.ktor.client.mock)
 
+    api(libs.ktor.server.netty)
     implementation(libs.exposed.h2Db)
 }
 

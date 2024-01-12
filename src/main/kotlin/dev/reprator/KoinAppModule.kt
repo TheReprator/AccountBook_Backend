@@ -1,7 +1,6 @@
 package dev.reprator
 
 import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import dev.reprator.commonFeatureImpl.di.APP_RUNNING_PORT_ADDRESS
 import dev.reprator.commonFeatureImpl.di.JWT_SERVICE
 import dev.reprator.country.data.TableCountry

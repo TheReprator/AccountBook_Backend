@@ -20,6 +20,7 @@ fun pluginClientDefaultRequest(koin: Koin, httpClientConfig: HttpClientConfig<*>
 
         headers {
             append(HttpHeaders.ContentType, "application/json")
+
             if (isExternal) {
                 append("API-Key", koin.get<String>(named(VERIFICATION_SMS_PHONE_APIKEY)))
                 append("User-ID", koin.get<String>(named(VERIFICATION_SMS_PHONE_USERID)))

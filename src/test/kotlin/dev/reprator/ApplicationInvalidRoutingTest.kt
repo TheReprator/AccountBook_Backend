@@ -30,7 +30,7 @@ internal class ApplicationInvalidRoutingTest : KoinTest {
         modules(
             listOf(
                 appTestCoreModule, koinAppCommonModule(TEST_SERVER!!.environment.config),
-                koinAppDBModule, appTestDBModule, koinAppCommonDBModule, koinAppNetworkClientModule
+                appTestDBModule, koinAppCommonDBModule, koinAppNetworkClientModule
             )
         )
 
