@@ -2,8 +2,8 @@ ktor:
   development: true
   deployment:
     port: "$PORT:8081"
-    shutdown:
-      url: "/shutdown"
+    shutDownUrl:
+      url: "/appShutDown"
   application:
     modules:
       - dev.reprator.ApplicationKt.module
