@@ -8,6 +8,7 @@ import dev.reprator.testModule.plugin.pluginClientResponseTransformation
 import io.ktor.client.plugins.api.*
 import io.ktor.server.config.*
 import org.h2.tools.RunScript
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.nio.file.Files
@@ -27,7 +28,8 @@ val appTestCoreModule = module {
 }
 
 
-val appTestDBModule = module {
+fun appTestDBModule(callBack: (HikariDataSource, Database) -> Unit)  = module {
+
     single<HikariConfig> {
 
         HikariConfig().apply {
@@ -39,16 +41,15 @@ val appTestDBModule = module {
             isAutoCommit = false
             validate()
         }
-
-        //SchemaDefinition.createSchema(hikariSource)
-        //hikariSource
     }
-}
 
+    single<(HikariDataSource, Database) -> Unit> { callBack }
+}
 
 object SchemaDefinition {
 
     fun createSchema(dataSource: HikariDataSource) {
+
         RunScript.execute(
             dataSource.connection, Files.newBufferedReader(
                 Paths.get("src/test/resources/db/schema.sql")

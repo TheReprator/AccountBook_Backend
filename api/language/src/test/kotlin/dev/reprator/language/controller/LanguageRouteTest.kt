@@ -1,18 +1,23 @@
 package dev.reprator.language.controller
 
-import dev.reprator.core.usecase.FailDTOResponse
-import dev.reprator.core.util.api.ApiResponse
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.base.usecase.AppResult
+import dev.reprator.base.usecase.FailDTOResponse
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
+import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
+import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
 import dev.reprator.language.data.LanguageRepository
 import dev.reprator.language.data.TableLanguage
 import dev.reprator.language.domain.LanguageNotFoundException
 import dev.reprator.language.modal.LanguageEntity
 import dev.reprator.language.modal.LanguageModal
+import dev.reprator.language.module
 import dev.reprator.language.setUpKoinLanguage
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.di.SchemaDefinition
+import dev.reprator.testModule.di.appTestCoreModule
+import dev.reprator.testModule.di.appTestDBModule
 import dev.reprator.testModule.hitApiWithClient
-import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -21,9 +26,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
@@ -37,20 +39,25 @@ internal class LanguageRouteTest : KoinTest {
         const val LANGUAGE_HINDI = "Hindi"
     }
 
-    private val databaseFactory by inject<DatabaseFactory>()
+    private val databaseFactory by inject<AppDatabaseFactory>()
     private val languageRepository by inject<LanguageRepository>()
 
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
 
-        setUpKoinLanguage()
-        setupCoreNetworkModule()
-
         modules(
-            module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
-            })
+            appTestCoreModule,
+            koinAppCommonModule(KtorServerExtension.TEST_SERVER!!.environment.config),
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule,
+            koinAppNetworkClientModule
+        )
+        setUpKoinLanguage()
+        
+        KtorServerExtension.TEST_SERVER!!.application.module()
     }
 
     @BeforeEach
@@ -76,7 +83,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Add new language And Verify from db by id for existence`(): Unit = runBlocking {
         val resultBody = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(resultBody)
 
@@ -88,7 +95,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Failed to add new language, if language already exist`(): Unit = runBlocking {
         val addEnglishLanguageResponse = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         val resultBody = addEnglishLanguageResponse.body
         Assertions.assertNotNull(addEnglishLanguageResponse.body)
@@ -97,7 +104,7 @@ internal class LanguageRouteTest : KoinTest {
 
         val addAgainEnglishLanguageResponse = languageClient<FailDTOResponse> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Error.GenericError
+        } as AppResult.Error.GenericError
 
         Assertions.assertNotNull(addAgainEnglishLanguageResponse.message)
     }
@@ -111,7 +118,7 @@ internal class LanguageRouteTest : KoinTest {
             }
         }
 
-        val resultBody = languageClient<List<LanguageModal.DTO>>(methodName = HttpMethod.Get) as ApiResponse.Success
+        val resultBody = languageClient<List<LanguageModal.DTO>>(methodName = HttpMethod.Get) as AppResult.Success
         Assertions.assertNotNull(resultBody)
 
         Assertions.assertEquals(resultBody.body.size, languageList.size)
@@ -122,14 +129,14 @@ internal class LanguageRouteTest : KoinTest {
     fun `Get language from db by ID, if exist`(): Unit = runBlocking {
         val addResultBody = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(addResultBody)
 
         val findResultBody = languageClient<LanguageModal.DTO>(
             methodName = HttpMethod.Get,
             endPoint = "/${addResultBody.body.id}"
-        ) as ApiResponse.Success
+        ) as AppResult.Success
 
         Assertions.assertNotNull(findResultBody)
         Assertions.assertEquals(findResultBody.body.name, LANGUAGE_ENGLISH)
@@ -142,7 +149,7 @@ internal class LanguageRouteTest : KoinTest {
         val findResultBody = languageClient<FailDTOResponse>(
             endPoint = "/$languageId",
             methodName = HttpMethod.Get
-        ) as ApiResponse.Error.HttpError
+        ) as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.code)
         Assertions.assertNotNull(findResultBody.errorBody)
@@ -152,7 +159,7 @@ internal class LanguageRouteTest : KoinTest {
     fun `Edit language from db by ID, as it exists`(): Unit = runBlocking {
         val addResultBody = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(addResultBody)
         Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.body.name)
@@ -161,7 +168,7 @@ internal class LanguageRouteTest : KoinTest {
 
         val editBody = languageClient<Boolean>(methodName = HttpMethod.Patch, endPoint = "/${addResultBody.body.id}") {
             setBody(LanguageEntity.DTO(addResultBody.body.id, editLanguage))
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertTrue(editBody.body)
         Assertions.assertEquals(editLanguage, languageRepository.language(addResultBody.body.id).name)
@@ -173,7 +180,7 @@ internal class LanguageRouteTest : KoinTest {
 
         val editBody = languageClient<Boolean>(endPoint = "/$languageId", methodName = HttpMethod.Patch) {
             setBody(LanguageEntity.DTO(languageId, "vikram"))
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertFalse(editBody.body)
     }
@@ -182,14 +189,14 @@ internal class LanguageRouteTest : KoinTest {
     fun `Delete language from db by ID, as it exists`(): Unit = runBlocking {
         val addResultBody = languageClient<LanguageModal.DTO> {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(addResultBody.body)
         Assertions.assertEquals(LANGUAGE_ENGLISH, addResultBody.body.name)
 
         val editBody = languageClient<Boolean>(methodName = HttpMethod.Delete, endPoint = "/${addResultBody.body.id}") {
             setBody(LANGUAGE_ENGLISH)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertTrue(editBody.body)
 
@@ -203,7 +210,7 @@ internal class LanguageRouteTest : KoinTest {
         val languageId = 21
 
         val deleteResponse =
-            languageClient<Boolean>(endPoint = "/$languageId", methodName = HttpMethod.Delete) as ApiResponse.Success
+            languageClient<Boolean>(endPoint = "/$languageId", methodName = HttpMethod.Delete) as AppResult.Success
 
         Assertions.assertFalse(deleteResponse.body)
     }

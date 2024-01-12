@@ -17,7 +17,6 @@ dependencies {
 
     implementation(libs.koin.ktor)
 
-    // testing
     testImplementation(libs.test.mockk)
     testImplementation(projects.lib.testModule)
     testImplementation(projects.lib.commonFeatureImpl)

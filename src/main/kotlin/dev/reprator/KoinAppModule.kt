@@ -1,16 +1,14 @@
 package dev.reprator
 
 import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import dev.reprator.commonFeatureImpl.di.APP_RUNNING_PORT_ADDRESS
 import dev.reprator.commonFeatureImpl.di.JWT_SERVICE
-import dev.reprator.country.data.TableCountry
-import dev.reprator.language.data.TableLanguage
-import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import propertyConfig
@@ -43,7 +41,7 @@ fun koinAppModule(applicationEnvironment: ApplicationEnvironment) = module {
 
 }
 
-val koinAppDBModule = module {
+fun koinAppDBModule(callBack: (HikariDataSource, Database) -> Unit) = module {
     single<HikariConfig> {
 
         fun property(property: String): String {
@@ -68,7 +66,5 @@ val koinAppDBModule = module {
 
     }
 
-    single<Array<Table>> {
-        arrayOf(TableLanguage, TableCountry, TableUserIdentity)
-    }
+    single<(HikariDataSource, Database) -> Unit> { callBack }
 }
