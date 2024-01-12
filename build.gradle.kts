@@ -37,6 +37,7 @@ dependencies {
     implementation(projects.api.userIdentity)
 
     implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.logging)
     implementation(libs.ktor.server.config.yaml)
 
     implementation(libs.koin.ktor)
@@ -45,7 +46,6 @@ dependencies {
 
     // testing
     testImplementation(projects.lib.testModule)
-    testImplementation(libs.test.ktor.server)
 }
 
 ktor {

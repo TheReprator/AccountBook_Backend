@@ -10,6 +10,5 @@ fun Application.setupServerPlugin() {
 
     configureJWTAuthentication()
     configureContentNegotiation()
-    configureServerMonitoring()
     configureStatusPage()
 }

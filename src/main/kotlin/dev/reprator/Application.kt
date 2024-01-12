@@ -38,6 +38,7 @@ fun Application.module() {
     val dbInstance by inject<AppDatabaseFactory>()
     dbInstance.connect()
 
+    configureServerMonitoring()
     setupServerPlugin()
 
 
