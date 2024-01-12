@@ -20,16 +20,6 @@ sealed class AppResult<out T> {
         ) : Error<E>()
 
         /**
-         * Represent SerializationExceptions.
-         * @param message Detail exception message
-         * @param errorMessage Formatted error message
-         */
-        data class SerializationError(
-            val message: String?,
-            val errorMessage: String?,
-        ) : Error<Nothing>()
-
-        /**
          * Represent other exceptions.
          * @param message Detail exception message
          * @param errorMessage Formatted error message

@@ -36,7 +36,7 @@ class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
     }
 
     override fun afterEach(context: ExtensionContext?) {
-            TEST_SERVER?.stop(100, 100)
+        TEST_SERVER?.stop(100, 100)
     }
 }
 

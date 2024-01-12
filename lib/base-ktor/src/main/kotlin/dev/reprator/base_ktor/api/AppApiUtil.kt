@@ -3,6 +3,7 @@ package dev.reprator.base_ktor.api
 import dev.reprator.base.beans.APIS
 import dev.reprator.base.beans.API_HOST_IDENTIFIER
 import dev.reprator.base.usecase.AppResult
+import dev.reprator.base.usecase.FailDTOResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -26,6 +27,13 @@ suspend inline fun <reified T> HttpClient.safeRequest(
             errorBody = exception.response.body(),
             errorMessage = "Status Code: ${exception.response.status.value} - API Key Missing",
         )
+    } catch (exception: OwnServerErrorException) {
+        println("vikramTest:: ApiError:: OwnServerErrorException:: "+ exception.message)
+        AppResult.Error.HttpError(
+            code = exception.errorModal.statusCode,
+            errorMessage = exception.errorModal.error,
+            errorBody = exception.message
+        )
     } catch (exception: HttpExceptions) {
         println("vikramTest:: ApiError:: HttpExceptions:: "+ exception.response.body())
         AppResult.Error.HttpError(
@@ -47,4 +55,10 @@ class HttpExceptions(
     cachedResponseText: String,
 ) : ResponseException(response, cachedResponseText) {
     override val message: String = "Status: ${response.status}" + " Failure: $failureReason"
+}
+
+class OwnServerErrorException(
+    val errorModal: FailDTOResponse,
+) : Exception(){
+    override val message: String = "Status: ${errorModal.statusCode}" + " Failure: ${errorModal.error}"
 }

@@ -9,12 +9,13 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureJWTAuthentication() {
 
-    val jwtService by inject<JwtTokenService>()
+
 
     authentication {
 
         jwt {
 
+            val jwtService by this@configureJWTAuthentication.inject<JwtTokenService>()
             realm = jwtService.jwtConfiguration.realm
 
             verifier(jwtService.jwtVerifier)
