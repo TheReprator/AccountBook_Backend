@@ -1,7 +1,7 @@
 package dev.reprator.userIdentity.modal
 
-import dev.reprator.core.usecase.AppEntityValidator
-import dev.reprator.core.util.constants.LENGTH_OTP
+import dev.reprator.base.beans.LENGTH_OTP
+import dev.reprator.base.usecase.AppEntityValidator
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import java.lang.NumberFormatException
 

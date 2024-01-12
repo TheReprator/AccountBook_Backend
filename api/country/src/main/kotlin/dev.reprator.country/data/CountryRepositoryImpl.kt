@@ -1,7 +1,7 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.util.AppMapper
-import dev.reprator.core.util.dbConfiguration.dbQuery
+import dev.reprator.base.mapper.AppMapper
+import dev.reprator.base_ktor.util.dbConfiguration.dbQuery
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
 import dev.reprator.country.modal.CountryEntity

@@ -1,5 +1,7 @@
 package dev.reprator.splash.controller
 
+import dev.reprator.base.beans.UPLOAD_FOLDER_SPLASH
+import dev.reprator.base.usecase.AppResult
 import dev.reprator.core.util.api.ApiResponse
 import dev.reprator.core.util.constants.UPLOAD_FOLDER_SPLASH
 import dev.reprator.language.domain.LanguageFacade
@@ -40,7 +42,7 @@ internal class SplashController : KoinTest {
             setupCoreNetworkModule()
             modules(
                 module {
-                factory(named(UPLOAD_FOLDER_SPLASH)) { "splashFileDirectory" }
+                factory(named(UPLOAD_FOLDER_SPLASH)) { "../splashFileDirectory" }
             })
         }
 
@@ -53,7 +55,7 @@ internal class SplashController : KoinTest {
         } returns langList
 
 
-        val response = hitApiWithClient<SplashModal>(koinApp.koin, ENDPOINT_SPLASH, HttpMethod.Get) as ApiResponse.Success
+        val response = hitApiWithClient<SplashModal>(koinApp.koin, ENDPOINT_SPLASH, HttpMethod.Get) as AppResult.Success
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(langList.size, response.body.languageList.size)

@@ -1,6 +1,6 @@
 package dev.reprator.country.controller
 
-import dev.reprator.core.util.respondWithResult
+import dev.reprator.base_ktor.util.respondWithResult
 import dev.reprator.country.domain.IllegalCountryException
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryEntity.Companion.mapToModal

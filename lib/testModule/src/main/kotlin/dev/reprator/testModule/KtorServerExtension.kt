@@ -1,8 +1,8 @@
 package dev.reprator.testModule
 
-import dev.reprator.core.util.api.safeRequest
-import dev.reprator.core.util.constants.APIS
-import dev.reprator.core.util.constants.API_BASE_URL
+import dev.reprator.base.beans.APIS
+import dev.reprator.base.beans.API_BASE_URL
+import dev.reprator.base_ktor.api.safeRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,10 +18,8 @@ import org.koin.core.Koin
 
 class KtorServerExtension : BeforeEachCallback, AfterEachCallback {
 
-
     companion object {
-
-        private var TEST_SERVER: NettyApplicationEngine ?= null
+        var TEST_SERVER: NettyApplicationEngine ?= null
     }
 
     override fun beforeEach(context: ExtensionContext?) {

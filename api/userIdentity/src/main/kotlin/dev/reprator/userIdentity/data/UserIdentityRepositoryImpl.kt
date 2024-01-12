@@ -1,7 +1,7 @@
 package dev.reprator.userIdentity.data
 
-import dev.reprator.core.util.dbConfiguration.dbQuery
-import dev.reprator.core.util.logger.AppLogger
+import dev.reprator.base.action.AppLogger
+import dev.reprator.base_ktor.util.dbConfiguration.dbQuery
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.userIdentity.data.mapper.UserIdentityResponseRegisterMapper
@@ -9,7 +9,6 @@ import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import dev.reprator.userIdentity.domain.InvalidTokenException
 import dev.reprator.userIdentity.modal.*
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.joda.time.DateTime
 
 class UserIdentityRepositoryImpl(

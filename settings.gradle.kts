@@ -16,8 +16,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "AccountBook"
 
+include(":lib:commonFeatureImpl")
+include(":lib:base")
+include(":lib:base-ktor")
+
 include(":lib:testModule")
-include(":lib:core")
+
 include(":api:language")
 include(":api:splash")
 include(":api:country")

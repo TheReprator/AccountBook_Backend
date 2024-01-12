@@ -1,6 +1,6 @@
 package dev.reprator.language.controller
 
-import dev.reprator.core.util.respondWithResult
+import dev.reprator.base_ktor.util.respondWithResult
 import dev.reprator.language.modal.LanguageEntity.DTO.Companion.mapToModal
 import dev.reprator.language.modal.validateLanguageId
 import dev.reprator.language.modal.validateLanguageName

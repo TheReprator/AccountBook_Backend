@@ -1,7 +1,7 @@
 package dev.reprator.userIdentity.domain
 
-import dev.reprator.core.usecase.JwtTokenService
-import dev.reprator.core.util.constants.LENGTH_OTP
+import dev.reprator.base.action.JwtTokenService
+import dev.reprator.base.beans.LENGTH_OTP
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.*
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator

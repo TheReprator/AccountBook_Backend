@@ -1,7 +1,7 @@
 package dev.reprator.language.data
 
-import dev.reprator.core.util.AppMapper
-import dev.reprator.core.util.dbConfiguration.dbQuery
+import dev.reprator.base.mapper.AppMapper
+import dev.reprator.base_ktor.util.dbConfiguration.dbQuery
 import dev.reprator.language.domain.IllegalLanguageException
 import dev.reprator.language.domain.LanguageNotFoundException
 import dev.reprator.language.modal.LanguageModal

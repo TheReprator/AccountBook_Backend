@@ -1,6 +1,6 @@
 package dev.reprator.language
 
-import dev.reprator.core.util.AppMapper
+import dev.reprator.base.mapper.AppMapper
 import dev.reprator.language.controller.LanguageController
 import dev.reprator.language.controller.LanguageControllerImpl
 import dev.reprator.language.data.LanguageRepositoryImpl

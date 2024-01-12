@@ -1,59 +1,47 @@
 package dev.reprator
 
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
+import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
+import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
+import dev.reprator.commonFeatureImpl.setupServerPlugin
+import dev.reprator.country.controller.routeCountry
 import dev.reprator.country.setUpKoinCountry
+import dev.reprator.language.controller.routeLanguage
 import dev.reprator.language.setUpKoinLanguage
+import dev.reprator.splash.controller.routeSplash
+import dev.reprator.userIdentity.controller.routeUserIdentity
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import dev.reprator.plugins.*
 import dev.reprator.userIdentity.setUpKoinUserIdentityModule
-import io.ktor.http.*
-import io.ktor.server.plugins.cors.routing.*
-import org.koin.ktor.ext.get
+import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
-import org.koin.logger.SLF4JLogger
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
 
     install(Koin) {
-        SLF4JLogger()
-        modules(koinAppModule(this@module.environment), koinAppDBModule, koinAppNetworkModule)
+        modules(koinAppModule(this@module.environment), koinAppCommonModule(this@module.environment.config),
+            koinAppLateInitializationModule(), koinAppDBModule, koinAppCommonDBModule, koinAppNetworkClientModule)
+
         setUpKoinLanguage()
         setUpKoinCountry()
         setUpKoinUserIdentityModule()
     }
 
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Get)
-        allowMethod(HttpMethod.Post)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader(HttpHeaders.ContentType)
-        allowHeader(HttpHeaders.AccessControlAllowOrigin)
-        // header("any header") if you want to add any header
-        allowCredentials = true
-        allowNonSimpleContentTypes = true
-        anyHost()
-    }
 
-    val dbInstance by inject<DatabaseFactory>()
+    val dbInstance by inject<AppDatabaseFactory>()
     dbInstance.connect()
 
-    install(ShutDownUrl.ApplicationCallPlugin) {
-        dbInstance.close()
-        shutDownUrl = "/shutdown"
-        exitCodeSupplier = { 0 }
-    }
+    setupServerPlugin()
 
-    configureJWTAuthentication()
-    configureMonitoring()
-    configureContentNegotiation()
-    configureRouting()
+
+    routing {
+        routeCountry()
+        routeLanguage()
+        routeSplash()
+        routeUserIdentity()
+    }
 }

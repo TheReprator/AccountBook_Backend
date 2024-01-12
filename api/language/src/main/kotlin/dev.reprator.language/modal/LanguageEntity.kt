@@ -1,6 +1,6 @@
 package dev.reprator.language.modal
 
-import dev.reprator.core.usecase.AppEntityValidator
+import dev.reprator.base.usecase.AppEntityValidator
 import dev.reprator.language.domain.IllegalLanguageException
 
 typealias LanguageId = Int
@@ -26,6 +26,8 @@ interface LanguageEntity {
 
                     if(name.isNotEmpty())
                         name.validateLanguageName()
+                    else
+                        throw IllegalLanguageException()
 
                     return DTO(0, name)
                 }

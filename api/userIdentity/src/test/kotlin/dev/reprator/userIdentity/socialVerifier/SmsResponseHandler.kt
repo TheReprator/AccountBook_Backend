@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.socialVerifier
 
-import dev.reprator.testModule.MockClientResponseHandler
+import dev.reprator.testModule.clientUtility.MockClientResponseHandler
 import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*

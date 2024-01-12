@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.socialVerifier
 
-import dev.reprator.core.util.logger.AppLogger
+import dev.reprator.base.action.AppLogger
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.errorResponse
 import dev.reprator.testModule.setupCoreNetworkModule

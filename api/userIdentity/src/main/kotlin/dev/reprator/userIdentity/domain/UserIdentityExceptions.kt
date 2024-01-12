@@ -1,6 +1,6 @@
 package dev.reprator.userIdentity.domain
 
-import dev.reprator.core.exception.StatusCodeException
+import dev.reprator.base_ktor.exception.StatusCodeException
 
 class UserIdentityEmptyException(message: String = "Empty UserInfo list", cause: Throwable? = null) : StatusCodeException.Empty(message, cause)
 class UserIdentityNotFoundException(message: String = "User didn't exist", cause: Throwable? = null) : StatusCodeException.NotFound(message, cause)
