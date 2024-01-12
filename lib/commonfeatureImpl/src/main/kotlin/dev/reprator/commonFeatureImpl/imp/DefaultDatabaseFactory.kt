@@ -3,7 +3,9 @@ package dev.reprator.commonFeatureImpl.imp
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import dev.reprator.base.action.AppDatabaseFactory
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DefaultDatabaseFactory(dbConfig: HikariConfig, private val tableList: Array<Table>) : AppDatabaseFactory {
@@ -22,6 +24,6 @@ class DefaultDatabaseFactory(dbConfig: HikariConfig, private val tableList: Arra
     }
 
     override fun close() {
-       // dataSource.close()
+        dataSource.close()
     }
 }

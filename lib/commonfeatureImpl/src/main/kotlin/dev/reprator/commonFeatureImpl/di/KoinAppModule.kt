@@ -36,11 +36,11 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import org.koin.java.KoinJavaComponent.inject
 import propertyConfig
 
 private const val MILLISECONDS = 1000L
 const val JWT_SERVICE = "appJwtRealm"
+const val KEY_SERVICE_SHUTDOWN = "shutDownUrl"
 const val APP_PLUGIN_CUSTOM_LIST = "appCustomPlugin"
 const val APP_RUNNING_PORT_ADDRESS = "appRunningAddress"
 
@@ -56,6 +56,10 @@ fun koinAppCommonModule(config: ApplicationConfig) = module {
         config.propertyConfig(
             VERIFICATION_SMS_PHONE_APIKEY
         )
+    }
+
+    factory(named(KEY_SERVICE_SHUTDOWN)) {
+        config.propertyConfig("ktor.deployment.$KEY_SERVICE_SHUTDOWN.url")
     }
 
     factory(named(VERIFICATION_SMS_PHONE_USERID)) {
