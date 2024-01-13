@@ -1,11 +1,12 @@
 package dev.reprator.userIdentity.data
 
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
 import dev.reprator.country.modal.CountryModal
-import dev.reprator.testModule.TestDatabaseFactory
-import dev.reprator.testModule.setupCoreNetworkModule
+import dev.reprator.testModule.di.SchemaDefinition
+import dev.reprator.testModule.di.appTestDBModule
 import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -19,15 +20,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 import java.util.stream.Stream
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class TableUserIdentityEntityTest : KoinTest {
 
     companion object {
@@ -44,16 +41,17 @@ internal class TableUserIdentityEntityTest : KoinTest {
         )
     }
 
-    private val databaseFactory by inject<DatabaseFactory>()
+    private val databaseFactory by inject<AppDatabaseFactory>()
 
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
-        setupCoreNetworkModule()
         modules(
-            module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
-            })
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule,
+        )
     }
 
     @BeforeEach

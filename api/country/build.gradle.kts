@@ -19,6 +19,7 @@ dependencies {
 
     // testing
     testImplementation(projects.lib.testModule)
+    testImplementation(projects.lib.commonFeatureImpl)
 }
 
 tasks {

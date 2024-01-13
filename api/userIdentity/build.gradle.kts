@@ -24,7 +24,7 @@ dependencies {
 
     // testing
     testImplementation(projects.lib.testModule)
-    testImplementation(libs.test.coroutine)
+    testImplementation(projects.lib.commonFeatureImpl)
 }
 
 tasks {

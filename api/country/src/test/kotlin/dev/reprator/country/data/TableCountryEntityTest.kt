@@ -1,10 +1,12 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
 import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.modal.CountryModal
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.di.SchemaDefinition
+import dev.reprator.testModule.di.appTestDBModule
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteAll
@@ -18,15 +20,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 import java.util.stream.Stream
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
 internal class TableCountryEntityTest : KoinTest {
 
@@ -77,15 +75,17 @@ internal class TableCountryEntityTest : KoinTest {
         )
     }
 
-    private val databaseFactory by inject<DatabaseFactory>()
+    private val databaseFactory by inject<AppDatabaseFactory>()
 
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
         modules(
-            module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
-            })
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule,
+        )
     }
 
     @BeforeEach
@@ -220,7 +220,7 @@ internal class TableCountryEntityTest : KoinTest {
 
     @ParameterizedTest
     @MethodSource("validUpdateCountryInput")
-    fun `update country by id`( countryInfo: CountryEntity.DTO) {
+    fun `update country by id`(countryInfo: CountryEntity.DTO) {
         val inputCountry = CountryEntity.DTO("India", 91, "IN")
 
         val insertedCountry = transaction {
@@ -250,7 +250,7 @@ internal class TableCountryEntityTest : KoinTest {
 
     @ParameterizedTest
     @MethodSource("inValidUpdateCountryInput")
-    fun `failed to update country by id, due to invalid inputs`( countryInfo: CountryEntity.DTO) {
+    fun `failed to update country by id, due to invalid inputs`(countryInfo: CountryEntity.DTO) {
         val inputCountry = CountryEntity.DTO("India", 91, "IN")
 
         val insertedCountry = transaction {

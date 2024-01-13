@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
-
 class SmsResponseHandler: MockClientResponseHandler {
     override fun handleRequest(
         scope: MockRequestHandleScope,
@@ -37,6 +36,13 @@ class SmsResponseHandler: MockClientResponseHandler {
     }
 }
 
+internal fun MockRequestHandleScope.errorResponse(): HttpResponseData {
+    return respond(
+        content = "",
+        status = HttpStatusCode.BadRequest,
+        headers = headersOf(HttpHeaders.ContentType, "application/json")
+    )
+}
 
 object MockedApiResponseSMS {
     const val FOR_INVALID = """

@@ -14,7 +14,7 @@ CREATE TABLE `user_login_data`
     `phoneOtp`          integer                                 ,
     `isphoneverified`   boolean                                 DEFAULT false,
     `usertype`          ENUM ('admin', 'owner', 'employee')     DEFAULT 'owner',
-    `refreshtoken`      VARCHAR(255)                            ,
+    `refreshtoken`      VARCHAR(1000)                            ,
     `creationtime`      TIMESTAMP                               DEFAULT CURRENT_DATE,
     `updatetime`        TIMESTAMP                               DEFAULT CURRENT_DATE,
     `otp_count`         integer                                 not null default 0,
