@@ -36,11 +36,11 @@ fun appTestDBModule(callBack: (HikariDataSource, Database) -> Unit)  = module {
 
         HikariConfig().apply {
             driverClassName = "org.h2.Driver"
-            jdbcUrl = "jdbc:h2:mem:db${UUID.randomUUID()}"
             username = "root"
             password = "password"
+            jdbcUrl = "jdbc:h2:mem:db${UUID.randomUUID()};MODE=MYSQL"
             maximumPoolSize = 2
-            isAutoCommit = false
+            isAutoCommit = true
             validate()
         }
     }

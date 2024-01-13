@@ -1,5 +1,7 @@
 package dev.reprator.userIdentity.data
 
+import dev.reprator.modals.user.UserIdentityId
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.*
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder

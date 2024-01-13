@@ -1,6 +1,7 @@
 package dev.reprator.userIdentity.controller
 
 import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.base.action.AppLogger
 import dev.reprator.base.beans.LENGTH_OTP
 import dev.reprator.base.usecase.AppResult
 import dev.reprator.commonFeatureImpl.di.JWT_SERVICE
@@ -11,15 +12,15 @@ import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_ACCESS
 import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_REFRESH
 import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
-import dev.reprator.country.modal.CountryEntity
 import dev.reprator.country.setUpKoinCountry
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.testModule.*
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestCoreModule
 import dev.reprator.testModule.di.appTestDBModule
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
-import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
@@ -31,9 +32,9 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.Ignore
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -44,6 +45,7 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
+import java.util.concurrent.TimeUnit
 
 @ExtendWith(KtorServerExtension::class)
 internal class UserIdentityRouteTest : KoinTest {
@@ -58,6 +60,7 @@ internal class UserIdentityRouteTest : KoinTest {
     private val databaseFactory by inject<AppDatabaseFactory>()
     private val controller by inject<UserIdentityController>()
     private val countryController by inject<CountryController>()
+    private val logger by inject<AppLogger>()
 
     @JvmField
     @RegisterExtension
@@ -98,6 +101,9 @@ internal class UserIdentityRouteTest : KoinTest {
 
     @BeforeEach
     fun clearDatabase() {
+        TOKEN_ACCESS = ""
+        TOKEN_REFRESH = ""
+
         databaseFactory.connect()
 
         transaction {
@@ -119,7 +125,7 @@ internal class UserIdentityRouteTest : KoinTest {
 
     @Test
     fun `Register a user as new user, for valid country id, with otp being sent by server to client successfully`() =
-        runBlocking {
+        runTest {
 
             val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
             
@@ -131,12 +137,13 @@ internal class UserIdentityRouteTest : KoinTest {
             Assertions.assertEquals(1, userRegisterResponse.body.userId)
 
             val userFullModal = controller.getUserById(1)
+            logger.e { "Vikram:: Register:: $userFullModal" }
             Assertions.assertEquals(LENGTH_OTP, userFullModal.phoneOtp.toString().length)
             Assertions.assertEquals(1, userFullModal.otpCount)
         }
 
     @Test
-    fun `Generate otp and send, when user exist in db`() = runBlocking {
+    fun `Generate otp and send, when user exist in db`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -152,11 +159,12 @@ internal class UserIdentityRouteTest : KoinTest {
         Assertions.assertTrue(generateOtp.body)
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
+        logger.e { "Vikram:: Generate otp and send:: $userFullModal" }
         Assertions.assertEquals(2, userFullModal.otpCount)
     }
 
     @Test
-    fun `Failed to Generate otp as user didn't exist in db`() = runBlocking {
+    fun `Failed to Generate otp as user didn't exist in db`() = runTest {
 
         val generateOtp = userIdentityClient<Boolean>(ACCOUNT_OTP_GENERATE, HttpMethod.Patch) {
             setBody(FormDataContent(Parameters.build {
@@ -168,7 +176,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `Verify user with otp, when user exist in db`() = runBlocking {
+    fun `Verify user with otp, when user exist in db`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -176,7 +184,8 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-
+        logger.e { "Vikram:: Verify user with otp:: $userFullModal" }
+        
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -190,7 +199,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `Failed to verify user with otp as otp didn't match in db for user`() = runBlocking {
+    fun `Failed to verify user with otp as otp didn't match in db for user`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -198,7 +207,8 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-
+        logger.e { "Vikram:: failed to Verify user with otp:: $userFullModal" }
+        
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, 3534543))
         } as AppResult.Error.HttpError
@@ -207,7 +217,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `Failed to add new user, for invalid country id`(): Unit = runBlocking {
+    fun `Failed to add new user, for invalid country id`(): Unit = runTest {
         val addCountryResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
             setBody(INPUT_COUNTRY_INVALID_COUNTRY)
         }
@@ -217,7 +227,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `update access and refresh token, if user is logged in successful`() = runBlocking {
+    fun `update access and refresh token, if user is logged in successful`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -225,7 +235,8 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-
+        logger.e { "Vikram:: update access and refresh token:: $userFullModal" }
+        
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -242,7 +253,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    fun `logout user, successfully, if token is valid`() = runBlocking {
+    fun `logout user, successfully, if token is valid`() = runTest {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -250,7 +261,8 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-
+        logger.e { "Vikram:: logout user, successfully:: $userFullModal" }
+        
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -264,7 +276,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    @Disabled
+    @Timeout(value = 6, unit = TimeUnit.SECONDS)
     fun `logout user, failed, as token is expired after 7 second for testing`() = runBlocking {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
@@ -273,7 +285,8 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-
+        logger.e { "Vikram:: logout user, failed:: $userFullModal" }
+        
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -281,11 +294,11 @@ internal class UserIdentityRouteTest : KoinTest {
         TOKEN_ACCESS = verifyOtp.body.accessToken
         TOKEN_REFRESH = verifyOtp.body.refreshToken
 
-        delay(60_000)
+        delay(3000)
         val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT)
 
         Assertions.assertTrue(logoutModal is AppResult.Error)
-        Assertions.assertEquals(401, (logoutModal as AppResult.Error.HttpError).code)
+        Assertions.assertEquals(HttpStatusCode.Unauthorized.value, (logoutModal as AppResult.Error.HttpError).code)
     }
 }
 

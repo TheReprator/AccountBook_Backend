@@ -13,6 +13,7 @@ java {
 dependencies {
     implementation(projects.lib.base)
     implementation(projects.lib.baseKtor)
+    implementation(projects.modals)
 
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)

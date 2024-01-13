@@ -1,9 +1,11 @@
 package dev.reprator.userIdentity.modal
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import dev.reprator.country.modal.CountryModal
-import dev.reprator.country.modal.CountryModal.DTO.Companion.emptyCountryModal
-import dev.reprator.userIdentity.data.USER_CATEGORY
+import dev.reprator.modals.country.CountryModal
+import dev.reprator.modals.country.CountryModal.DTO.Companion.emptyCountryModal
+import dev.reprator.modals.user.PhoneNumber
+import dev.reprator.modals.user.USER_CATEGORY
+import dev.reprator.modals.user.UserIdentityId
 import org.joda.time.DateTime
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityRegisterModal.DTO::class)
@@ -14,27 +16,6 @@ interface UserIdentityRegisterModal  {
     data class DTO (
         override val userId: UserIdentityId
     ) : UserIdentityRegisterModal
-}
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityOTPModal.DTO::class)
-interface UserIdentityOTPModal {
-    val userId: UserIdentityId
-    val phoneNumber: PhoneNumber
-    val isPhoneVerified: Boolean
-    val id: CountryModal.DTO
-    val refreshToken: String
-    val accessToken: String
-    val userType: USER_CATEGORY
-
-    data class DTO (
-        override val userId: UserIdentityId,
-        override val phoneNumber: PhoneNumber,
-        override val isPhoneVerified: Boolean,
-        override val id: CountryModal.DTO,
-        override val refreshToken: String,
-        override val accessToken: String,
-        override val userType: USER_CATEGORY
-    ) : UserIdentityOTPModal
 }
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = UserIdentityFullModal.DTO::class)

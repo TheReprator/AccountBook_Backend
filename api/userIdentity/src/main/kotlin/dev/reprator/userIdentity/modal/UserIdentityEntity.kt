@@ -2,21 +2,21 @@ package dev.reprator.userIdentity.modal
 
 import dev.reprator.base.beans.LENGTH_OTP
 import dev.reprator.base.usecase.AppEntityValidator
+import dev.reprator.modals.country.CountryId
+import dev.reprator.modals.user.PhoneNumber
+import dev.reprator.modals.user.UserIdentityId
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import java.lang.NumberFormatException
 
-typealias PhoneNumber = String
-typealias PhoneCountryCodeId = Int
-typealias UserIdentityId = Int
 typealias UserPhoneOTP = Int
 
 interface UserIdentityRegisterEntity {
     val phoneNumber: PhoneNumber
-    val countryId: PhoneCountryCodeId
+    val countryId: CountryId
 
     data class DTO (
         override val phoneNumber: PhoneNumber,
-        override val countryId: PhoneCountryCodeId
+        override val countryId: CountryId
     ) : UserIdentityRegisterEntity, AppEntityValidator<DTO> {
 
         override fun validate(): DTO {

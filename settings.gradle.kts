@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "AccountBook"
 
+include(":modals")
 include(":lib:commonFeatureImpl")
 include(":lib:base")
 include(":lib:base-ktor")

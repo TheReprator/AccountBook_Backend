@@ -4,6 +4,8 @@ import dev.reprator.base.action.AppLogger
 import dev.reprator.base_ktor.util.dbConfiguration.dbQuery
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
+import dev.reprator.modals.user.UserIdentityId
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.data.mapper.UserIdentityResponseRegisterMapper
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import dev.reprator.userIdentity.domain.InvalidTokenException

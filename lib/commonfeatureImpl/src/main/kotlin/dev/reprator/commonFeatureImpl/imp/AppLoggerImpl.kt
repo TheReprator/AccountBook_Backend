@@ -34,7 +34,7 @@ class AppLoggerImpl : AppLogger {
         if (m.find()) {
             tag = m.replaceAll("")
         }
-        return tag
+        return "$tag:(${element.lineNumber})"
     }
 
     private fun log(

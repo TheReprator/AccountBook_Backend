@@ -1,4 +1,4 @@
-package dev.reprator.country.modal
+package dev.reprator.modals.country
 
 interface CountryModal : CountryEntity {
     val id: CountryId

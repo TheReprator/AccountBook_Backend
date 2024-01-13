@@ -7,9 +7,13 @@ interface JwtTokenService {
 
     companion object {
         const val JWT_USER_ID = "userId"
-        private const val HOUR_1 = 60 * 60 * 1_000L
-        private const val tokenExpiration: Long = 12 * HOUR_1   // 1 day
-        private const val refreshTokenExpiration: Long = 2 * HOUR_1 // 2 day
+        private const val SECOND_1 = 1_000L
+        private const val MINUTE_1 = 60 * SECOND_1
+        private const val HOUR_1 = 60 * MINUTE_1
+        //private const val tokenExpiration: Long = 12 * HOUR_1   // 1 day
+        //private const val refreshTokenExpiration: Long = 2 * HOUR_1 // 2 day
+        private const val tokenExpiration: Long = 1 * SECOND_1   // 1 day
+        private const val refreshTokenExpiration: Long =  2 * SECOND_1 // 2 day
     }
 
     val jwtConfiguration: JWTConfiguration

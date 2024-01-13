@@ -10,6 +10,7 @@ java {
 }
 
 dependencies {
+    implementation(projects.modals)
     implementation(projects.lib.base)
     implementation(projects.lib.baseKtor)
 

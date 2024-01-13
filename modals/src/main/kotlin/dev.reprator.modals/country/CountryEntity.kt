@@ -1,7 +1,6 @@
-package dev.reprator.country.modal
+package dev.reprator.modals.country
 
 import dev.reprator.base.usecase.AppEntityValidator
-import dev.reprator.country.domain.IllegalCountryException
 
 typealias CountryId = Int
 typealias CountryName = String

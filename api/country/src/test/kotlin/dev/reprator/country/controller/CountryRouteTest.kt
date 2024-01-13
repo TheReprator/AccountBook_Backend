@@ -8,11 +8,11 @@ import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
 import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
-import dev.reprator.country.domain.CountryNotFoundException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryModal
 import dev.reprator.country.module
 import dev.reprator.country.setUpKoinCountry
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.country.CountryModal
+import dev.reprator.modals.country.CountryNotFoundException
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestCoreModule

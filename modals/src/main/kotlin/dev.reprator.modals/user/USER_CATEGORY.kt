@@ -1,4 +1,4 @@
-package dev.reprator.userIdentity.data
+package dev.reprator.modals.user
 
 enum class USER_CATEGORY(val userType: String) {
     admin("admin"),

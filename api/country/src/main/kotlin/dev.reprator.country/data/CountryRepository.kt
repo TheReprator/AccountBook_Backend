@@ -1,8 +1,8 @@
 package dev.reprator.country.data
 
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryId
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.country.CountryId
+import dev.reprator.modals.country.CountryModal
 
 interface CountryRepository {
 

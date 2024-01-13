@@ -1,10 +1,10 @@
 package dev.reprator.country.controller
 
 import dev.reprator.base_ktor.util.respondWithResult
-import dev.reprator.country.domain.IllegalCountryException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryEntity.Companion.mapToModal
-import dev.reprator.country.modal.validateCountryIsoCode
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.country.CountryEntity.Companion.mapToModal
+import dev.reprator.modals.country.IllegalCountryException
+import dev.reprator.modals.country.validateCountryIsoCode
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

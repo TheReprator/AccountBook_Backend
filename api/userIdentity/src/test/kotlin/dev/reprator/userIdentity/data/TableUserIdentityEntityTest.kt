@@ -4,10 +4,11 @@ import dev.reprator.base.action.AppDatabaseFactory
 import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.data.TableCountryEntity
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.CountryModal
+import dev.reprator.modals.user.USER_CATEGORY
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestDBModule
-import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterEntity
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*

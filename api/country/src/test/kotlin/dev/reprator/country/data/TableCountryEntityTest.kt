@@ -2,8 +2,8 @@ package dev.reprator.country.data
 
 import dev.reprator.base.action.AppDatabaseFactory
 import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.country.CountryModal
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestDBModule
