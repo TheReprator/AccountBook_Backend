@@ -30,7 +30,6 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
 internal class LanguageRouteTest : KoinTest {
 
@@ -57,7 +56,6 @@ internal class LanguageRouteTest : KoinTest {
             },
             koinAppCommonDBModule,
         )
-
 
         KtorServerExtension.TEST_SERVER!!.application.module()
     }

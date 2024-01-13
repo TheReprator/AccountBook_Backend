@@ -56,6 +56,7 @@ internal class SplashController : KoinTest {
             },
             koinAppCommonDBModule, ownModule
         )
+
         KtorServerExtension.TEST_SERVER!!.application.module()
     }
 

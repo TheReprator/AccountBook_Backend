@@ -15,8 +15,6 @@ import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import kotlin.math.sin
-
 
 val appTestCoreModule = module {
     single<Int>(named(APP_RUNNING_PORT_ADDRESS)) {
