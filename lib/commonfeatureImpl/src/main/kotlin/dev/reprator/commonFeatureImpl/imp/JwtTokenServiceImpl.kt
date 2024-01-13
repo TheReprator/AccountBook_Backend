@@ -13,6 +13,8 @@ private const val JWT_RANDOM_UUID = "randomUUID"
 
 class JwtTokenServiceImpl(
     override val jwtConfiguration: JWTConfiguration,
+    private val timeExpirationAccessToken: Long,
+    private val timeExpirationRefreshToken: Long,
     private val isUserValid:(Int) -> Boolean
 ) : JwtTokenService {
 
@@ -24,11 +26,9 @@ class JwtTokenServiceImpl(
         .withExpiresAt(Date(System.currentTimeMillis() + time))
         .sign(Algorithm.HMAC256(jwtConfiguration.secret))
 
-    override suspend fun generateAccessToken(userId: String, expirationPeriod: Long) =
-        createJWTToken(userId, expirationPeriod)
+    override suspend fun generateAccessToken(userId: String) = createJWTToken(userId, timeExpirationAccessToken)
 
-    override suspend fun generateRefreshToken(userId: String, expirationPeriod: Long) =
-        createJWTToken(userId, expirationPeriod)
+    override suspend fun generateRefreshToken(userId: String) = createJWTToken(userId, timeExpirationRefreshToken)
 
     override val jwtVerifier: JWTVerifier = JWT.require(Algorithm.HMAC256(jwtConfiguration.secret))
         .withAudience(jwtConfiguration.audience)
@@ -50,15 +50,6 @@ class JwtTokenServiceImpl(
         } catch (exception: Exception) {
             null
         }
-//        return try {
-//            val fullModal = userController.getUserById(userId.toInt())
-//            if(fullModal.refreshToken.trim().isNotEmpty())
-//                JWTPrincipal(credential.payload)
-//            else
-//                null
-//        } catch (exception: Exception) {
-//            null
-//        }
     }
 
     override suspend fun isTokenValid(token: String): Pair<Boolean, Int> {

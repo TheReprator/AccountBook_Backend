@@ -39,10 +39,13 @@ import org.koin.dsl.module
 import propertyConfig
 
 private const val MILLISECONDS = 1000L
-const val JWT_SERVICE = "appJwtRealm"
 const val KEY_SERVICE_SHUTDOWN = "shutDownUrl"
 const val APP_PLUGIN_CUSTOM_LIST = "appCustomPlugin"
 const val APP_RUNNING_PORT_ADDRESS = "appRunningAddress"
+
+const val JWT_SERVICE = "appJwtRealm"
+const val APP_JWT_TOKEN_ACCESS = "appJwtAccess"
+const val APP_JWT_TOKEN_REFRESH = "appJwtRefresh"
 
 fun koinAppCommonModule(config: ApplicationConfig) = module {
 
@@ -76,6 +79,14 @@ fun koinAppCommonModule(config: ApplicationConfig) = module {
         {true}
     }
 
+    single<Long>(named(APP_JWT_TOKEN_ACCESS)) {
+        12 * JwtTokenService.HOUR_1_MILLISECONDS
+    }
+
+    single<Long>(named(APP_JWT_TOKEN_REFRESH)) {
+        24 * JwtTokenService.HOUR_1_MILLISECONDS
+    }
+
     single<JwtTokenService> {
         val property: (String) -> String = {
             config.propertyConfig("jwt.$it")
@@ -83,7 +94,7 @@ fun koinAppCommonModule(config: ApplicationConfig) = module {
         val jwtConfiguration =
             JWTConfiguration(property("secret"), property("audience"), property("issuer"), property("realm"))
 
-        JwtTokenServiceImpl(jwtConfiguration, get(named(JWT_SERVICE)))
+        JwtTokenServiceImpl(jwtConfiguration,get(named(APP_JWT_TOKEN_ACCESS)), get(named(APP_JWT_TOKEN_REFRESH)), get(named(JWT_SERVICE)))
     }
 }
 

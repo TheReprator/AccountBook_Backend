@@ -19,6 +19,7 @@ import dev.reprator.testModule.*
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestCoreModule
 import dev.reprator.testModule.di.appTestDBModule
+import dev.reprator.testModule.di.appTestOverrideModule
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.UserIdentityOtpEntity
@@ -60,7 +61,6 @@ internal class UserIdentityRouteTest : KoinTest {
     private val databaseFactory by inject<AppDatabaseFactory>()
     private val controller by inject<UserIdentityController>()
     private val countryController by inject<CountryController>()
-    private val logger by inject<AppLogger>()
 
     @JvmField
     @RegisterExtension
@@ -76,6 +76,7 @@ internal class UserIdentityRouteTest : KoinTest {
             appTestDBModule { hikariDataSource, _ ->
                 SchemaDefinition.createSchema(hikariDataSource)
             },
+            appTestOverrideModule,
             koinAppCommonDBModule,
             module {
                 singleOf(::SMScodeGeneratorTestImpl) bind SMScodeGenerator::class
@@ -137,7 +138,7 @@ internal class UserIdentityRouteTest : KoinTest {
             Assertions.assertEquals(1, userRegisterResponse.body.userId)
 
             val userFullModal = controller.getUserById(1)
-            logger.e { "Vikram:: Register:: $userFullModal" }
+
             Assertions.assertEquals(LENGTH_OTP, userFullModal.phoneOtp.toString().length)
             Assertions.assertEquals(1, userFullModal.otpCount)
         }
@@ -159,7 +160,7 @@ internal class UserIdentityRouteTest : KoinTest {
         Assertions.assertTrue(generateOtp.body)
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: Generate otp and send:: $userFullModal" }
+
         Assertions.assertEquals(2, userFullModal.otpCount)
     }
 
@@ -184,8 +185,7 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: Verify user with otp:: $userFullModal" }
-        
+
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -207,8 +207,7 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: failed to Verify user with otp:: $userFullModal" }
-        
+
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, 3534543))
         } as AppResult.Error.HttpError
@@ -235,8 +234,7 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: update access and refresh token:: $userFullModal" }
-        
+
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -261,8 +259,7 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: logout user, successfully:: $userFullModal" }
-        
+
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -277,7 +274,7 @@ internal class UserIdentityRouteTest : KoinTest {
 
     @Test
     @Timeout(value = 6, unit = TimeUnit.SECONDS)
-    fun `logout user, failed, as token is expired after 7 second for testing`() = runBlocking {
+    fun `logout user, failed, as token is expired after 5 second`() = runBlocking {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
         val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
@@ -285,8 +282,7 @@ internal class UserIdentityRouteTest : KoinTest {
         } as AppResult.Success
 
         val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
-        logger.e { "Vikram:: logout user, failed:: $userFullModal" }
-        
+
         val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
@@ -294,11 +290,33 @@ internal class UserIdentityRouteTest : KoinTest {
         TOKEN_ACCESS = verifyOtp.body.accessToken
         TOKEN_REFRESH = verifyOtp.body.refreshToken
 
-        delay(3000)
+        delay(5000)
         val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT)
 
         Assertions.assertTrue(logoutModal is AppResult.Error)
         Assertions.assertEquals(HttpStatusCode.Unauthorized.value, (logoutModal as AppResult.Error.HttpError).code)
+    }
+
+    @Test
+    @Timeout(value = 6, unit = TimeUnit.SECONDS)
+    fun `logout user, if access token is invalid or expired but have valid access token`() = runBlocking {
+
+        val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)
+        val userRegisterResponse = userIdentityClient<UserIdentityRegisterModal>(ACCOUNT_REGISTER) {
+            setBody(INPUT_COUNTRY_VALID_COUNTRY(countryInserted.id))
+        } as AppResult.Success
+
+        val userFullModal = controller.getUserById(userRegisterResponse.body.userId)
+
+        val verifyOtp = userIdentityClient<UserIdentityOTPModal>(ACCOUNT_OTP_VERIFY) {
+            setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
+        } as AppResult.Success
+
+        TOKEN_REFRESH = verifyOtp.body.refreshToken
+
+        val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT) as AppResult.Success
+
+        Assertions.assertTrue(logoutModal.body)
     }
 }
 

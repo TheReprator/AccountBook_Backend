@@ -2,6 +2,9 @@ package dev.reprator.testModule.di
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import dev.reprator.base.action.JwtTokenService
+import dev.reprator.commonFeatureImpl.di.APP_JWT_TOKEN_ACCESS
+import dev.reprator.commonFeatureImpl.di.APP_JWT_TOKEN_REFRESH
 import dev.reprator.commonFeatureImpl.di.APP_PLUGIN_CUSTOM_LIST
 import dev.reprator.commonFeatureImpl.di.APP_RUNNING_PORT_ADDRESS
 import dev.reprator.testModule.AppReflectionTypes
@@ -27,6 +30,17 @@ val appTestCoreModule = module {
 
     single<List<ClientPlugin<Unit>>>(named(APP_PLUGIN_CUSTOM_LIST)) {
         listOf(pluginClientResponseTransformation(getKoin()))
+    }
+}
+
+val appTestOverrideModule = module {
+
+    single<Long>(named(APP_JWT_TOKEN_ACCESS)) {
+        2 * JwtTokenService.SECOND_1
+    }
+
+    single<Long>(named(APP_JWT_TOKEN_REFRESH)) {
+        3 * JwtTokenService.SECOND_1
     }
 }
 
