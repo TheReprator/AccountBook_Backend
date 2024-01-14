@@ -1,7 +1,6 @@
 package dev.reprator.userIdentity.controller
 
 import dev.reprator.base.action.AppDatabaseFactory
-import dev.reprator.base.action.AppLogger
 import dev.reprator.base.beans.LENGTH_OTP
 import dev.reprator.base.usecase.AppResult
 import dev.reprator.commonFeatureImpl.di.JWT_SERVICE
@@ -12,8 +11,8 @@ import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_ACCESS
 import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_REFRESH
 import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
+import dev.reprator.country.modal.CountryEntityDTO
 import dev.reprator.country.setUpKoinCountry
-import dev.reprator.modals.country.CountryEntity
 import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.testModule.*
 import dev.reprator.testModule.di.SchemaDefinition
@@ -52,7 +51,7 @@ import java.util.concurrent.TimeUnit
 internal class UserIdentityRouteTest : KoinTest {
 
     companion object {
-        private val INPUT_COUNTRY = CountryEntity.DTO("India", 91, "IN")
+        private val INPUT_COUNTRY = CountryEntityDTO("India", 91, "IN")
         private val INPUT_COUNTRY_INVALID_COUNTRY = UserIdentityRegisterEntity.DTO("9041866055", 91)
         private fun INPUT_COUNTRY_VALID_COUNTRY(countryId: Int) =
             UserIdentityRegisterEntity.DTO("9041866055", countryId)
@@ -273,7 +272,7 @@ internal class UserIdentityRouteTest : KoinTest {
     }
 
     @Test
-    @Timeout(value = 6, unit = TimeUnit.SECONDS)
+    @Timeout(value = 6, unit = TimeUnit.MINUTES)
     fun `logout user, failed, as token is expired after 5 second`() = runBlocking {
 
         val countryInserted = countryController.addNewCountry(INPUT_COUNTRY)

@@ -1,80 +1,15 @@
 package dev.reprator.modals.country
 
-import dev.reprator.base.usecase.AppEntityValidator
-
 typealias CountryId = Int
 typealias CountryName = String
 typealias CountryCallingCode = Int
 typealias CountryShortCode = String
 
+
 interface CountryEntity {
     val name: CountryName
     val callingCode: CountryCallingCode
     val shortCode: CountryShortCode
-
-    companion object {
-        fun Map<String, String>?.mapToModal(): DTO = object: AppEntityValidator<DTO> {
-
-            val data = this@mapToModal ?: throw IllegalCountryException()
-
-            val name:String by data.withDefault { "" }
-            val code: String by data.withDefault { "0" }
-            val shortCode:String by data.withDefault { "" }
-
-            override fun validate(): DTO {
-                if(name.isNotEmpty())
-                    validateCountryName(name)
-
-                if(shortCode.isNotEmpty())
-                    validateCountryShortCode(shortCode)
-
-                if(0 != code.toInt())
-                    code.validateCountryIsoCode()
-
-                return DTO(name, code.toInt(), shortCode)
-            }
-
-        }.validate()
-    }
-
-    data class DTO (
-        override val name: CountryName,
-        override val callingCode: CountryCallingCode,
-        override val shortCode: CountryShortCode
-    ) : CountryEntity, AppEntityValidator<DTO> {
-
-        override fun validate(): DTO {
-            validateCountryName(name)
-            validateCountryShortCode(shortCode)
-            callingCode.toString().validateCountryIsoCode()
-
-            return this
-        }
-    }
 }
 
-fun validateCountryName(countryName: CountryName) {
-    if(countryName.isBlank()) {
-        throw IllegalCountryException()
-    }
 
-    if(3 >= countryName.length) {
-        throw IllegalCountryException()
-    }
-}
-
-fun validateCountryShortCode(countryShortCode: CountryShortCode) {
-    if(countryShortCode.isBlank()) {
-        throw IllegalCountryException()
-    }
-}
-
-fun String?.validateCountryIsoCode(): CountryCallingCode {
-    val countryCode = this?.toIntOrNull() ?: throw IllegalCountryException()
-
-    if(0 >= countryCode) {
-        throw IllegalCountryException()
-    }
-
-    return countryCode
-}

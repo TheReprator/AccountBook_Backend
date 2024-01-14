@@ -8,6 +8,5 @@ java {
 }
 
 dependencies {
-    implementation(projects.lib.base)
-    implementation(projects.lib.baseKtor)
+    implementation(libs.ktor.server.serialization.jackson)
 }

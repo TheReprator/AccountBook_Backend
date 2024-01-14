@@ -51,6 +51,7 @@ fun pluginClientResponseAuth(koin: Koin, httpClientConfig: HttpClientConfig<*>) 
 
                 val refreshResultWrapper =
                     httpClient.safeRequest<UserIdentityOTPModal>(apiType = APIS.INTERNAL_APP, attributes = attributes) {
+                        markAsRefreshTokenRequest()
                         url {
                             method = HttpMethod.Post
                             path("/accounts/refreshToken")

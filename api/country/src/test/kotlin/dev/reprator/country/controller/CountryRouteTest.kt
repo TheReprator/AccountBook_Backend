@@ -8,11 +8,11 @@ import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
 import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
+import dev.reprator.country.domain.CountryNotFoundException
+import dev.reprator.country.modal.CountryEntityDTO
 import dev.reprator.country.module
 import dev.reprator.country.setUpKoinCountry
-import dev.reprator.modals.country.CountryEntity
 import dev.reprator.modals.country.CountryModal
-import dev.reprator.modals.country.CountryNotFoundException
 import dev.reprator.testModule.KtorServerExtension
 import dev.reprator.testModule.di.SchemaDefinition
 import dev.reprator.testModule.di.appTestCoreModule
@@ -34,7 +34,7 @@ import org.koin.test.junit5.KoinTestExtension
 internal class CountryRouteTest : KoinTest {
 
     companion object {
-        private val INPUT_COUNTRY = CountryEntity.DTO("India",91,"IN")
+        private val INPUT_COUNTRY = CountryEntityDTO("India",91,"IN")
     }
 
     private val databaseFactory by inject<AppDatabaseFactory>()
@@ -120,7 +120,7 @@ internal class CountryRouteTest : KoinTest {
     @Test
     fun `Get all country from db`(): Unit = runBlocking {
         val countryInputList = listOf(INPUT_COUNTRY,
-            CountryEntity.DTO("Pakistan",92,"PAK"))
+            CountryEntityDTO("Pakistan",92,"PAK"))
 
         countryInputList.forEach {
             countryClient<CountryModal.DTO>{
@@ -168,7 +168,7 @@ internal class CountryRouteTest : KoinTest {
 
         Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.body.callingCode)
 
-        val changedRequestBody = CountryEntity.DTO("United Arab Emirates",971,"UAE")
+        val changedRequestBody = CountryEntityDTO("United Arab Emirates",971,"UAE")
 
         val editResponse = countryClient<Boolean>(methodName = HttpMethod.Put, endPoint = "/${addResultBody.body.id}"){
             contentType(ContentType.Application.Json)

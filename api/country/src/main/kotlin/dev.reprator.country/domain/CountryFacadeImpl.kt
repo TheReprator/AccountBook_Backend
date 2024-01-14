@@ -1,7 +1,6 @@
 package dev.reprator.country.domain
 
 import dev.reprator.country.data.CountryRepository
-import dev.reprator.modals.country.CountryEmptyException
 import dev.reprator.modals.country.CountryEntity
 import dev.reprator.modals.country.CountryId
 import dev.reprator.modals.country.CountryModal

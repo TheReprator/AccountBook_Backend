@@ -1,4 +1,4 @@
-package dev.reprator.modals.country
+package dev.reprator.country.domain
 
 import dev.reprator.base_ktor.exception.StatusCodeException
 
