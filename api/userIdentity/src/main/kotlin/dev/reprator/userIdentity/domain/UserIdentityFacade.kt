@@ -1,5 +1,7 @@
 package dev.reprator.userIdentity.domain
 
+import dev.reprator.modals.user.UserIdentityId
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.*
 
 interface UserIdentityFacade {

@@ -11,14 +11,15 @@ java {
 }
 
 dependencies {
+    implementation(projects.lib.base)
+    implementation(projects.lib.baseKtor)
     implementation(projects.api.language)
 
     implementation(libs.koin.ktor)
 
-    // testing
-    testImplementation(libs.test.ktor.server)
     testImplementation(libs.test.mockk)
     testImplementation(projects.lib.testModule)
+    testImplementation(projects.lib.commonFeatureImpl)
 }
 
 tasks {

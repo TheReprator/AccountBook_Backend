@@ -1,7 +1,7 @@
 package dev.reprator.userIdentity.controller
 
-import dev.reprator.core.usecase.JwtTokenService.Companion.JWT_USER_ID
-import dev.reprator.core.util.respondWithResult
+import dev.reprator.base.action.JwtTokenService.Companion.JWT_USER_ID
+import dev.reprator.base_ktor.util.respondWithResult
 import dev.reprator.userIdentity.domain.IllegalUserIdentityException
 import dev.reprator.userIdentity.domain.InvalidTokenException
 import dev.reprator.userIdentity.modal.UserIdentityOtpEntity

@@ -1,10 +1,11 @@
 package dev.reprator.country.controller
 
-import dev.reprator.core.util.respondWithResult
+import dev.reprator.base_ktor.util.respondWithResult
 import dev.reprator.country.domain.IllegalCountryException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryEntity.Companion.mapToModal
+import dev.reprator.country.modal.CountryEntityDTO
+import dev.reprator.country.modal.CountryEntityDTO.Companion.mapToModal
 import dev.reprator.country.modal.validateCountryIsoCode
+import dev.reprator.modals.country.CountryEntity
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -30,14 +31,14 @@ fun Routing.routeCountry() {
 
         post {
             val countryInfo =
-                call.receiveNullable<CountryEntity.DTO>()?.validate() ?: throw IllegalCountryException()
+                call.receiveNullable<CountryEntityDTO>()?.validate() ?: throw IllegalCountryException()
             respondWithResult(HttpStatusCode.Created, countryFacade.addNewCountry(countryInfo))
         }
 
         put ("{$INPUT_COUNTRY_ID}") {
             val countryId = call.parameters[INPUT_COUNTRY_ID].validateCountryIsoCode()
 
-            val countryInfo = call.receiveNullable<CountryEntity.DTO>()?.validate() ?: throw IllegalCountryException()
+            val countryInfo = call.receiveNullable<CountryEntityDTO>()?.validate() ?: throw IllegalCountryException()
             respondWithResult(HttpStatusCode.OK, countryFacade.editCountry(countryId, countryInfo))
         }
 

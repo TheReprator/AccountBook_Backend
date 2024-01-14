@@ -1,7 +1,9 @@
 package dev.reprator.userIdentity.domain
 
-import dev.reprator.core.usecase.JwtTokenService
-import dev.reprator.core.util.constants.LENGTH_OTP
+import dev.reprator.base.action.JwtTokenService
+import dev.reprator.base.beans.LENGTH_OTP
+import dev.reprator.modals.user.UserIdentityId
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.data.UserIdentityRepository
 import dev.reprator.userIdentity.modal.*
 import dev.reprator.userIdentity.socialVerifier.SMScodeGenerator
@@ -18,9 +20,9 @@ class UserIdentityFacadeImpl(
         return repository.addNewUserIdentity(userInfo)
     }
 
-    private suspend fun generateCode(): Int {
-        val random = Random.nextInt(999999)
-        return String.format("%0${LENGTH_OTP}d", random).toInt()
+    private fun generateCode(): Int {
+        val random = Random.nextInt(900000) + 100000
+        return random
     }
 
     override suspend fun generateAndSendOTP(userId: UserIdentityId): Boolean {

@@ -1,9 +1,9 @@
 package dev.reprator.country.domain
 
 import dev.reprator.country.data.CountryRepository
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryId
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.CountryEntity
+import dev.reprator.modals.country.CountryId
+import dev.reprator.modals.country.CountryModal
 
 class CountryFacadeImpl(private val repository: CountryRepository): CountryFacade {
 

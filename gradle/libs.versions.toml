@@ -15,7 +15,7 @@ ktor-server-common = { module = "io.ktor:ktor-server-host-common", version.ref =
 ktor-server-status-page = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor" }
 ktor-server-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
-ktor-server-serialization = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
+ktor-server-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth-jvm", version.ref = "ktor" }

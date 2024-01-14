@@ -1,18 +1,23 @@
 package dev.reprator.country.controller
 
-import dev.reprator.core.usecase.FailDTOResponse
-import dev.reprator.core.util.api.ApiResponse
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.base.usecase.AppResult
+import dev.reprator.base.usecase.FailDTOResponse
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
+import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
+import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
 import dev.reprator.country.data.CountryRepository
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.domain.CountryNotFoundException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.country.modal.CountryEntityDTO
+import dev.reprator.country.module
 import dev.reprator.country.setUpKoinCountry
+import dev.reprator.modals.country.CountryModal
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.di.SchemaDefinition
+import dev.reprator.testModule.di.appTestCoreModule
+import dev.reprator.testModule.di.appTestDBModule
 import dev.reprator.testModule.hitApiWithClient
-import dev.reprator.testModule.setupCoreNetworkModule
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
@@ -21,22 +26,18 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
 internal class CountryRouteTest : KoinTest {
 
     companion object {
-        private val INPUT_COUNTRY = CountryEntity.DTO("India",91,"IN")
+        private val INPUT_COUNTRY = CountryEntityDTO("India",91,"IN")
     }
 
-    private val databaseFactory by inject<DatabaseFactory>()
+    private val databaseFactory by inject<AppDatabaseFactory>()
     private val countryRepository by inject<CountryRepository>()
 
     @JvmField
@@ -44,11 +45,17 @@ internal class CountryRouteTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
 
         setUpKoinCountry()
-        setupCoreNetworkModule()
         modules(
-            module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
-            })
+            koinAppNetworkClientModule,
+            koinAppCommonModule(KtorServerExtension.TEST_SERVER!!.environment.config),
+            appTestCoreModule,
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule,
+        )
+
+        KtorServerExtension.TEST_SERVER!!.application.module()
     }
 
     @BeforeEach
@@ -74,7 +81,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Add new country And Verify from db by id for existence`(): Unit = runBlocking {
         val response = countryClient<CountryModal.DTO>{
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         val modal = response.body
 
@@ -86,9 +93,9 @@ internal class CountryRouteTest : KoinTest {
     fun `Failed to add new country, for invalid countryCode`(): Unit = runBlocking {
         val addCountryResponse = countryClient<FailDTOResponse>{
             setBody(INPUT_COUNTRY.copy(callingCode = -5))
-        } as ApiResponse.Error
+        } as AppResult.Error
 
-        val resultBodyAgain = addCountryResponse as ApiResponse.Error.HttpError
+        val resultBodyAgain = addCountryResponse as AppResult.Error.HttpError
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, resultBodyAgain.code)
         Assertions.assertNotNull(resultBodyAgain)
     }
@@ -97,14 +104,14 @@ internal class CountryRouteTest : KoinTest {
     fun `Failed to add new country, if country already exist`(): Unit = runBlocking {
         val addCountryResponse = countryClient<CountryModal.DTO>{
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(addCountryResponse)
         Assertions.assertEquals(INPUT_COUNTRY.name, addCountryResponse.body.name)
 
         val resultBodyAgain = countryClient<CountryModal.DTO>{
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Error.HttpError
+        } as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, resultBodyAgain.code)
         Assertions.assertNotNull(resultBodyAgain)
@@ -113,7 +120,7 @@ internal class CountryRouteTest : KoinTest {
     @Test
     fun `Get all country from db`(): Unit = runBlocking {
         val countryInputList = listOf(INPUT_COUNTRY,
-            CountryEntity.DTO("Pakistan",92,"PAK"))
+            CountryEntityDTO("Pakistan",92,"PAK"))
 
         countryInputList.forEach {
             countryClient<CountryModal.DTO>{
@@ -121,7 +128,7 @@ internal class CountryRouteTest : KoinTest {
             }
         }
 
-        val response = countryClient<List<CountryModal.DTO>>(methodName = HttpMethod.Get) as ApiResponse.Success
+        val response = countryClient<List<CountryModal.DTO>>(methodName = HttpMethod.Get) as AppResult.Success
 
         Assertions.assertNotNull(response)
         Assertions.assertEquals(response.body.size, countryInputList.size)
@@ -132,12 +139,12 @@ internal class CountryRouteTest : KoinTest {
     fun `Get country from db by ID, if exist`(): Unit = runBlocking {
         val addResultBody = countryClient<CountryModal.DTO>{
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertNotNull(addResultBody)
 
         val findResultBody = countryClient<CountryModal.DTO>(methodName = HttpMethod.Get,
-            endPoint = "/${addResultBody.body.id}") as ApiResponse.Success
+            endPoint = "/${addResultBody.body.id}") as AppResult.Success
 
         Assertions.assertNotNull(findResultBody)
         Assertions.assertEquals(findResultBody.body.shortCode, INPUT_COUNTRY.shortCode)
@@ -148,7 +155,7 @@ internal class CountryRouteTest : KoinTest {
         val countryId = 90
 
         val findResultBody = countryClient<CountryModal.DTO>(methodName = HttpMethod.Get,
-            endPoint = "/$countryId") as ApiResponse.Error.HttpError
+            endPoint = "/$countryId") as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.NotFound.value, findResultBody.code)
     }
@@ -157,16 +164,16 @@ internal class CountryRouteTest : KoinTest {
     fun `Update full country, as it exists`(): Unit = runBlocking {
         val addResultBody = countryClient<CountryModal.DTO>{
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.body.callingCode)
 
-        val changedRequestBody = CountryEntity.DTO("United Arab Emirates",971,"UAE")
+        val changedRequestBody = CountryEntityDTO("United Arab Emirates",971,"UAE")
 
         val editResponse = countryClient<Boolean>(methodName = HttpMethod.Put, endPoint = "/${addResultBody.body.id}"){
             contentType(ContentType.Application.Json)
             setBody(changedRequestBody)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertTrue(editResponse.body)
         Assertions.assertEquals(changedRequestBody.name, countryRepository.getCountry(addResultBody.body.id).name)
@@ -179,7 +186,7 @@ internal class CountryRouteTest : KoinTest {
         val editResponse = countryClient<FailDTOResponse>(methodName = HttpMethod.Put,
             endPoint = "/$countryId}") {
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Error.HttpError
+        } as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, editResponse.code)
     }
@@ -188,7 +195,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Partial update of a country, as it exists`(): Unit = runBlocking {
         val addCountryResponse = countryClient<CountryModal.DTO> {
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertEquals(INPUT_COUNTRY.callingCode, addCountryResponse.body.callingCode)
 
@@ -196,7 +203,7 @@ internal class CountryRouteTest : KoinTest {
 
         val editResponse = countryClient<Boolean>(methodName = HttpMethod.Patch, endPoint = "/${addCountryResponse.body.id}") {
             setBody(changedRequestBody)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertTrue(editResponse.body)
         Assertions.assertEquals(changedRequestBody.name, countryRepository.getCountry(addCountryResponse.body.id).name)
@@ -230,7 +237,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Partial update of a country failed, for invalid country name`(): Unit = runBlocking {
         val addResultBody = countryClient<CountryModal.DTO> {
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertEquals(INPUT_COUNTRY.callingCode, addResultBody.body.callingCode)
 
@@ -238,7 +245,7 @@ internal class CountryRouteTest : KoinTest {
 
         val editResponse = countryClient<FailDTOResponse>(methodName = HttpMethod.Patch, endPoint = "/${addResultBody.body.id}") {
             setBody(changedRequestBody)
-        } as ApiResponse.Error.HttpError
+        } as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, editResponse.code)
     }
@@ -249,7 +256,7 @@ internal class CountryRouteTest : KoinTest {
 
         val editResponse = countryClient<FailDTOResponse>(methodName = HttpMethod.Patch, endPoint = "/$countryId") {
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Error.HttpError
+        } as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, editResponse.code)
     }
@@ -258,11 +265,11 @@ internal class CountryRouteTest : KoinTest {
     fun `Delete country by ID, as it exists`(): Unit = runBlocking {
         val addResultBody = countryClient<CountryModal.DTO> {
             setBody(INPUT_COUNTRY)
-        } as ApiResponse.Success
+        } as AppResult.Success
 
         Assertions.assertEquals(INPUT_COUNTRY.shortCode, addResultBody.body.shortCode)
 
-        val deleteResponse = countryClient<Boolean>(methodName = HttpMethod.Delete, endPoint = "/${addResultBody.body.id}") as ApiResponse.Success
+        val deleteResponse = countryClient<Boolean>(methodName = HttpMethod.Delete, endPoint = "/${addResultBody.body.id}") as AppResult.Success
 
         Assertions.assertTrue(deleteResponse.body)
 
@@ -275,7 +282,7 @@ internal class CountryRouteTest : KoinTest {
     fun `Delete country by ID got failed, as it didn't exists`(): Unit = runBlocking {
         val countryId = 21
 
-        val deleteResponse = countryClient<FailDTOResponse>(methodName = HttpMethod.Delete, endPoint = "/$countryId") as ApiResponse.Error.HttpError
+        val deleteResponse = countryClient<FailDTOResponse>(methodName = HttpMethod.Delete, endPoint = "/$countryId") as AppResult.Error.HttpError
 
         Assertions.assertEquals(HttpStatusCode.BadRequest.value, deleteResponse.code)
     }

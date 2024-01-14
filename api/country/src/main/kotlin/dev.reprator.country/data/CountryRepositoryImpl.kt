@@ -1,12 +1,10 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.util.AppMapper
-import dev.reprator.core.util.dbConfiguration.dbQuery
+import dev.reprator.base.mapper.AppMapper
+import dev.reprator.base_ktor.util.dbConfiguration.dbQuery
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryId
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 

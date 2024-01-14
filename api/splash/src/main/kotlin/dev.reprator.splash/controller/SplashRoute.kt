@@ -1,7 +1,7 @@
 package dev.reprator.splash.controller
 
-import dev.reprator.core.util.constants.UPLOAD_FOLDER_SPLASH
-import dev.reprator.core.util.respondWithResult
+import dev.reprator.base.beans.UPLOAD_FOLDER_SPLASH
+import dev.reprator.base_ktor.util.respondWithResult
 import dev.reprator.language.domain.LanguageFacade
 import dev.reprator.splash.modal.SplashModal
 import io.ktor.http.*
@@ -26,7 +26,7 @@ fun Routing.routeSplash() {
 
             val fileAsyncResult = async {
                 splashDirectory.listFiles()?.map {
-                    it.absolutePath
+                    it.canonicalPath
                 }.orEmpty()
             }
 

@@ -10,35 +10,25 @@ java {
 }
 
 dependencies {
-    api(libs.ktor.server.core)
-    api(libs.exposed.core)
+    implementation(projects.lib.baseKtor)
+    implementation(projects.lib.base)
+    implementation(projects.lib.commonFeatureImpl)
 
-    // testing
-    api(project(mapOf("path" to ":lib:core")))
+    api(libs.ktor.server.netty)
+    api(libs.ktor.server.core)
+
+    api(libs.exposed.core)
+    implementation(libs.exposed.h2Db)
+
     api(libs.test.junit5)
     api(libs.test.junit5.suite)
     api(libs.test.junit5.runtime)
-    api(libs.test.ktor.server)
     api(libs.test.koin)
     api(libs.test.koin.junit5)
     api(libs.test.kotlin)
 
-    api(libs.ktor.client.auth)
-
     api(libs.ktor.client.mock)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.content.negotiation)
-
-    implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.common)
-    implementation(libs.ktor.server.status.page)
-    implementation(libs.ktor.server.logging)
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.server.serialization)
-
-    implementation(libs.exposed.jdbc)
-    implementation(libs.exposed.hikariCp)
-    implementation(libs.exposed.h2Db)
+    api(libs.test.coroutine)
 }
 
 tasks {

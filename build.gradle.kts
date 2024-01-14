@@ -27,37 +27,26 @@ java {
 }
 
 dependencies {
+    implementation(projects.lib.base)
+    implementation(projects.lib.baseKtor)
+    implementation(projects.lib.commonFeatureImpl)
+
     implementation(projects.api.language)
     implementation(projects.api.splash)
     implementation(projects.api.country)
     implementation(projects.api.userIdentity)
-    implementation(projects.lib.core)
 
-    implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.common)
-    implementation(libs.ktor.server.status.page)
-    implementation(libs.ktor.server.logging)
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.server.serialization)
     implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.logging)
     implementation(libs.ktor.server.config.yaml)
-    implementation(libs.ktor.logback)
-
-    runtimeOnly(libs.exposed.postgres)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.exposed.hikariCp)
 
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger)
-
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.logback)
 
     // testing
     testImplementation(projects.lib.testModule)
-    testImplementation(libs.test.ktor.server)
+   // testImplementation(libs.test.ktor.server)
 }
 
 ktor {

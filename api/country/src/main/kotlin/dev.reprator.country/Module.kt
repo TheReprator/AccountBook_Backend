@@ -1,7 +1,6 @@
 package dev.reprator.country
 
-import dev.reprator.core.util.AppMapper
-
+import dev.reprator.base.mapper.AppMapper
 import dev.reprator.country.controller.CountryController
 import dev.reprator.country.controller.CountryControllerImpl
 import dev.reprator.country.data.CountryRepository

@@ -11,19 +11,21 @@ java {
 }
 
 dependencies {
-    implementation(projects.lib.core)
+    implementation(projects.modals)
+    implementation(projects.lib.base)
+    implementation(projects.lib.baseKtor)
+
     implementation(projects.api.country)
+
     implementation("com.google.api-client:google-api-client:1.35.2")
 
     implementation(libs.exposed.postgres)
-    implementation(libs.test.coroutine)
-
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)
 
     // testing
-    testImplementation(libs.test.ktor.server)
     testImplementation(projects.lib.testModule)
+    testImplementation(projects.lib.commonFeatureImpl)
 }
 
 tasks {

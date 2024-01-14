@@ -7,7 +7,7 @@ import com.google.api.client.http.HttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
-import dev.reprator.core.util.logger.AppLogger
+import dev.reprator.base.action.AppLogger
 import java.util.*
 
 class GoogleTokenVerifier(private val logger: AppLogger) {

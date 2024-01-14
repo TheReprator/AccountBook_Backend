@@ -1,11 +1,11 @@
 package dev.reprator.userIdentity.data.mapper
 
-import dev.reprator.core.util.AppMarkerMapper
+import dev.reprator.base.mapper.AppMarkerMapper
 import dev.reprator.country.data.TableCountryEntity
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.CountryModal
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.data.TableUserIdentity
 import dev.reprator.userIdentity.modal.UserIdentityFullModal
-import dev.reprator.userIdentity.modal.UserIdentityOTPModal
 import dev.reprator.userIdentity.modal.UserIdentityRegisterModal
 import org.jetbrains.exposed.sql.ResultRow
 

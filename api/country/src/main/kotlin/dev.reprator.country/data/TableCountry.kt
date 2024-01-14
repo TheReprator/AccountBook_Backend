@@ -11,7 +11,6 @@ class TableCountryEntity(id: EntityID<Int>) : IntEntity(id) {
     var shortcode by TableCountry.shortcode
 
     companion object : IntEntityClass<TableCountryEntity>(TableCountry)
-
 }
 
 object TableCountry : IntIdTable("country", "id") {

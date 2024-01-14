@@ -1,5 +1,7 @@
 package dev.reprator.userIdentity.controller
 
+import dev.reprator.modals.user.UserIdentityId
+import dev.reprator.modals.user.UserIdentityOTPModal
 import dev.reprator.userIdentity.domain.UserIdentityFacade
 import dev.reprator.userIdentity.modal.*
 

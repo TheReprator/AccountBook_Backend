@@ -2,11 +2,11 @@ package dev.reprator.userIdentity.socialVerifier
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
-import dev.reprator.core.util.api.ApiResponse
-import dev.reprator.core.util.api.safeRequest
-import dev.reprator.core.util.constants.APIS
-import dev.reprator.core.util.constants.LENGTH_OTP
-import dev.reprator.core.util.logger.AppLogger
+import dev.reprator.base.action.AppLogger
+import dev.reprator.base.beans.APIS
+import dev.reprator.base.beans.LENGTH_OTP
+import dev.reprator.base.usecase.AppResult
+import dev.reprator.base_ktor.api.safeRequest
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -26,7 +26,7 @@ class SMScodeGeneratorImpl(private val client: HttpClient, private val attribute
 
 
     override suspend fun sendOtpToMobileNumber(countryCode: Int, phoneNumber: String, messageCode: Int): Boolean {
-        val response: ApiResponse<AuthServiceEntity> = client.safeRequest(apiType= APIS.EXTERNAL_OTP_VERIFICATION, attributes = attributes) {
+        val response: AppResult<AuthServiceEntity> = client.safeRequest(apiType= APIS.EXTERNAL_OTP_VERIFICATION, attributes = attributes) {
             url {
                 method = HttpMethod.Post
                 path(VERIFY_SMS)
@@ -43,9 +43,10 @@ class SMScodeGeneratorImpl(private val client: HttpClient, private val attribute
                 )
             }
         }
-        appLogger.e { "vikramResponseTest:: $response" }
+
+        appLogger.e { "$response" }
         return when (response) {
-            is ApiResponse.Success -> {
+            is AppResult.Success -> {
                 response.body.sent
             }
 

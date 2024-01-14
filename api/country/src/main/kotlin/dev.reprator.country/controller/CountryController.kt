@@ -3,9 +3,7 @@ package dev.reprator.country.controller
 import dev.reprator.country.domain.CountryEmptyException
 import dev.reprator.country.domain.CountryNotFoundException
 import dev.reprator.country.domain.IllegalCountryException
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryId
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.*
 
 interface CountryController  {
 

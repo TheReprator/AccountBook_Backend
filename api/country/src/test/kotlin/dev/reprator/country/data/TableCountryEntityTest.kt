@@ -1,10 +1,12 @@
 package dev.reprator.country.data
 
-import dev.reprator.core.util.dbConfiguration.DatabaseFactory
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
+import dev.reprator.country.modal.CountryEntityDTO
+import dev.reprator.modals.country.CountryModal
 import dev.reprator.testModule.KtorServerExtension
-import dev.reprator.testModule.TestDatabaseFactory
+import dev.reprator.testModule.di.SchemaDefinition
+import dev.reprator.testModule.di.appTestDBModule
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteAll
@@ -18,15 +20,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 import java.util.stream.Stream
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(KtorServerExtension::class)
 internal class TableCountryEntityTest : KoinTest {
 
@@ -34,58 +32,60 @@ internal class TableCountryEntityTest : KoinTest {
 
         @JvmStatic
         fun inValidUpdateCountryInput() = Stream.of(
-            Arguments.of(CountryEntity.DTO("123", 91, "IN")),
+            Arguments.of(CountryEntityDTO("123", 91, "IN")),
         )
 
         @JvmStatic
         fun validUpdateCountryInput() = Stream.of(
-            Arguments.of(CountryEntity.DTO("India", 91, "UAE")),
-            Arguments.of(CountryEntity.DTO("India", 971, "IN")),
-            Arguments.of(CountryEntity.DTO("United Arab Emirate", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("United Arab Emirate", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("India", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("  ", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("dddf", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("India", -1, "IN")),
-            Arguments.of(CountryEntity.DTO("India", 91, "")),
+            Arguments.of(CountryEntityDTO("India", 91, "UAE")),
+            Arguments.of(CountryEntityDTO("India", 971, "IN")),
+            Arguments.of(CountryEntityDTO("United Arab Emirate", 91, "IN")),
+            Arguments.of(CountryEntityDTO("United Arab Emirate", 91, "IN")),
+            Arguments.of(CountryEntityDTO("India", 91, "IN")),
+            Arguments.of(CountryEntityDTO("", 91, "IN")),
+            Arguments.of(CountryEntityDTO("  ", 91, "IN")),
+            Arguments.of(CountryEntityDTO("dddf", 91, "IN")),
+            Arguments.of(CountryEntityDTO("India", -1, "IN")),
+            Arguments.of(CountryEntityDTO("India", 91, "")),
         )
 
         @JvmStatic
         fun validCountryInput() = Stream.of(
-            Arguments.of(CountryEntity.DTO("India", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("   India", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("234234", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("    #d>1", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("India", 1, "IN")),
-            Arguments.of(CountryEntity.DTO("India", 91, "1")),
-            Arguments.of(CountryEntity.DTO("India", 91, "##")),
-            Arguments.of(CountryEntity.DTO("India", 91, "  ##")),
-            Arguments.of(CountryEntity.DTO("India", 91, "  #4")),
+            Arguments.of(CountryEntityDTO("India", 91, "IN")),
+            Arguments.of(CountryEntityDTO("   India", 91, "IN")),
+            Arguments.of(CountryEntityDTO("234234", 91, "IN")),
+            Arguments.of(CountryEntityDTO("    #d>1", 91, "IN")),
+            Arguments.of(CountryEntityDTO("India", 1, "IN")),
+            Arguments.of(CountryEntityDTO("India", 91, "1")),
+            Arguments.of(CountryEntityDTO("India", 91, "##")),
+            Arguments.of(CountryEntityDTO("India", 91, "  ##")),
+            Arguments.of(CountryEntityDTO("India", 91, "  #4")),
         )
 
         @JvmStatic
         fun inValidCountryInput() = Stream.of(
-            Arguments.of(CountryEntity.DTO("", 91, "IN")),
-            Arguments.of(CountryEntity.DTO(" ", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("sd", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("12#", 91, "IN")),
-            Arguments.of(CountryEntity.DTO("India", 0, "IN")),
-            Arguments.of(CountryEntity.DTO("India", -1, "IN")),
-            //Arguments.of(CountryEntity.DTO("India", 91, " ")),
-            Arguments.of(CountryEntity.DTO("", 0, " "))
+            Arguments.of(CountryEntityDTO("", 91, "IN")),
+            Arguments.of(CountryEntityDTO(" ", 91, "IN")),
+            Arguments.of(CountryEntityDTO("sd", 91, "IN")),
+            Arguments.of(CountryEntityDTO("12#", 91, "IN")),
+            Arguments.of(CountryEntityDTO("India", 0, "IN")),
+            Arguments.of(CountryEntityDTO("India", -1, "IN")),
+            //Arguments.of(CountryEntityDTO("India", 91, " ")),
+            Arguments.of(CountryEntityDTO("", 0, " "))
         )
     }
 
-    private val databaseFactory by inject<DatabaseFactory>()
+    private val databaseFactory by inject<AppDatabaseFactory>()
 
     @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
         modules(
-            module {
-                singleOf(::TestDatabaseFactory) bind DatabaseFactory::class
-            })
+            appTestDBModule { hikariDataSource, _ ->
+                SchemaDefinition.createSchema(hikariDataSource)
+            },
+            koinAppCommonDBModule,
+        )
     }
 
     @BeforeEach
@@ -103,7 +103,7 @@ internal class TableCountryEntityTest : KoinTest {
 
     @Test
     fun `Delete country by id`() {
-        val inputCountry = CountryEntity.DTO("India", 91, "IN")
+        val inputCountry = CountryEntityDTO("India", 91, "IN")
 
         val insertedCountry = transaction {
             TableCountryEntity.new {
@@ -138,7 +138,7 @@ internal class TableCountryEntityTest : KoinTest {
 
     @Test
     fun `Get country by id`() {
-        val inputCountry = CountryEntity.DTO("India", 91, "IN")
+        val inputCountry = CountryEntityDTO("India", 91, "IN")
 
         val insertedCountry = transaction {
             TableCountryEntity.new {
@@ -169,12 +169,12 @@ internal class TableCountryEntityTest : KoinTest {
     @Test
     fun `Get all inserted country`() {
         val countryInputList = listOf(
-            CountryEntity.DTO("India", 91, "IN"),
-            CountryEntity.DTO("United Arab Emirates", 971, "UAE")
+            CountryEntityDTO("India", 91, "IN"),
+            CountryEntityDTO("United Arab Emirates", 971, "UAE")
         )
 
         countryInputList.forEach {
-            val inputCountry: CountryEntity.DTO = it
+            val inputCountry: CountryEntityDTO = it
 
             transaction {
                 TableCountryEntity.new {
@@ -197,7 +197,7 @@ internal class TableCountryEntityTest : KoinTest {
     @ParameterizedTest
     @MethodSource("validCountryInput")
     fun `Failed to add, if shortCode, name, iso code is not unique`(
-        inputCountry: CountryEntity.DTO
+        inputCountry: CountryEntityDTO
     ) {
         transaction {
             TableCountryEntity.new {
@@ -220,8 +220,8 @@ internal class TableCountryEntityTest : KoinTest {
 
     @ParameterizedTest
     @MethodSource("validUpdateCountryInput")
-    fun `update country by id`( countryInfo: CountryEntity.DTO) {
-        val inputCountry = CountryEntity.DTO("India", 91, "IN")
+    fun `update country by id`(countryInfo: CountryEntityDTO) {
+        val inputCountry = CountryEntityDTO("India", 91, "IN")
 
         val insertedCountry = transaction {
             TableCountryEntity.new {
@@ -250,8 +250,8 @@ internal class TableCountryEntityTest : KoinTest {
 
     @ParameterizedTest
     @MethodSource("inValidUpdateCountryInput")
-    fun `failed to update country by id, due to invalid inputs`( countryInfo: CountryEntity.DTO) {
-        val inputCountry = CountryEntity.DTO("India", 91, "IN")
+    fun `failed to update country by id, due to invalid inputs`(countryInfo: CountryEntityDTO) {
+        val inputCountry = CountryEntityDTO("India", 91, "IN")
 
         val insertedCountry = transaction {
             TableCountryEntity.new {
@@ -280,7 +280,7 @@ internal class TableCountryEntityTest : KoinTest {
     @ParameterizedTest
     @MethodSource("validCountryInput")
     fun `Tests for the successfull insertion of valid country`(
-        inputCountry: CountryEntity.DTO
+        inputCountry: CountryEntityDTO
     ) {
         val insertedCountry = transaction {
             TableCountryEntity.new {
@@ -301,7 +301,7 @@ internal class TableCountryEntityTest : KoinTest {
     @ParameterizedTest
     @MethodSource("inValidCountryInput")
     fun `Insertion failed to invalid country`(
-        inputCountry: CountryEntity.DTO
+        inputCountry: CountryEntityDTO
     ) {
         assertThrows<ExposedSQLException> {
             transaction {

@@ -1,8 +1,6 @@
 package dev.reprator.country.domain
 
-import dev.reprator.country.modal.CountryEntity
-import dev.reprator.country.modal.CountryId
-import dev.reprator.country.modal.CountryModal
+import dev.reprator.modals.country.*
 
 interface CountryFacade {
 
