@@ -16,9 +16,9 @@ object TableUserIdentity : Table(name="user_login_data") {
     val otpCount = integer("otp_count").default(0)
     val isPhoneVerified = bool("isphoneverified").default(false)
     /*Enable this for testing and comment other*/
-   val userType = enumerationByName<USER_CATEGORY>("usertype", 20, USER_CATEGORY::class).default(USER_CATEGORY.owner)
-//    val userType = customEnumeration("usertype", "USER_CATEGORY", { value ->
-//        USER_CATEGORY.valueOf(value as String) }, { PGEnum("usercategory", it) }).default(USER_CATEGORY.owner)
+   //val userType = enumerationByName<USER_CATEGORY>("usertype", 20, USER_CATEGORY::class).default(USER_CATEGORY.owner)
+    val userType = customEnumeration("usertype", "USER_CATEGORY", { value ->
+        USER_CATEGORY.valueOf(value as String) }, { PGEnum("usercategory", it) }).default(USER_CATEGORY.owner)
     val refreshToken = text("refreshtoken").nullable()
     val creationTime = datetime("creationtime").default(DateTime.now().toDateTimeISO())
     val updateTime = datetime("updatetime").default(DateTime.now().toDateTimeISO())

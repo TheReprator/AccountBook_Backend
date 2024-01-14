@@ -44,7 +44,7 @@ class SMScodeGeneratorImpl(private val client: HttpClient, private val attribute
             }
         }
 
-        appLogger.e { "vikramResponseTest:: $response" }
+        appLogger.e { "$response" }
         return when (response) {
             is AppResult.Success -> {
                 response.body.sent

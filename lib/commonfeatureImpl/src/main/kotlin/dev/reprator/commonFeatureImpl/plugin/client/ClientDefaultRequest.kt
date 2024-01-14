@@ -4,6 +4,7 @@ import dev.reprator.base.beans.*
 import dev.reprator.commonFeatureImpl.di.APP_RUNNING_PORT_ADDRESS
 import io.ktor.client.*
 import io.ktor.client.plugins.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.*
 import org.koin.core.Koin
