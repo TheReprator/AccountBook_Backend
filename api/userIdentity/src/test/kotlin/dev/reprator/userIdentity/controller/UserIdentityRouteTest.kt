@@ -1,14 +1,13 @@
 package dev.reprator.userIdentity.controller
 
 import dev.reprator.base.action.AppDatabaseFactory
+import dev.reprator.base.action.TokenStorage
 import dev.reprator.base.beans.LENGTH_OTP
 import dev.reprator.base.usecase.AppResult
 import dev.reprator.commonFeatureImpl.di.JWT_SERVICE
 import dev.reprator.commonFeatureImpl.di.koinAppCommonDBModule
 import dev.reprator.commonFeatureImpl.di.koinAppCommonModule
 import dev.reprator.commonFeatureImpl.di.koinAppNetworkClientModule
-import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_ACCESS
-import dev.reprator.commonFeatureImpl.plugin.client.TOKEN_REFRESH
 import dev.reprator.country.controller.CountryController
 import dev.reprator.country.data.TableCountry
 import dev.reprator.country.modal.CountryEntityDTO
@@ -60,6 +59,7 @@ internal class UserIdentityRouteTest : KoinTest {
     private val databaseFactory by inject<AppDatabaseFactory>()
     private val controller by inject<UserIdentityController>()
     private val countryController by inject<CountryController>()
+    private val tokenStorage by inject<TokenStorage>()
 
     @JvmField
     @RegisterExtension
@@ -101,9 +101,7 @@ internal class UserIdentityRouteTest : KoinTest {
 
     @BeforeEach
     fun clearDatabase() {
-        TOKEN_ACCESS = ""
-        TOKEN_REFRESH = ""
-
+        tokenStorage.cleaToken()
         databaseFactory.connect()
 
         transaction {
@@ -263,8 +261,7 @@ internal class UserIdentityRouteTest : KoinTest {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
 
-        TOKEN_ACCESS = verifyOtp.body.accessToken
-        TOKEN_REFRESH = verifyOtp.body.refreshToken
+        tokenStorage.updateToken(verifyOtp.body.accessToken, verifyOtp.body.refreshToken)
 
         val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT) as AppResult.Success
 
@@ -286,8 +283,7 @@ internal class UserIdentityRouteTest : KoinTest {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
 
-        TOKEN_ACCESS = verifyOtp.body.accessToken
-        TOKEN_REFRESH = verifyOtp.body.refreshToken
+        tokenStorage.updateToken(verifyOtp.body.accessToken, verifyOtp.body.refreshToken)
 
         delay(5000)
         val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT)
@@ -311,7 +307,7 @@ internal class UserIdentityRouteTest : KoinTest {
             setBody(UserIdentityOtpEntity.DTO(userFullModal.userId, userFullModal.phoneOtp))
         } as AppResult.Success
 
-        TOKEN_REFRESH = verifyOtp.body.refreshToken
+        tokenStorage.updateToken("", verifyOtp.body.refreshToken)
 
         val logoutModal = userIdentityClient<Boolean>(ACCOUNT_LOGOUT) as AppResult.Success
 

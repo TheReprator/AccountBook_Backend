@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
-class SmsResponseHandler: MockClientResponseHandler {
+class SmsResponseHandler : MockClientResponseHandler {
     override fun handleRequest(
         scope: MockRequestHandleScope,
         request: HttpRequestData
@@ -16,18 +16,23 @@ class SmsResponseHandler: MockClientResponseHandler {
             return null
         }
 
-        val formData = (request.body as FormDataContent).formData
-        val numberLength = formData["number"]?.length ?: 0
-        val responseContent= if(10 < numberLength)
-            MockedApiResponseSMS.FOR_VALID
-         else
-            MockedApiResponseSMS.FOR_INVALID
+        val (statusCode, responseContent) = if (!(request.headers.contains("API-Key") && request.headers.contains("User-ID"))) {
+            HttpStatusCode.Forbidden to MockedApiResponseSMS.FOR_INVALID
+        } else {
+            val formData = (request.body as FormDataContent).formData
+            val numberLength = formData["number"]?.length ?: 0
+            val responseContent = if (10 < numberLength)
+                MockedApiResponseSMS.FOR_VALID
+            else
+                MockedApiResponseSMS.FOR_INVALID
 
-        val statusCode= if(10 < numberLength)
-            HttpStatusCode.OK
-         else
-            HttpStatusCode.BadRequest
+            val statusCode = if (10 < numberLength)
+                HttpStatusCode.OK
+            else
+                HttpStatusCode.BadRequest
 
+            statusCode to responseContent
+        }
         return scope.respond(
             content = responseContent,
             status = statusCode,

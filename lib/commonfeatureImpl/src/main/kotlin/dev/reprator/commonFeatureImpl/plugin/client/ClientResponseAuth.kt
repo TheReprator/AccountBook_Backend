@@ -1,6 +1,7 @@
 package dev.reprator.commonFeatureImpl.plugin.client
 
 import dev.reprator.base.action.AppLogger
+import dev.reprator.base.action.TokenStorage
 import dev.reprator.base.beans.APIS
 import dev.reprator.base.beans.API_BASE_URL
 import dev.reprator.base.usecase.AppResult
@@ -15,13 +16,11 @@ import io.ktor.http.*
 import io.ktor.util.*
 import org.koin.core.Koin
 
-var TOKEN_ACCESS: String = ""
-var TOKEN_REFRESH: String = ""
-
 fun pluginClientResponseAuth(koin: Koin, httpClientConfig: HttpClientConfig<*>) {
 
     httpClientConfig.install(Auth) {
         val logger by koin.inject<AppLogger>()
+        val tokenStorage by koin.inject<TokenStorage>()
 
         bearer {
 
@@ -31,18 +30,19 @@ fun pluginClientResponseAuth(koin: Koin, httpClientConfig: HttpClientConfig<*>) 
             }
 
             loadTokens {
-                logger.e { "pluginAuth: loadToken, $TOKEN_ACCESS, $TOKEN_REFRESH" }
-                if (TOKEN_ACCESS.isNotEmpty())
-                    BearerTokens(TOKEN_ACCESS, TOKEN_REFRESH)
+                logger.e { "pluginAuth: loadToken, ${tokenStorage.accessToken}, ${tokenStorage.refresh}" }
+                if (tokenStorage.accessToken.isNotEmpty())
+                    BearerTokens(tokenStorage.accessToken, tokenStorage.refresh)
                 else
                     null
             }
 
             refreshTokens {
-                TOKEN_ACCESS = ""
-                logger.e { "pluginAuth: refreshTokens, $TOKEN_ACCESS, $TOKEN_REFRESH" }
+                tokenStorage.clearAccessToken()
 
-                if (TOKEN_REFRESH.isEmpty()) {
+                logger.e { "pluginAuth: refreshTokens, ${tokenStorage.accessToken}, ${tokenStorage.refresh}" }
+
+                if (tokenStorage.refresh.isEmpty()) {
                     return@refreshTokens null
                 }
 
@@ -58,7 +58,7 @@ fun pluginClientResponseAuth(koin: Koin, httpClientConfig: HttpClientConfig<*>) 
                             setBody(
                                 FormDataContent(
                                     parameters {
-                                        append("accessToken", TOKEN_REFRESH)
+                                        append("accessToken", tokenStorage.refresh)
                                     })
                             )
                         }
@@ -69,15 +69,12 @@ fun pluginClientResponseAuth(koin: Koin, httpClientConfig: HttpClientConfig<*>) 
                 when (refreshResultWrapper) {
                     is AppResult.Success -> {
                         val body = refreshResultWrapper.body
-                        TOKEN_ACCESS = body.accessToken
-                        TOKEN_REFRESH = body.refreshToken
-                        logger.e { "pluginAuth: refreshTokens result :: success: $TOKEN_ACCESS, ::,  $TOKEN_REFRESH " }
-                        BearerTokens(TOKEN_ACCESS, TOKEN_REFRESH)
+                        tokenStorage.updateToken(body.accessToken, body.refreshToken)
+                        BearerTokens(body.accessToken, body.refreshToken)
                     }
 
                     else -> {
-                        TOKEN_REFRESH = ""
-
+                        tokenStorage.cleaToken()
                         null
                     }
                 }

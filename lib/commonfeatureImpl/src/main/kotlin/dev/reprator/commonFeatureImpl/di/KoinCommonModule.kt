@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import dev.reprator.base.action.AppDatabaseFactory
-import dev.reprator.base.action.AppLogger
-import dev.reprator.base.action.JWTConfiguration
-import dev.reprator.base.action.JwtTokenService
+import dev.reprator.base.action.*
 import dev.reprator.base.beans.APP_COROUTINE_SCOPE
 import dev.reprator.base.beans.UPLOAD_FOLDER_SPLASH
 import dev.reprator.base.beans.VERIFICATION_SMS_PHONE_APIKEY
@@ -16,6 +13,7 @@ import dev.reprator.base.beans.VERIFICATION_SMS_PHONE_USERID
 import dev.reprator.commonFeatureImpl.imp.AppLoggerImpl
 import dev.reprator.commonFeatureImpl.imp.DefaultDatabaseFactory
 import dev.reprator.commonFeatureImpl.imp.JwtTokenServiceImpl
+import dev.reprator.commonFeatureImpl.imp.TokenStorageImpl
 import dev.reprator.commonFeatureImpl.plugin.client.pluginClientDefaultRequest
 import dev.reprator.commonFeatureImpl.plugin.client.pluginClientResponseAuth
 import dev.reprator.commonFeatureImpl.plugin.client.pluginClientResponseValidator
@@ -50,6 +48,8 @@ const val APP_JWT_TOKEN_REFRESH = "appJwtRefresh"
 fun koinAppCommonModule(config: ApplicationConfig) = module {
 
     single<AppLogger> { AppLoggerImpl() }
+
+    single<TokenStorage> { TokenStorageImpl() }
 
     factory(named(UPLOAD_FOLDER_SPLASH)) {
         config.propertyConfig(UPLOAD_FOLDER_SPLASH)
