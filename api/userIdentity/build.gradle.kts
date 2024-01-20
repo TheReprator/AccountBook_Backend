@@ -17,8 +17,6 @@ dependencies {
 
     implementation(projects.api.country)
 
-    implementation("com.google.api-client:google-api-client:1.35.2")
-
     implementation(libs.exposed.postgres)
     implementation(libs.exposed.dao)
     implementation(libs.koin.ktor)
