@@ -34,7 +34,7 @@ fun Application.module() {
         modules(koinAppModule(this@module.environment), koinAppCommonModule(this@module.environment.config),
             koinAppLateInitializationModule(), koinAppDBModule { _, database ->
                 transaction(database) {
-                    SchemaUtils.create(TableLanguage, TableCountry, TableUserIdentity)
+                    SchemaUtils.createMissingTablesAndColumns(TableLanguage, TableCountry, TableUserIdentity)
                 }
             }, koinAppCommonDBModule, koinAppNetworkClientModule
         )
