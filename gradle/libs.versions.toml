@@ -6,7 +6,7 @@ logback = "1.4.14"
 exposedVersion = "0.47.0"
 koin = "3.5.3"
 koin-test = "3.5.3"
-junit5 = "5.10.1"
+junit5 = "5.10.2"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -42,7 +42,7 @@ koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin
 
 test-mockk = "io.mockk:mockk:1.13.9"
 test-coroutine = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3"
-test-junit5-suite = "org.junit.platform:junit-platform-suite:1.10.1"
+test-junit5-suite = "org.junit.platform:junit-platform-suite:1.10.2"
 test-junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 test-junit5-runtime= { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
 test-ktor-server ={ module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
