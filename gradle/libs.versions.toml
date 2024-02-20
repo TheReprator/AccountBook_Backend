@@ -35,7 +35,7 @@ exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "e
 exposed-jodatime = { module = "org.jetbrains.exposed:exposed-jodatime", version.ref = "exposedVersion" }
 exposed-h2Db = "com.h2database:h2:2.2.224"
 exposed-hikariCp = "com.zaxxer:HikariCP:5.1.0"
-exposed-postgres = "org.postgresql:postgresql:42.7.1"
+exposed-postgres = "org.postgresql:postgresql:42.7.2"
 
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
