@@ -40,7 +40,7 @@ exposed-postgres = "org.postgresql:postgresql:42.7.2"
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 
-test-mockk = "io.mockk:mockk:1.13.9"
+test-mockk = "io.mockk:mockk:1.13.10"
 test-coroutine = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0"
 test-junit5-suite = "org.junit.platform:junit-platform-suite:1.10.2"
 test-junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
